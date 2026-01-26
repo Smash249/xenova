@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  #app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@utility flex-row-start {
+  @apply flex flex-row items-center justify-start;
+}
+
+@utility flex-row-center {
+  @apply flex flex-row items-center justify-center;
+}
+
+@utility flex-row-evenly {
+  @apply flex flex-row items-center justify-evenly;
+}
+
+@utility flex-row-between {
+  @apply flex flex-row items-center justify-between;
+}
+
+@utility flex-col-start {
+  @apply flex flex-col items-center justify-start;
+}
+
+@utility flex-col-center {
+  @apply flex flex-col items-center justify-center;
+}
+
+@utility flex-col-evenly {
+  @apply flex flex-col items-center justify-evenly;
+}
+
+@utility flex-col-between {
+  @apply flex flex-col items-center justify-between;
+}
