@@ -1,9 +1,7 @@
-<script setup lang="ts">
-import CustomLayout from "@/layout/index.vue"
-</script>
-
 <template>
-  <CustomLayout />
+  <router-view />
 </template>
+
+<script setup lang="ts"></script>
 
 <style scoped></style>

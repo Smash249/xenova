@@ -7,32 +7,27 @@ const routes: RouteRecordRaw[] = [
     redirect: "/dashboard",
     children: [
       {
-        path: "/dashboard",
+        path: "dashboard",
         name: "dashboard",
         component: () => import("@/pages/dashboard/index.vue"),
       },
       {
-        path: "/product",
+        path: "product",
         name: "product",
         component: () => import("@/pages/product/index.vue"),
       },
       {
-        path: "/news",
+        path: "news",
         name: "news",
         component: () => import("@/pages/news/index.vue"),
       },
       {
-        path: "/honor",
-        name: "honor",
-        component: () => import("@/pages/honor/index.vue"),
-      },
-      {
-        path: "/download",
+        path: "download",
         name: "download",
         component: () => import("@/pages/download/index.vue"),
       },
       {
-        path: "/about",
+        path: "about",
         name: "about",
         component: () => import("@/pages/about/index.vue"),
       },
