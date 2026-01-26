@@ -1,13 +1,13 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
-  <div>
-    dashboard
-  </div>
+  <Hero />
+  <Product />
+  <Advantage />
+  <ChooseUs />
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<script setup>
+import Advantage from "./components/Advantage.vue"
+import ChooseUs from "./components/ChooseUs.vue"
+import Hero from "./components/Hero.vue"
+import Product from "./components/Product.vue"
+</script>
