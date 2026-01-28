@@ -1,13 +1,7 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
-  <div>
-    product
-  </div>
+  <div class="min-h-screen">product</div>
 </template>
 
-<style scoped lang="scss">
+<script setup lang="ts"></script>
 
-</style>
+<style scoped lang="scss"></style>

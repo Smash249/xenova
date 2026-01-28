@@ -1,8 +1,10 @@
 <template>
-  <Hero />
-  <Product />
-  <Advantage />
-  <ChooseUs />
+  <div>
+    <Hero />
+    <Product />
+    <Advantage />
+    <ChooseUs />
+  </div>
 </template>
 
 <script setup>
