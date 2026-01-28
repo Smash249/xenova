@@ -1,7 +1,7 @@
 <template>
   <section
     ref="containerRef"
-    class="flex-col-center relative min-h-screen overflow-hidden bg-slate-50 py-24 font-sans select-none"
+    class="flex-col-center relative min-h-screen overflow-hidden bg-slate-50 font-sans select-none"
   >
     <div
       class="pointer-events-none absolute inset-0 z-0 opacity-40"
@@ -46,6 +46,7 @@
         <!-- 左侧-->
         <div class="group perspective-1000 relative">
           <div
+            ref="decorationRef"
             class="anim-decoration absolute -top-4 -left-4 z-20 h-20 w-20 border-t-2 border-l-2 border-blue-600"
           ></div>
           <div
@@ -83,7 +84,7 @@
         </div>
 
         <!-- 右侧-->
-        <div class="relative min-h-100">
+        <div ref="rightSideRef" class="relative min-h-100">
           <div class="space-y-6">
             <div class="relative overflow-hidden">
               <div
@@ -186,30 +187,45 @@ import { computed, nextTick, onMounted, onUnmounted, ref } from "vue"
 
 import { systemConfig } from "@/config/header"
 
-let ctx: gsap.Context
+let ctx: gsap.Context | null = null
 let autoPlayTween: gsap.core.Tween | null = null
 const AUTO_PLAY_TIME = 5
 
 const currentIndex = ref(0)
 const isAnimating = ref(false)
 const containerRef = ref<HTMLElement | null>(null)
+const rightSideRef = ref<HTMLElement | null>(null)
 const progressBarRef = ref<HTMLElement | null>(null)
 const productImageRef = ref<HTMLElement | null>(null)
+const decorationRef = ref<HTMLElement | null>(null)
 
 const currentProduct = computed(() => systemConfig.products[currentIndex.value])
 
 function animateIn() {
+  if (!containerRef.value || !rightSideRef.value || !productImageRef.value) {
+    return
+  }
+
+  const animTexts = rightSideRef.value.querySelectorAll(".anim-text")
+
+  if (animTexts.length === 0) {
+    console.warn("No .anim-text elements found")
+  }
+
   const tl = gsap.timeline({
     onComplete: () => {
       isAnimating.value = false
       startAutoPlay()
     },
   })
+
   tl.set(productImageRef.value, {
     clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)",
     filter: "grayscale(0%) blur(5px)",
   })
-  tl.set(".anim-text", { y: 30, opacity: 0 })
+
+  tl.set(animTexts, { y: 30, opacity: 0 })
+
   tl.to(productImageRef.value, {
     clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
     scale: 1,
@@ -219,7 +235,7 @@ function animateIn() {
   })
 
   tl.to(
-    ".anim-text",
+    animTexts,
     {
       y: 0,
       opacity: 1,
@@ -234,6 +250,12 @@ function animateIn() {
 }
 
 function animateOut() {
+  if (!rightSideRef.value || !productImageRef.value) {
+    return gsap.timeline()
+  }
+
+  const animTexts = rightSideRef.value.querySelectorAll(".anim-text")
+
   const tl = gsap.timeline()
   tl.to(productImageRef.value, {
     clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
@@ -243,7 +265,7 @@ function animateOut() {
     ease: "power2.in",
   })
   tl.to(
-    ".anim-text",
+    animTexts,
     {
       y: -20,
       opacity: 0,
@@ -265,6 +287,7 @@ function manualChangeSlide(dir: number) {
 }
 
 function startAutoPlay() {
+  if (!progressBarRef.value) return
   if (autoPlayTween) autoPlayTween.kill()
   autoPlayTween = gsap.fromTo(
     progressBarRef.value,
@@ -293,9 +316,18 @@ function handleMouseMove(e: MouseEvent) {
   if (!containerRef.value) return
   const x = (e.clientX / window.innerWidth - 0.5) * 2
   const y = (e.clientY / window.innerHeight - 0.5) * 2
-  gsap.to(".parallax-item", {
-    x: (_, target) => x * 30 * parseFloat(target.dataset.depth),
-    y: (_, target) => y * 30 * parseFloat(target.dataset.depth),
+
+  const parallaxItems = containerRef.value.querySelectorAll(".parallax-item")
+
+  gsap.to(parallaxItems, {
+    x: (_, target) => {
+      const depth = parseFloat((target as HTMLElement).dataset.depth || "0")
+      return x * 30 * depth
+    },
+    y: (_, target) => {
+      const depth = parseFloat((target as HTMLElement).dataset.depth || "0")
+      return y * 30 * depth
+    },
     duration: 0.5,
     overwrite: "auto",
   })
@@ -312,21 +344,35 @@ async function switchSlide(newIndex: number) {
 }
 
 onMounted(() => {
-  if (!containerRef.value) return
-  ctx = gsap.context(() => {
-    gsap.from(".anim-decoration", {
-      scale: 0,
-      opacity: 0,
-      duration: 1,
-      stagger: 0.2,
-      ease: "elastic.out(1, 0.5)",
-    })
-    animateIn()
-  }, containerRef.value)
+  nextTick(() => {
+    if (!containerRef.value || !decorationRef.value) return
+
+    ctx = gsap.context(() => {
+      const decorations =
+        containerRef.value!.querySelectorAll(".anim-decoration")
+
+      if (decorations.length > 0) {
+        gsap.from(decorations, {
+          scale: 0,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.2,
+          ease: "elastic.out(1, 0.5)",
+        })
+      }
+
+      animateIn()
+    }, containerRef.value)
+  })
 })
 
 onUnmounted(() => {
-  ctx.revert()
+  if (ctx) {
+    ctx.revert()
+  }
+  if (autoPlayTween) {
+    autoPlayTween.kill()
+  }
 })
 </script>
 
