@@ -17,11 +17,10 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
   ],
-  base: "/xenova/",
+  base: process.env.VITE_BASEPATH || "",
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      vue: "vue/dist/vue.esm-bundler.js",
     },
   },
 })

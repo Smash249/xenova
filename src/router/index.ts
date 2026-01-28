@@ -36,7 +36,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 const router = createRouter({
-  history: createWebHistory("/xenova/"),
+  history: createWebHistory(import.meta.env.VITE_BASEPATH || ""),
   routes,
 })
 
