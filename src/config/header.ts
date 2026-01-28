@@ -21,7 +21,7 @@ export const systemConfig: SystemConfig = {
   navItems: [
     {
       title: "首页",
-      path: "/",
+      path: "/dashboard",
     },
     {
       title: "产品中心",

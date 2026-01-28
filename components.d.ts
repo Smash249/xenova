@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CustomBanner: typeof import('./src/components/customBanner/index.vue')['default']
     HeaderDeskDrawer: typeof import('./src/components/layout/HeaderDeskDrawer.vue')['default']
     HeaderDrawer: typeof import('./src/components/layout/HeaderDrawer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

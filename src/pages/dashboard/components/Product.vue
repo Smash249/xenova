@@ -1,7 +1,7 @@
 <template>
   <section
     ref="containerRef"
-    class="flex-col-center relative min-h-screen overflow-hidden bg-slate-50 py-24 font-sans select-none"
+    class="flex-col-center relative min-h-screen overflow-hidden bg-slate-50 font-sans select-none"
   >
     <div
       class="pointer-events-none absolute inset-0 z-0 opacity-40"

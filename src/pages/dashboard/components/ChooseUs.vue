@@ -1,7 +1,7 @@
 <template>
   <section
     ref="sectionRef"
-    class="relative flex min-h-[90vh] items-center overflow-hidden bg-slate-50 py-24 font-sans"
+    class="relative flex min-h-screen items-center overflow-hidden bg-slate-50 font-sans"
   >
     <div
       class="animate-pulse-slow absolute top-0 left-0 -z-10 h-125 w-125 rounded-full bg-blue-100/60 mix-blend-multiply blur-[100px]"
