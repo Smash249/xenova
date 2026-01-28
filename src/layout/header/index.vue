@@ -38,11 +38,13 @@
         </div>
       </div>
 
-      <nav class="hidden items-center space-x-1 md:flex">
+      <nav
+        class="hidden items-center gap-2 rounded-full bg-gray-100 p-1 md:flex"
+      >
         <div
           v-for="(item, index) in systemConfig.navItems"
           :key="index"
-          class="cursor-pointer rounded-full px-5 py-2 text-base font-bold transition-all duration-300"
+          class="cursor-pointer rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300"
           @click="handelClickItem(item, index)"
           :style="getItemStyle(index)"
         >
@@ -97,15 +99,15 @@ const dynamicTextColor = computed(() => {
 
 function getItemStyle(index) {
   const isActive = activeItem.value === index
-  const p = fadeProgress.value
   if (!isActive) {
     return {
-      color: dynamicTextColor.value,
+      color: "#374151",
       backgroundColor: "transparent",
     }
   }
   return {
-    color: "#d97706",
+    color: "#ffffff",
+    backgroundColor: "#4F61AD",
   }
 }
 
