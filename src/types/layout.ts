@@ -13,7 +13,8 @@ interface SystemConfig {
 
 interface HeaderNavItem {
   title: string
-  path: string
+  path?: string
+  isNav: boolean
 }
 
 interface ProductItem {

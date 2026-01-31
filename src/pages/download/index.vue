@@ -18,27 +18,19 @@
         >
           软件中心
         </h1>
-        <p
-          class="mx-auto max-w-2xl text-lg font-light text-blue-100 drop-shadow-sm"
-        >
-          驱动与软件下载 · 获取最新的技术支持与文档
-        </p>
       </div>
     </div>
 
     <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-      <!-- 面包屑导航 -->
       <nav class="mb-10 flex items-center text-sm text-slate-500">
         <a href="/" class="transition-colors hover:text-blue-600">首页</a>
         <ChevronRight class="mx-2 h-4 w-4" />
         <span class="font-medium text-slate-800">软件中心</span>
       </nav>
 
-      <!-- 搜索与筛选区域 -->
       <div
         class="mb-10 flex flex-col items-center justify-between gap-6 md:flex-row"
       >
-        <!-- Tabs -->
         <div
           class="flex max-w-full overflow-x-auto rounded-xl border border-gray-100 bg-white p-1 shadow-sm"
         >
@@ -57,7 +49,6 @@
           </button>
         </div>
 
-        <!-- 搜索框 -->
         <div class="relative w-full md:w-80">
           <input
             type="text"
@@ -70,7 +61,6 @@
         </div>
       </div>
 
-      <!-- 列表区域 -->
       <div class="space-y-4">
         <div
           v-for="(item, index) in filteredDownloads"
@@ -84,9 +74,7 @@
           <div
             class="flex flex-col justify-between gap-6 md:flex-row md:items-center"
           >
-            <!-- 左侧：图标与信息 -->
             <div class="flex items-start gap-5">
-              <!-- 类型图标 -->
               <div
                 class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl transition-colors duration-300"
                 :class="[
@@ -100,7 +88,6 @@
                 <component :is="getIcon(item.type)" class="h-7 w-7" />
               </div>
 
-              <!-- 文本内容 -->
               <div>
                 <div class="mb-1 flex items-center gap-3">
                   <h3
@@ -108,7 +95,7 @@
                   >
                     {{ item.title }}
                   </h3>
-                  <!-- 热门标签 -->
+
                   <span
                     v-if="item.isPopular"
                     class="rounded-md border border-red-100 bg-red-50 px-2 py-0.5 text-[10px] font-bold tracking-wider text-red-600 uppercase"
@@ -123,7 +110,6 @@
                   {{ item.description }}
                 </p>
 
-                <!-- 元数据 -->
                 <div
                   class="flex items-center gap-4 text-xs font-medium text-slate-400"
                 >
@@ -140,7 +126,6 @@
               </div>
             </div>
 
-            <!-- 右侧：下载按钮 -->
             <div class="flex items-center justify-end">
               <button
                 class="group/btn flex w-full items-center justify-center rounded-xl px-6 py-3 font-medium transition-all duration-300 active:scale-95 md:w-auto"
@@ -161,7 +146,6 @@
         </div>
       </div>
 
-      <!-- 空状态 (当筛选结果为空时) -->
       <div v-if="filteredDownloads.length === 0" class="py-20 text-center">
         <div class="mb-4 inline-flex rounded-full bg-gray-100 p-4">
           <Search class="h-8 w-8 text-gray-400" />
@@ -280,17 +264,4 @@ const getIcon = (type: string) => {
 }
 </script>
 
-<style scoped>
-@keyframes pulse-slow {
-  0%,
-  100% {
-    opacity: 0.8;
-  }
-  50% {
-    opacity: 0.4;
-  }
-}
-.animate-pulse-slow {
-  animation: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-</style>
+<style scoped></style>

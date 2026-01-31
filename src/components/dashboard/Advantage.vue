@@ -1,6 +1,5 @@
 <template>
   <section
-    ref="sectionRef"
     class="flex-col-center relative min-h-screen overflow-hidden bg-slate-50 font-sans select-none"
   >
     <div
@@ -16,7 +15,8 @@
     ></div>
 
     <div class="relative z-10 container mx-auto px-6 lg:px-12">
-      <div class="header-group relative mb-16 translate-y-8 opacity-0">
+      <!-- 移除了初始的 opacity-0 和 translate-y-8 -->
+      <div class="header-group relative mb-16">
         <h2
           class="flex items-center gap-3 text-4xl font-black tracking-tight text-slate-900 md:text-5xl"
         >
@@ -31,12 +31,14 @@
           class="mt-4 h-1 w-24 rounded-full bg-linear-to-r from-blue-600 to-transparent"
         ></div>
       </div>
+
       <div class="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <!-- 移除了初始的 opacity-0 和 translate-y-4 -->
         <button
           v-for="(item, index) in systemConfig.advantages"
           :key="index"
           @click="handleTabClick(index)"
-          class="gsap-tab-btn group relative flex h-32 translate-y-4 cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border opacity-0 transition-all duration-300"
+          class="gsap-tab-btn group relative flex h-32 cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border transition-all duration-300"
           :class="
             activeTab === index
               ? 'z-10 -translate-y-1 border-blue-600 bg-blue-600 shadow-xl shadow-blue-600/30'
@@ -74,19 +76,20 @@
           </span>
         </button>
       </div>
+
       <div
         ref="contentContainerRef"
         class="relative min-h-125 overflow-hidden rounded-2xl border border-slate-100 bg-white"
       >
         <div class="grid h-full grid-cols-1 lg:grid-cols-12">
+          <!-- 移除了初始的 opacity-0 -->
           <div
-            class="left-panel-block group relative h-64 overflow-hidden opacity-0 lg:col-span-5 lg:h-full"
+            class="left-panel-block group relative h-64 overflow-hidden lg:col-span-5 lg:h-full"
           >
             <div
               class="absolute inset-0 z-10 bg-blue-900/10 transition-colors duration-500 group-hover:bg-transparent"
             ></div>
             <img
-              ref="imageRef"
               :src="currentItem?.image"
               :alt="currentItem?.headline"
               class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -98,8 +101,9 @@
             </div>
           </div>
 
+          <!-- 移除了初始的 opacity-0 -->
           <div
-            class="right-panel-block relative flex flex-col justify-center bg-white p-8 opacity-0 lg:col-span-7 lg:p-14"
+            class="right-panel-block relative flex flex-col justify-center bg-white p-8 lg:col-span-7 lg:p-14"
           >
             <span
               class="absolute top-6 right-6 z-0 text-9xl font-black text-slate-50 select-none"
@@ -190,20 +194,28 @@
 
 <script setup lang="ts">
 import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { computed, nextTick, onMounted, onUnmounted, ref } from "vue"
 
 import { systemConfig } from "@/config/header"
 
-gsap.registerPlugin(ScrollTrigger)
 let ctx: gsap.Context
+let timer: number | null = null
 
-const sectionRef = ref<HTMLElement | null>(null)
 const contentContainerRef = ref<HTMLElement | null>(null)
-
 const activeTab = ref(0)
 const isAnimating = ref(false)
 const currentItem = computed(() => systemConfig.advantages[activeTab.value])
+
+function startAutoTab() {
+  if (timer) clearInterval(timer)
+  timer = setInterval(() => {
+    let nextIndex = activeTab.value + 1
+    if (nextIndex >= systemConfig.advantages.length) {
+      nextIndex = 0
+    }
+    handleTabClick(nextIndex)
+  }, 4000)
+}
 
 function parseNumber(str: string) {
   const match = str.match(/\d+(\.\d+)?/)
@@ -224,6 +236,7 @@ function animateContentIn() {
       isAnimating.value = false
     },
   })
+
   tl.set([".left-panel-block", ".right-panel-block"], {
     opacity: 0,
     y: 15,
@@ -270,6 +283,7 @@ async function animateContentOut() {
 async function handleTabClick(index: number) {
   if (activeTab.value === index || isAnimating.value) return
   isAnimating.value = true
+  startAutoTab()
   await animateContentOut()
   activeTab.value = index
   await nextTick()
@@ -277,42 +291,18 @@ async function handleTabClick(index: number) {
 }
 
 onMounted(() => {
-  if (!sectionRef.value) return
   ctx = gsap.context(() => {
-    const masterTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.value,
-        start: "top 70%",
-      },
-    })
-
-    masterTl.to(".header-group", {
-      y: 0,
-      opacity: 1,
-      duration: 0.8,
-      ease: "power3.out",
-    })
-
-    masterTl.to(
-      ".gsap-tab-btn",
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.4,
-        stagger: 0.05,
-        ease: "back.out(1.1)",
-      },
-      "-=0.5"
-    )
-
-    masterTl.add(() => {
-      animateContentIn()
-    }, "-=0.2")
-  }, sectionRef.value)
+    animateContentIn()
+  }, contentContainerRef.value || undefined)
+  startAutoTab()
 })
 
 onUnmounted(() => {
-  ctx.revert()
+  ctx?.revert()
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
 })
 </script>
 
