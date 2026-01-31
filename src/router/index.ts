@@ -27,9 +27,14 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/pages/download/index.vue"),
       },
       {
-        path: "about",
-        name: "about",
-        component: () => import("@/pages/about/index.vue"),
+        path: "honor",
+        name: "honor",
+        component: () => import("@/pages/honor/index.vue"),
+      },
+      {
+        path: "contact",
+        name: "contact",
+        component: () => import("@/pages/contact/index.vue"),
       },
     ],
   },
@@ -37,6 +42,15 @@ const routes: RouteRecordRaw[] = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.VITE_BASEPATH || ""),
+  scrollBehavior(to) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: "smooth",
+      }
+    }
+    return { top: 0 }
+  },
   routes,
 })
 

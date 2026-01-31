@@ -11,7 +11,6 @@
     <div
       class="container mx-auto flex h-full items-center justify-between px-4"
     >
-      <!-- 左侧 Logo -->
       <div class="flex items-center gap-3">
         <div class="relative h-10 w-10 shrink-0">
           <svg class="h-full w-full" fill="none" viewBox="0 0 100 100">
@@ -29,17 +28,9 @@
           <h1 class="text-2xl font-bold tracking-wide text-orange-500">
             星实科技
           </h1>
-          <div
-            :style="{ color: dynamicTextColor }"
-            class="hidden origin-left scale-90 items-center gap-2 text-xs transition-colors md:flex"
-          >
-            <span>创新科技</span>
-            <span>星耀未来</span>
-          </div>
         </div>
       </div>
 
-      <!-- 中间菜单 -->
       <nav
         ref="navRef"
         :style="{
@@ -66,13 +57,12 @@
             color: activeItem === index ? '#ffffff' : dynamicTextColor,
           }"
           class="relative z-10 cursor-pointer rounded-full px-6 py-2.5 text-sm font-medium transition-colors duration-300"
-          @click="handleClickItem(item)"
+          @click="handleClickItem(item, index)"
         >
           {{ item.title }}
         </div>
       </nav>
 
-      <!-- 右侧用户头像 -->
       <div class="hidden items-center gap-3 md:flex">
         <div class="cursor-pointer" @click="toggleDesktopDrawer">
           <img
@@ -99,14 +89,9 @@ const { y: scrollY } = useWindowScroll()
 const { height: windowHeight } = useWindowSize()
 
 const activeItem = ref(-1)
-
 const navRef = ref(null)
 const menuItemsRef = ref([])
-const activeSlider = ref({
-  left: 0,
-  width: 0,
-})
-const showDesktopDrawer = ref(false)
+const activeSlider = ref({ left: 0, width: 0 })
 
 const fadeProgress = computed(() => {
   if (windowHeight.value === 0) return 0
@@ -114,6 +99,7 @@ const fadeProgress = computed(() => {
   const end = windowHeight.value
   return Math.min(Math.max((scrollY.value - start) / (end - start), 0), 1)
 })
+
 const headerOpacity = computed(() => fadeProgress.value * 0.95)
 
 const dynamicTextColor = computed(() => {
@@ -122,7 +108,6 @@ const dynamicTextColor = computed(() => {
   return `rgb(${v}, ${v}, ${v})`
 })
 
-// 更新滑块位置
 function updateSliderPosition(element) {
   if (!element || !navRef.value) return
   const rect = element.getBoundingClientRect()
@@ -133,47 +118,48 @@ function updateSliderPosition(element) {
   }
 }
 
-// 核心逻辑：根据当前路径激活菜单
-function updateActiveByPath(path) {
+function updateActiveByPath() {
   nextTick(() => {
-    const index = systemConfig.navItems.findIndex((item) => item.path === path)
+    const currentPath = route.path
+    const currentHash = route.hash
+
+    const index = systemConfig.navItems.findIndex((item) => {
+      if (item.title === "关于我们") {
+        return currentHash === "#about"
+      }
+      return item.path === currentPath && !currentHash
+    })
+
     if (index !== -1) {
       activeItem.value = index
-      // 确保 DOM 元素存在后再更新滑块
-      if (menuItemsRef.value && menuItemsRef.value[index]) {
+      if (menuItemsRef.value[index]) {
         updateSliderPosition(menuItemsRef.value[index])
       }
     } else {
-      // 可选：如果路径不匹配任何菜单（例如详情页），你可以选择保持原样，或者设为 -1
-      // activeItem.value = -1
+      activeItem.value = -1
     }
   })
 }
 
-function handleClickItem(item) {
-  router.push(item.path)
+function handleClickItem(item, index) {
+  if (item.isNav) {
+    router.push(item.path)
+  } else {
+    router.push("/dashboard#about")
+  }
 }
 
-function toggleDesktopDrawer() {
-  showDesktopDrawer.value = !showDesktopDrawer.value
-}
-
-// 监听路由变化
 watch(
-  () => route.path,
-  (newPath) => {
-    updateActiveByPath(newPath)
+  () => route.fullPath,
+  () => {
+    updateActiveByPath()
   },
   { immediate: true }
 )
 
 onMounted(() => {
   window.addEventListener("resize", () => {
-    if (
-      activeItem.value !== -1 &&
-      menuItemsRef.value &&
-      menuItemsRef.value[activeItem.value]
-    ) {
+    if (activeItem.value !== -1 && menuItemsRef.value[activeItem.value]) {
       updateSliderPosition(menuItemsRef.value[activeItem.value])
     }
   })

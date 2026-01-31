@@ -1,7 +1,7 @@
 <template>
   <section
     ref="sectionRef"
-    class="relative flex min-h-screen items-center overflow-hidden bg-slate-50 font-sans"
+    class="relative flex items-center overflow-hidden bg-slate-50 py-10 font-sans"
   >
     <div
       class="animate-pulse-slow absolute top-0 left-0 -z-10 h-125 w-125 rounded-full bg-blue-100/60 mix-blend-multiply blur-[100px]"
@@ -22,17 +22,6 @@
         <!-- 左侧-->
         <div class="relative z-10 space-y-8">
           <div class="left-content-group">
-            <div class="mb-4 flex items-center gap-2">
-              <span
-                class="gsap-text-reveal text-lg font-bold tracking-widest text-blue-600 uppercase"
-              >
-                ABOUT US
-              </span>
-              <div
-                class="gsap-line h-0.5 w-0 bg-linear-to-r from-blue-600 to-transparent"
-              ></div>
-            </div>
-
             <h2
               class="gsap-text-reveal mb-6 text-4xl leading-tight font-black text-slate-900 lg:text-5xl"
             >

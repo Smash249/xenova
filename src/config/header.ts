@@ -22,22 +22,36 @@ export const systemConfig: SystemConfig = {
     {
       title: "首页",
       path: "/dashboard",
+      isNav: true,
+    },
+    {
+      title: "关于我们",
+      isNav: false,
     },
     {
       title: "产品中心",
       path: "/product",
+      isNav: true,
     },
     {
       title: "企业动态",
       path: "/news",
+      isNav: true,
     },
     {
       title: "下载中心",
       path: "/download",
+      isNav: true,
     },
     {
-      title: "关于我们",
-      path: "/about",
+      title: "荣誉和文化",
+      path: "/honor",
+      isNav: true,
+    },
+    {
+      title: "联系我们",
+      path: "/contact",
+      isNav: true,
     },
   ],
 
