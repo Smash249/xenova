@@ -1,0 +1,49 @@
+@import url("./animation.css");
+
+@import "tailwindcss";
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  #app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@utility flex-row-start {
+  @apply flex flex-row items-center justify-start;
+}
+
+@utility flex-row-center {
+  @apply flex flex-row items-center justify-center;
+}
+
+@utility flex-row-evenly {
+  @apply flex flex-row items-center justify-evenly;
+}
+
+@utility flex-row-between {
+  @apply flex flex-row items-center justify-between;
+}
+
+@utility flex-col-start {
+  @apply flex flex-col items-center justify-start;
+}
+
+@utility flex-col-center {
+  @apply flex flex-col items-center justify-center;
+}
+
+@utility flex-col-evenly {
+  @apply flex flex-col items-center justify-evenly;
+}
+
+@utility flex-col-between {
+  @apply flex flex-col items-center justify-between;
+}

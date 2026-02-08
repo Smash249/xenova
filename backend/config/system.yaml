@@ -1,0 +1,9 @@
+Router:
+  port: 8099
+
+Database:
+  host: localhost
+  port: 5432
+  username: username
+  password: password
+ 

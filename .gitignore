@@ -1,0 +1,59 @@
+# -------------------------------------------------------
+# Node / Frontend
+# -------------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+.local/
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+pnp-debug.yaml
+pnp-lock.yaml
+
+# -------------------------------------------------------
+# Editor / OS
+# -------------------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# -------------------------------------------------------
+# Go build artifacts
+# -------------------------------------------------------
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.cover
+*.prof
+*.testcache
+
+# Go workspace / vendor / build
+bin/
+build/
+vendor/
+**/go.work.sum
+**/go.sum
+
+# -------------------------------------------------------
+# Misc
+# -------------------------------------------------------
+# Add your custom ignores below
+.env
+.env.local
+.env.*.local
+coverage/
+.cache/
