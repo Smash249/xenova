@@ -2,8 +2,10 @@ Router:
   port: 8099
 
 Database:
-  host: localhost
-  port: 5432
-  username: username
-  password: password
+  mysqlConfig:
+    dsn: "root:2495592289@tcp(127.0.0.1:3306)/xenova?charset=utf8mb4&parseTime=True&loc=Local"
+    defaultStringSize: 256
+    disableDatetimePrecision: true
+
+
  
