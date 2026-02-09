@@ -10,18 +10,20 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Smash249/xenova/backend/pkg/middleware"
+	"github.com/Smash249/xenova/backend/pkg/validator"
 	"github.com/Smash249/xenova/backend/router"
 	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
 )
 
 func initRouter() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	e := echo.New()
-	e.Use(middleware.RequestLogger())
+	e.Validator = validator.InitCustomValidator()
+	e.Use(middleware.NewLogger())
 	public := e.Group("/public")
-	private := e.Group("/private")
+	private := e.Group("/private", middleware.NewAuth())
 	router.GroupRouterHubApp.InitRouterHub(public, private)
 	server := &http.Server{
 		Addr:    ":8080",
