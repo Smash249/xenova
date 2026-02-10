@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Smash249/xenova/backend/pkg/utils"
+	"github.com/Smash249/xenova/backend/utils"
 	"github.com/labstack/echo/v5"
 )
 
@@ -62,14 +62,14 @@ func NewAuthWithConfig(config AuthConfig) echo.MiddlewareFunc {
 				}
 			}
 			ctx.Set("userID", claims.ID)
-			ctx.Set("username", claims.Username)
+			ctx.Set("UserName", claims.UserName)
 			ctx.Set("claims", claims)
 			return next(ctx)
 		}
 	}
 }
 
-// extractTokenFromLookup 根据 TokenLookup 配置提取 token
+// extractTokenFromLookup
 // 格式: "header:Authorization", "query:token", "cookie:token"
 func extractTokenFromLookup(ctx *echo.Context, lookup string) (string, error) {
 	parts := strings.SplitN(lookup, ":", 2)

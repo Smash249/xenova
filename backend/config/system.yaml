@@ -7,13 +7,17 @@ Database:
     defaultStringSize: 256
     disableDatetimePrecision: true
 
-
 Redis:
   host: 127.0.0.1
   port: 6379
   db: 0
   password:
 
-
 Jwt:
   signingKey: "xenova@2026!!"
+
+Email:
+  stmp: "your stmp server"
+  port: "your smtp port"
+  host: "your smtp host"
+  pwd: "your smtp pwd"

@@ -22,7 +22,7 @@ type CustomClaims struct {
 // BaseClaims 基础用户信息
 type BaseClaims struct {
 	ID       int    `json:"id"`
-	Username string `json:"username"`
+	UserName string `json:"UserName"`
 }
 
 // JWT 错误定义
@@ -52,9 +52,9 @@ func GetUserID(ctx *echo.Context) (int, bool) {
 	return id, ok
 }
 
-// GetUsername 从 Context 中获取当前用户名
-func GetUsername(ctx *echo.Context) (string, bool) {
-	name, ok := ctx.Get("username").(string)
+// GetUserName 从 Context 中获取当前用户名
+func GetUserName(ctx *echo.Context) (string, bool) {
+	name, ok := ctx.Get("UserName").(string)
 	return name, ok
 }
 
@@ -107,23 +107,31 @@ func CreateToken(claims BaseClaims) (string, error) {
 }
 
 // CreateRefreshToken 创建刷新 token
-func CreateRefreshToken(claims BaseClaims) (string, error) {
-	c := CreateClaims(claims, viper.GetInt("Jwt.fresh_exp"))
+func CreateRefreshToken(ctx context.Context, claims BaseClaims) (string, error) {
+	redisKey := fmt.Sprintf("jwt:refresh:%d", claims.ID)
+	oldToken, err := global.RedisClient.Get(ctx, redisKey).Result()
+	if err == nil && oldToken != "" {
+		if err := global.RedisClient.Del(ctx, redisKey).Err(); err != nil {
+			return "", fmt.Errorf("删除旧的 refresh token 失败: %w", err)
+		}
+	}
+	c := CreateClaims(claims, viper.GetInt("Jwt.refresh_exp"))
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
-	return token.SignedString(GetSigningKey())
+	refreshToken, err := token.SignedString(GetSigningKey())
+	if err != nil {
+		return "", fmt.Errorf("生成 refresh token 失败: %w", err)
+	}
+	exp := time.Duration(viper.GetInt("Jwt.refresh_exp")) * time.Hour
+	if err := global.RedisClient.Set(ctx, redisKey, refreshToken, exp).Err(); err != nil {
+		return "", fmt.Errorf("存储 refresh token 到 Redis 失败: %w", err)
+	}
+	return refreshToken, nil
 }
 
-// GenerateTokenPair 生成 accessToken + refreshToken 并将 refreshToken 存入 Redis
+// GenerateTokenPair 生成 accessToken + refreshToken
 func GenerateTokenPair(claims BaseClaims) (refreshToken, accessToken string, err error) {
-	refreshToken, err = CreateRefreshToken(claims)
-	if err != nil {
-		return "", "", fmt.Errorf("生成刷新 token 失败: %w", err)
-	}
-	redisKey := fmt.Sprintf("jwt:fresh:%d", claims.ID)
-	exp := time.Duration(viper.GetInt("Jwt.fresh_exp")) * time.Hour
-	if err = global.RedisClient.Set(context.Background(), redisKey, refreshToken, exp).Err(); err != nil {
-		return "", "", fmt.Errorf("存储刷新 token 到 Redis 失败: %w", err)
-	}
+	basicCtx := context.Background()
+	refreshToken, err = CreateRefreshToken(basicCtx, claims)
 	accessToken, err = CreateToken(claims)
 	if err != nil {
 		return "", "", fmt.Errorf("生成访问 token 失败: %w", err)
