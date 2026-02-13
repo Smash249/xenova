@@ -31,6 +31,14 @@ func Paginator[T any](query *gorm.DB, params global.PaginateReq, orderParams ...
 		data         []T
 		defaultOrder = "created_at DESC"
 	)
+
+	if params.Page <= 0 {
+		params.Page = 1
+	}
+	if params.PageSize <= 0 {
+		params.PageSize = 10
+	}
+
 	if len(orderParams) > 0 && orderParams[0] != "" {
 		defaultOrder = orderParams[0]
 	}

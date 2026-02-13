@@ -15,6 +15,9 @@ Redis:
 
 Jwt:
   signingKey: "xenova@2026!!"
+  refresh_exp: 72
+  token_exp: 24 #小时
+  issuer: "xenova"
 
 Email:
   stmp: "your stmp server"

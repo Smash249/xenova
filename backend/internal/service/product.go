@@ -22,7 +22,7 @@ func (p *ProductService) GetProductSeriesList() ([]models.ProductSeries, error) 
 
 // CreateProductSeries 创建产品系列
 func (p *ProductService) CreateProductSeries(params request.CreateProductSeriesReq) error {
-	return global.DB.Create(&models.Product{
+	return global.DB.Create(&models.ProductSeries{
 		Name:        params.Name,
 		Description: params.Description,
 	}).Error

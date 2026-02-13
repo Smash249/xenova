@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -23,7 +25,6 @@ func NewAuth() echo.MiddlewareFunc {
 	return NewAuthWithConfig(DefaultAuthConfig)
 }
 
-// NewAuthWithConfig
 func NewAuthWithConfig(config AuthConfig) echo.MiddlewareFunc {
 	if config.TokenLookup == "" {
 		config.TokenLookup = DefaultAuthConfig.TokenLookup
@@ -49,13 +50,14 @@ func NewAuthWithConfig(config AuthConfig) echo.MiddlewareFunc {
 
 			// 解析验证 token
 			claims, err := utils.ParseToken(tokenStr)
+			fmt.Println(claims, err)
 			if err != nil {
-				switch err {
-				case utils.ErrTokenExpired:
+				switch {
+				case errors.Is(err, utils.ErrTokenExpired):
 					return echo.NewHTTPError(http.StatusUnauthorized, "token 已过期，请重新登录")
-				case utils.ErrTokenMalformed:
+				case errors.Is(err, utils.ErrTokenMalformed):
 					return echo.NewHTTPError(http.StatusUnauthorized, "token 格式错误")
-				case utils.ErrTokenNotValidYet:
+				case errors.Is(err, utils.ErrTokenNotValidYet):
 					return echo.NewHTTPError(http.StatusUnauthorized, "token 尚未生效")
 				default:
 					return echo.NewHTTPError(http.StatusUnauthorized, "token 无效")

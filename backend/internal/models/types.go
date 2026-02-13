@@ -8,7 +8,7 @@ import (
 
 type StringList []string
 
-func (s *StringList) Value() (driver.Value, error) {
+func (s StringList) Value() (driver.Value, error) {
 	if s == nil {
 		return "[]", nil
 	}
@@ -33,6 +33,5 @@ func (s *StringList) Scan(value interface{}) error {
 	default:
 		return fmt.Errorf("无法将 %T 转换为 StringList", value)
 	}
-
 	return json.Unmarshal(bytes, s)
 }

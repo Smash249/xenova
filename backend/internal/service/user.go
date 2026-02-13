@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/Smash249/xenova/backend/internal/global"
 	"github.com/Smash249/xenova/backend/internal/models"
@@ -33,6 +34,7 @@ func (UserService) Login(params request.UserLoginReq) (*response.UserLoginResp, 
 		ID:       int(user.ID),
 		UserName: user.UserName,
 	})
+	fmt.Println(err)
 	if err != nil {
 		return nil, errors.New("生成 token 失败")
 	}

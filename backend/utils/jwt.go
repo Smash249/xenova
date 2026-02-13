@@ -58,7 +58,7 @@ func GetUserName(ctx *echo.Context) (string, bool) {
 	return name, ok
 }
 
-// GetClaims 从 Context 中获取完整 Claims（
+// GetClaims 从 Context 中获取完整 Claims
 func GetClaims(ctx *echo.Context) (*BaseClaims, bool) {
 	claims, ok := ctx.Get("claims").(*BaseClaims)
 	return claims, ok
@@ -94,14 +94,18 @@ func CreateClaims(base BaseClaims, expireHours int) CustomClaims {
 			NotBefore: jwt.NewNumericDate(now),
 			ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour * time.Duration(expireHours))),
 			Issuer:    viper.GetString("Jwt.issuer"),
-			Audience:  jwt.ClaimStrings{"Komu"},
+			Audience:  jwt.ClaimStrings{"xenova-backend"},
 		},
 	}
 }
 
 // CreateToken 创建访问 token
 func CreateToken(claims BaseClaims) (string, error) {
-	c := CreateClaims(claims, viper.GetInt("Jwt.token_exp"))
+	expHours := viper.GetInt("Jwt.token_exp")
+	if expHours <= 0 {
+		return "", fmt.Errorf("Jwt.token_exp 配置无效或为 0，请检查配置文件")
+	}
+	c := CreateClaims(claims, expHours)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	return token.SignedString(GetSigningKey())
 }
@@ -115,13 +119,20 @@ func CreateRefreshToken(ctx context.Context, claims BaseClaims) (string, error) 
 			return "", fmt.Errorf("删除旧的 refresh token 失败: %w", err)
 		}
 	}
-	c := CreateClaims(claims, viper.GetInt("Jwt.refresh_exp"))
+
+	refreshExp := viper.GetInt("Jwt.refresh_exp")
+	if refreshExp <= 0 {
+		return "", fmt.Errorf("Jwt.refresh_exp 配置无效或为 0，请检查配置文件")
+	}
+
+	c := CreateClaims(claims, refreshExp)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	refreshToken, err := token.SignedString(GetSigningKey())
 	if err != nil {
 		return "", fmt.Errorf("生成 refresh token 失败: %w", err)
 	}
-	exp := time.Duration(viper.GetInt("Jwt.refresh_exp")) * time.Hour
+
+	exp := time.Duration(refreshExp) * time.Hour
 	if err := global.RedisClient.Set(ctx, redisKey, refreshToken, exp).Err(); err != nil {
 		return "", fmt.Errorf("存储 refresh token 到 Redis 失败: %w", err)
 	}
@@ -131,11 +142,17 @@ func CreateRefreshToken(ctx context.Context, claims BaseClaims) (string, error) 
 // GenerateTokenPair 生成 accessToken + refreshToken
 func GenerateTokenPair(claims BaseClaims) (refreshToken, accessToken string, err error) {
 	basicCtx := context.Background()
+
 	refreshToken, err = CreateRefreshToken(basicCtx, claims)
+	if err != nil {
+		return "", "", fmt.Errorf("生成刷新 token 失败: %w", err)
+	}
+
 	accessToken, err = CreateToken(claims)
 	if err != nil {
 		return "", "", fmt.Errorf("生成访问 token 失败: %w", err)
 	}
+
 	return refreshToken, accessToken, nil
 }
 
@@ -147,6 +164,7 @@ func ParseToken(tokenString string) (*BaseClaims, error) {
 		}
 		return GetSigningKey(), nil
 	})
+
 	if err != nil {
 		switch {
 		case errors.Is(err, jwt.ErrTokenMalformed):
@@ -172,7 +190,9 @@ func RefreshToken(refreshToken string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	redisKey := fmt.Sprintf("jwt:fresh:%d", claims.ID)
+
+	// 修复：key 与 CreateRefreshToken 保持一致，使用 "jwt:refresh:"
+	redisKey := fmt.Sprintf("jwt:refresh:%d", claims.ID)
 	stored, err := global.RedisClient.Get(context.Background(), redisKey).Result()
 	if err != nil {
 		return "", fmt.Errorf("查询刷新 token 失败: %w", err)

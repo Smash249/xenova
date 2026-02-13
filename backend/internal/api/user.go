@@ -19,7 +19,7 @@ func (userApi) Login(ctx *echo.Context) error {
 	}
 	result, err := userServicesApp.Login(userLoginReq)
 	if err != nil {
-		return utils.ErrorApiResponse(ctx, err, http.StatusBadRequest)
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
 }
@@ -30,7 +30,7 @@ func (userApi) Register(ctx *echo.Context) error {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	if err := userServicesApp.Register(userRegisterReq); err != nil {
-		return utils.ErrorApiResponse(ctx, err, http.StatusBadRequest)
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, "注册成功", http.StatusOK)
 }
