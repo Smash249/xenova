@@ -12,8 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var UserServicesApp = new(UserService)
-
 type UserService struct {
 }
 

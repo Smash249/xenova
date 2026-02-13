@@ -7,8 +7,6 @@ import (
 	"github.com/Smash249/xenova/backend/utils"
 )
 
-var ProductServiceApp = new(ProductService)
-
 type ProductService struct{}
 
 // ==================== ProductSeries 产品系列 CRUD ====================

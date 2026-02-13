@@ -14,6 +14,8 @@ func (r *routerHub) InitRouterHub(public, private *echo.Group) {
 	// 这里填入需要注册的路由函数
 	initUserRouter()
 	initProductRouter()
+	initJournalism()
+	initSoftwareRouter()
 	for _, registerFunc := range r.routerHubList {
 		registerFunc(public, private)
 	}

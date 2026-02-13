@@ -22,7 +22,7 @@ type DeleteProductSeriesReq struct {
 type GetProductReq struct {
 	global.PaginateReq
 	Name     string `query:"name" json:"name"`
-	SeriesID uint   `query:"seriesId" json:"seriesId" validate:"required"`
+	SeriesID uint   `query:"series_id" json:"series_id" validate:"required"`
 }
 
 type CreateProductReq struct {
@@ -31,7 +31,7 @@ type CreateProductReq struct {
 	Cover       string   `json:"cover" validate:"required"`
 	Previews    []string `json:"previews" validate:"required"`
 	Price       float64  `json:"price" validate:"required"`
-	SeriesID    uint     `json:"seriesId" validate:"required"`
+	SeriesID    uint     `json:"series_id" validate:"required"`
 }
 
 type UpdateProductReq struct {
@@ -41,7 +41,7 @@ type UpdateProductReq struct {
 	Cover       string   `json:"cover" validate:"required"`
 	Previews    []string `json:"previews" validate:"required"`
 	Price       float64  `json:"price" validate:"required"`
-	SeriesID    uint     `json:"seriesId" validate:"required"`
+	SeriesID    uint     `json:"series_id" validate:"required"`
 }
 
 type DeleteProductReq struct {
