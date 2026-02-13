@@ -48,7 +48,10 @@ func (j *JournalismService) DeleteJournalismSeries(params request.DeleteJournali
 
 // GetJournalismList 获取新闻列表
 func (j *JournalismService) GetJournalismList(params request.GetJournalismReq) (*global.PaginatorResp[models.Journalism], error) {
-	query := global.DB.Model(&models.Journalism{}).Where("series_id = ?", params.SeriesID)
+	query := global.DB.Model(&models.Journalism{})
+	if params.SeriesID != 0 {
+		query = query.Where("series_id = ?", params.SeriesID)
+	}
 	if params.Title != "" {
 		query = query.Where("title LIKE ?", "%"+params.Title+"%")
 	}
@@ -81,7 +84,7 @@ func (j *JournalismService) CreateJournalism(params request.CreateJournalismReq)
 
 // UpdateJournalism 更新新闻
 func (j *JournalismService) UpdateJournalism(params request.UpdateJournalismReq) error {
-	return global.DB.Where("id = ?", params.ID).Updates(models.Journalism{
+	return global.DB.Model(&models.Journalism{}).Where("id = ?", params.ID).Updates(models.Journalism{
 		Title:    params.Title,
 		Content:  params.Content,
 		Cover:    params.Cover,

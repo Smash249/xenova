@@ -71,15 +71,15 @@ func (j *journalismApi) GetJournalismList(ctx *echo.Context) error {
 }
 
 func (j *journalismApi) GetJournalismDetail(ctx *echo.Context) error {
-	journalismId := ctx.Param("journalism_id")
-	if journalismId == "" {
+	journalismID := ctx.Param("journalism_id")
+	if journalismID == "" {
 		return utils.ErrorApiResponse(ctx, "新闻ID不能为空", http.StatusBadRequest)
 	}
-	journalismIdUint, err := utils.ParseStringToUint(journalismId)
+	journalismIDUint, err := utils.ParseStringToUint(journalismID)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, "无效的新闻ID", http.StatusBadRequest)
 	}
-	result, err := journalismServiceApp.GetJournalismById(journalismIdUint)
+	result, err := journalismServiceApp.GetJournalismById(journalismIDUint)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return utils.ErrorApiResponse(ctx, "新闻不存在", 404)

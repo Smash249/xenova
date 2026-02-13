@@ -22,7 +22,7 @@ type DeleteJournalismSeriesReq struct {
 type GetJournalismReq struct {
 	global.PaginateReq
 	Title    string `query:"title" json:"title"`
-	SeriesID uint   `query:"seriesId" json:"seriesId" validate:"required"`
+	SeriesID uint   `query:"seriesId" json:"seriesId"`
 }
 
 type CreateJournalismReq struct {
