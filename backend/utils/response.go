@@ -9,7 +9,7 @@ func SuccessApiResponse(ctx *echo.Context, data any, code int) error {
 	})
 }
 
-func ErroApiResponse(ctx *echo.Context, err any, code int) error {
+func ErrorApiResponse(ctx *echo.Context, err any, code int) error {
 	return ctx.JSON(code, map[string]any{
 		"message": err,
 		"success": false,

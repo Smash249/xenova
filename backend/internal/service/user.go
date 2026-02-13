@@ -16,7 +16,7 @@ var UserServicesApp = new(UserService)
 type UserService struct {
 }
 
-func (UserService) Login(params request.UserLoginReq) (*response.UserLoginRes, error) {
+func (UserService) Login(params request.UserLoginReq) (*response.UserLoginResp, error) {
 	var user models.User
 	err := global.DB.Where("email = ?", params.Email).First(&user).Error
 	if err != nil {
@@ -29,7 +29,7 @@ func (UserService) Login(params request.UserLoginReq) (*response.UserLoginRes, e
 		return nil, errors.New("密码错误")
 	}
 
-	accessToken, rereshToken, err := utils.GenerateTokenPair(utils.BaseClaims{
+	accessToken, refreshToken, err := utils.GenerateTokenPair(utils.BaseClaims{
 		ID:       int(user.ID),
 		UserName: user.UserName,
 	})
@@ -37,10 +37,10 @@ func (UserService) Login(params request.UserLoginReq) (*response.UserLoginRes, e
 		return nil, errors.New("生成 token 失败")
 	}
 
-	result := &response.UserLoginRes{
+	result := &response.UserLoginResp{
 		User:         user,
 		AccessToken:  accessToken,
-		ReFreshToken: rereshToken,
+		ReFreshToken: refreshToken,
 	}
 	return result, nil
 }

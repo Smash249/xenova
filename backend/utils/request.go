@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/labstack/echo/v5"
 )
@@ -21,4 +22,12 @@ func BindAndValidate[T any](ctx *echo.Context) (T, error) {
 	}
 
 	return reqParams, nil
+}
+
+func ParseStringToUint(s string) (uint, error) {
+	v, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return uint(v), nil
 }

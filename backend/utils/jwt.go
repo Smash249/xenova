@@ -38,7 +38,7 @@ var (
 // jwtSigningKey
 var jwtSigningKey []byte
 
-// GetSigningKey
+// GetSigningKey 获取 JWT 签名密钥，使用单例模式确保只加载一次
 func GetSigningKey() []byte {
 	if jwtSigningKey == nil {
 		jwtSigningKey = []byte(viper.GetString("Jwt.signingKey"))

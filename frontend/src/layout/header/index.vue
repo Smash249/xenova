@@ -56,7 +56,7 @@
           :style="{
             color: activeItem === index ? '#ffffff' : dynamicTextColor,
           }"
-          class="relative z-10 cursor-pointer rounded-full px-6 py-2.5 text-sm font-medium transition-colors duration-300"
+          class="relative z-10 cursor-pointer rounded-full px-6 py-3 text-xs font-medium transition-colors duration-300"
           @click="handleClickItem(item, index)"
         >
           {{ item.title }}

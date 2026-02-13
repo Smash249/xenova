@@ -8,12 +8,12 @@ import (
 
 type User struct {
 	global.BaseModel
-	UserName string `gorm:"type:varchar(100);uniqueIndex;not null" json:"userName"`
-	Email    string `gorm:"type:varchar(100);uniqueIndex;not null" json:"email"`
-	Password string `gorm:"type:varchar(255);not null" json:"-"`
+	UserName string `gorm:"type:varchar(100);uniqueIndex;not null;comment:用户名" json:"userName"`
+	Email    string `gorm:"type:varchar(100);uniqueIndex;not null;comment:邮箱" json:"email"`
+	Password string `gorm:"type:varchar(255);not null;comment:密码" json:"-"`
 }
 
-func (User) TableName() string {
+func (u *User) TableName() string {
 	return "user"
 }
 
