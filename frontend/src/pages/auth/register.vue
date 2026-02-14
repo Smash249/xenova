@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue"
+import { ref, reactive, onBeforeUnmount } from "vue"
 import { useRouter } from "vue-router"
 import { ElMessage } from "element-plus"
 import { User, Lock, Message, Key } from "@element-plus/icons-vue"
@@ -120,6 +120,7 @@ const loading = ref(false)
 const codeDisabled = ref(false)
 const codeText = ref("发送验证码")
 const countdown = ref(60)
+const countdownTimer = ref<NodeJS.Timeout | null>(null)
 
 const registerForm = reactive({
   UserName: "",
@@ -170,17 +171,26 @@ const handleSendCode = async () => {
   ElMessage.info("验证码发送功能需要后端支持，请联系管理员获取验证码")
   
   codeDisabled.value = true
-  const timer = setInterval(() => {
+  countdownTimer.value = setInterval(() => {
     countdown.value--
     codeText.value = `${countdown.value}秒后重发`
     if (countdown.value <= 0) {
-      clearInterval(timer)
+      if (countdownTimer.value) {
+        clearInterval(countdownTimer.value)
+        countdownTimer.value = null
+      }
       codeDisabled.value = false
       codeText.value = "发送验证码"
       countdown.value = 60
     }
   }, 1000)
 }
+
+onBeforeUnmount(() => {
+  if (countdownTimer.value) {
+    clearInterval(countdownTimer.value)
+  }
+})
 
 const handleRegister = async () => {
   if (!registerFormRef.value) return
