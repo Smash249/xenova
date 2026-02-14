@@ -105,7 +105,7 @@ services:
     environment:
       # Use environment variables for sensitive data
       # Create a .env file with: MYSQL_ROOT_PASSWORD=your_secure_password_here
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-your_secure_password_here}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: xenova
     volumes:
       - mysql_data:/var/lib/mysql
