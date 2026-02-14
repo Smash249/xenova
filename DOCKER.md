@@ -103,7 +103,8 @@ services:
   mysql:
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: your_password
+      # ⚠️ IMPORTANT: Change these values in production!
+      MYSQL_ROOT_PASSWORD: CHANGE_ME_IN_PRODUCTION
       MYSQL_DATABASE: xenova
     volumes:
       - mysql_data:/var/lib/mysql

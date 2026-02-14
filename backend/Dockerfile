@@ -9,8 +9,8 @@ COPY go.mod ./
 # Copy source code to discover dependencies
 COPY . .
 
-# Download dependencies and generate go.sum
-RUN go mod download && go mod tidy
+# Download dependencies and generate go.sum if needed
+RUN go mod tidy && go mod download
 
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
