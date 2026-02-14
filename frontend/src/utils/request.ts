@@ -1,6 +1,8 @@
 import axios from "axios"
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios"
 
+import type { RequestResponse } from "@/types/common"
+
 let axiosCache: Request | null = null
 
 class Request {
@@ -18,7 +20,6 @@ class Request {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config) => {
-        // 从 localStorage 获取 token
         const userStore = localStorage.getItem("user")
         if (userStore) {
           try {
@@ -55,7 +56,10 @@ class Request {
     return axiosCache
   }
 
-  public get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public get<T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<RequestResponse<T>> {
     return this.instance.get(url, config)
   }
 
@@ -63,7 +67,7 @@ class Request {
     url: string,
     data?: any,
     config?: AxiosRequestConfig
-  ): Promise<T> {
+  ): Promise<RequestResponse<T>> {
     return this.instance.post(url, data, config)
   }
 
@@ -71,13 +75,18 @@ class Request {
     url: string,
     data?: any,
     config?: AxiosRequestConfig
-  ): Promise<T> {
+  ): Promise<RequestResponse<T>> {
     return this.instance.put(url, data, config)
   }
 
-  public delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public delete<T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<RequestResponse<T>> {
     return this.instance.delete(url, config)
   }
 }
 
-export default Request.getInstance()
+export default Request.getInstance({
+  baseURL: import.meta.env.VITE_PROXY_PATH,
+})

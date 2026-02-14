@@ -8,10 +8,8 @@
     }"
     class="fixed inset-0 z-50 h-16 w-full transition-shadow duration-100 ease-linear"
   >
-    <div
-      class="container mx-auto flex h-full items-center justify-between px-4"
-    >
-      <div class="flex items-center gap-3">
+    <div class="mx-auto flex h-full w-[90%] items-center justify-between">
+      <div class="flex items-center">
         <div class="relative h-10 w-10 shrink-0">
           <svg class="h-full w-full" fill="none" viewBox="0 0 100 100">
             <path
@@ -25,7 +23,7 @@
           </svg>
         </div>
         <div class="flex flex-col">
-          <h1 class="text-2xl font-bold tracking-wide text-orange-500">
+          <h1 class="text-2xl font-bold tracking-wide text-orange-400">
             星实科技
           </h1>
         </div>
@@ -37,7 +35,7 @@
           backgroundColor: `rgba(243, 244, 246, ${0.3 + fadeProgress * 0.5})`,
           backdropFilter: `blur(${(1 - fadeProgress) * 8}px)`,
         }"
-        class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full p-1 md:flex"
+        class="hidden items-center gap-2 rounded-full p-1 md:flex"
       >
         <div
           v-if="activeItem !== -1"
@@ -46,7 +44,7 @@
             width: `${activeSlider.width}px`,
             top: '4px',
           }"
-          class="absolute h-10.5 rounded-full bg-[#4F61AD] transition-all duration-300 ease-out"
+          class="absolute h-10.5 rounded-full bg-blue-600 transition-all duration-300 ease-out"
         ></div>
 
         <div
@@ -57,41 +55,60 @@
             color: activeItem === index ? '#ffffff' : dynamicTextColor,
           }"
           class="relative z-10 cursor-pointer rounded-full px-6 py-3 text-xs font-medium transition-colors duration-300"
-          @click="handleClickItem(item, index)"
+          @click="HandleClickItem(item, index)"
         >
           {{ item.title }}
         </div>
       </nav>
 
       <div class="hidden items-center gap-3 md:flex">
-        <div class="cursor-pointer" @click="toggleDesktopDrawer">
-          <img
-            alt="用户头像"
-            class="h-10 w-10 rounded-full border-2 border-gray-200 transition-transform duration-200 hover:scale-110"
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-          />
+        <div
+          v-if="user.isLogin"
+          class="cursor-pointer transition-transform hover:scale-105 active:scale-95"
+          @click="ToggleDesktopDrawer"
+        >
+          <el-avatar class="bg-blue-100 font-bold text-blue-600">
+            {{ avatarLetter }}
+          </el-avatar>
         </div>
+        <el-button
+          v-else
+          type="primary"
+          round
+          class="border-0! bg-blue-600! px-6! py-5! text-sm font-medium hover:bg-blue-500!"
+          @click="router.push('/login')"
+          :icon="Position"
+        >
+          登录
+        </el-button>
       </div>
     </div>
   </header>
+  <DeskDrawer v-model="drawerVisible" />
 </template>
 
 <script setup>
+import userStore from "@/store/modules/user"
+import { Position } from "@element-plus/icons-vue"
 import { useWindowScroll, useWindowSize } from "@vueuse/core"
 import { computed, nextTick, onMounted, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
 import { systemConfig } from "@/config/header"
+import DeskDrawer from "@/components/layout/DeskDrawer.vue"
 
 const router = useRouter()
 const route = useRoute()
 const { y: scrollY } = useWindowScroll()
 const { height: windowHeight } = useWindowSize()
 
+const user = userStore()
+
 const activeItem = ref(-1)
 const navRef = ref(null)
 const menuItemsRef = ref([])
 const activeSlider = ref({ left: 0, width: 0 })
+const drawerVisible = ref(false)
 
 const fadeProgress = computed(() => {
   if (windowHeight.value === 0) return 0
@@ -108,7 +125,11 @@ const dynamicTextColor = computed(() => {
   return `rgb(${v}, ${v}, ${v})`
 })
 
-function updateSliderPosition(element) {
+const avatarLetter = computed(() => {
+  return user.email ? user.email.charAt(0).toUpperCase() : ""
+})
+
+function UpdateSliderPosition(element) {
   if (!element || !navRef.value) return
   const rect = element.getBoundingClientRect()
   const navRect = navRef.value.getBoundingClientRect()
@@ -118,7 +139,7 @@ function updateSliderPosition(element) {
   }
 }
 
-function updateActiveByPath() {
+function SyncActiveItemWithRoute() {
   nextTick(() => {
     const currentPath = route.path
     const currentHash = route.hash
@@ -133,7 +154,7 @@ function updateActiveByPath() {
     if (index !== -1) {
       activeItem.value = index
       if (menuItemsRef.value[index]) {
-        updateSliderPosition(menuItemsRef.value[index])
+        UpdateSliderPosition(menuItemsRef.value[index])
       }
     } else {
       activeItem.value = -1
@@ -141,7 +162,7 @@ function updateActiveByPath() {
   })
 }
 
-function handleClickItem(item, index) {
+function HandleClickItem(item, index) {
   if (item.isNav) {
     router.push(item.path)
   } else {
@@ -149,18 +170,16 @@ function handleClickItem(item, index) {
   }
 }
 
-watch(
-  () => route.fullPath,
-  () => {
-    updateActiveByPath()
-  },
-  { immediate: true }
-)
+function ToggleDesktopDrawer() {
+  drawerVisible.value = true
+}
+
+watch(() => route.fullPath, SyncActiveItemWithRoute, { immediate: true })
 
 onMounted(() => {
   window.addEventListener("resize", () => {
     if (activeItem.value !== -1 && menuItemsRef.value[activeItem.value]) {
-      updateSliderPosition(menuItemsRef.value[activeItem.value])
+      UpdateSliderPosition(menuItemsRef.value[activeItem.value])
     }
   })
 })

@@ -64,7 +64,4 @@ const router = createRouter({
   routes,
 })
 
-// 路由拦截器
-router.beforeEach(() => {})
-
 export default router

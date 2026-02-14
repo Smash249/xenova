@@ -1,72 +1,66 @@
+import { LoginApi, RegisterApi } from "@/api/auth"
 import { defineStore } from "pinia"
-import { ref } from "vue"
-import request from "@/utils/request"
+import { computed, ref } from "vue"
+import { useRouter } from "vue-router"
 
-interface User {
-  ID: number
-  UserName: string
-  Email: string
-}
-
-interface LoginResponse {
-  user: User
-  accessToken: string
-  reFreshToken: string
-}
+import type { LoginParams, RegisterParams } from "@/types/auth"
+import type { User } from "@/types/user"
 
 const userStore = defineStore(
   "user",
   () => {
+    const router = useRouter()
     const user = ref<User | null>(null)
     const accessToken = ref<string>("")
     const refreshToken = ref<string>("")
+    const isLogin = computed(() => {
+      return user.value ? true : false
+    })
+    const email = computed(() => {
+      return user.value?.email ?? ""
+    })
+    const userName = computed(() => {
+      return user.value?.userName ?? ""
+    })
 
-    const login = async (email: string, password: string) => {
+    async function Login(params: LoginParams) {
       try {
-        const res = await request.post<LoginResponse>("/api/login", {
-          email,
-          password,
-        })
-        user.value = res.user
-        accessToken.value = res.accessToken
-        refreshToken.value = res.reFreshToken
-        return res
+        const result = await LoginApi(params)
+        user.value = result.user
+        accessToken.value = result.accessToken
+        refreshToken.value = result.reFreshToken
       } catch (error) {
         throw error
       }
     }
 
-    const register = async (
-      UserName: string,
-      email: string,
-      code: string,
-      password: string
-    ) => {
+    async function Register(params: RegisterParams) {
       try {
-        await request.post("/api/register", {
-          UserName,
-          email,
-          code,
-          password,
-        })
+        const result = await RegisterApi(params)
+        console.log(result)
       } catch (error) {
         throw error
       }
     }
 
-    const logout = () => {
+    function Logout() {
       user.value = null
       accessToken.value = ""
       refreshToken.value = ""
+      localStorage.removeItem("user")
+      router.replace("/login")
     }
 
     return {
+      isLogin,
       user,
+      email,
+      userName,
       accessToken,
       refreshToken,
-      login,
-      register,
-      logout,
+      Login,
+      Register,
+      Logout,
     }
   },
   {
