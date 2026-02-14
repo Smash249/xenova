@@ -43,9 +43,7 @@ coverage/
 README.md
 LICENSE
 
-# Config files
+# Optional config files that may not be needed for Docker builds
 .prettierrc
 .eslintrc*
-tsconfig*.json
-vite.config.ts
 prettier.config.cjs
