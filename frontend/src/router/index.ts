@@ -2,6 +2,16 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router"
 
 const routes: RouteRecordRaw[] = [
   {
+    path: "/login",
+    name: "login",
+    component: () => import("@/pages/auth/login.vue"),
+  },
+  {
+    path: "/register",
+    name: "register",
+    component: () => import("@/pages/auth/register.vue"),
+  },
+  {
     path: "/",
     component: () => import("@/layout/index.vue"),
     redirect: "/dashboard",
