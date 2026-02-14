@@ -18,6 +18,18 @@ class Request {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config) => {
+        // 从 localStorage 获取 token
+        const userStore = localStorage.getItem("user")
+        if (userStore) {
+          try {
+            const user = JSON.parse(userStore)
+            if (user.accessToken) {
+              config.headers.Authorization = `Bearer ${user.accessToken}`
+            }
+          } catch (e) {
+            console.error("Failed to parse user store:", e)
+          }
+        }
         return config
       },
       (error) => {
