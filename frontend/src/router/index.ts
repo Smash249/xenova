@@ -41,7 +41,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.VITE_BASEPATH || ""),
+  history: createWebHistory(),
   scrollBehavior(to) {
     if (to.hash) {
       return {
@@ -53,5 +53,8 @@ const router = createRouter({
   },
   routes,
 })
+
+// 路由拦截器
+router.beforeEach(() => {})
 
 export default router

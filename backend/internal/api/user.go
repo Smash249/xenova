@@ -34,3 +34,7 @@ func (userApi) Register(ctx *echo.Context) error {
 	}
 	return utils.SuccessApiResponse(ctx, "注册成功", http.StatusOK)
 }
+
+func (userApi) Health(ctx *echo.Context) error {
+	return utils.SuccessApiResponse(ctx, "ok", http.StatusOK)
+}
