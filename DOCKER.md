@@ -103,8 +103,9 @@ services:
   mysql:
     image: mysql:8
     environment:
-      # ⚠️ IMPORTANT: Use a strong, unique password in production!
-      MYSQL_ROOT_PASSWORD: your_secure_password_here
+      # Use environment variables for sensitive data
+      # Create a .env file with: MYSQL_ROOT_PASSWORD=your_secure_password_here
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-your_secure_password_here}
       MYSQL_DATABASE: xenova
     volumes:
       - mysql_data:/var/lib/mysql
@@ -116,6 +117,17 @@ services:
 
 volumes:
   mysql_data:
+```
+
+### 环境变量配置 / Environment Variables
+
+为了安全起见，建议创建 `.env` 文件来管理敏感信息（不要提交到版本控制）：
+
+For security, create a `.env` file to manage sensitive information (do not commit to version control):
+
+```bash
+# .env
+MYSQL_ROOT_PASSWORD=your_secure_password_here
 ```
 
 使用 Docker Compose 启动 / Start with Docker Compose:
