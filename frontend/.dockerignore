@@ -43,7 +43,10 @@ coverage/
 README.md
 LICENSE
 
-# Optional config files that may not be needed for Docker builds
+# Linting/formatting config files (not needed for build, only for development)
 .prettierrc
 .eslintrc*
 prettier.config.cjs
+
+# NOTE: TypeScript (tsconfig*.json) and Vite (vite.config.ts) config files
+# are intentionally NOT excluded as they are required for the build process
