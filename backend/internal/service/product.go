@@ -14,7 +14,7 @@ type ProductService struct{}
 // GetProductSeriesList 获取产品系列列表
 func (p *ProductService) GetProductSeriesList() ([]models.ProductSeries, error) {
 	var seriesList []models.ProductSeries
-	err := global.DB.Find(&seriesList).Error
+	err := global.DB.Select("id,name").Find(&seriesList).Error
 	return seriesList, err
 }
 
@@ -46,7 +46,10 @@ func (p *ProductService) DeleteProductSeries(params request.DeleteProductSeriesR
 
 // GetProductList 获取产品列表
 func (p *ProductService) GetProductList(params request.GetProductReq) (*global.PaginatorResp[models.Product], error) {
-	query := global.DB.Model(&models.Product{}).Where("series_id = ?", params.SeriesID)
+	query := global.DB.Model(&models.Product{})
+	if params.SeriesID != 0 {
+		query = query.Where("series_id = ?", params.SeriesID)
+	}
 	if params.Name != "" {
 		query = query.Where("name LIKE ?", "%"+params.Name+"%")
 	}

@@ -49,10 +49,12 @@ func Paginator[T any](query *gorm.DB, params global.PaginateReq, orderParams ...
 		return nil, err
 	}
 	return &global.PaginatorResp[T]{
-		Page:       params.Page,
-		PageSize:   params.PageSize,
-		TotalCount: count,
-		TotalPage:  int64(math.Ceil(float64(count) / float64(params.PageSize))),
-		Data:       data,
+		Paginate: global.Paginate{
+			Page:       params.Page,
+			PageSize:   params.PageSize,
+			TotalCount: count,
+			TotalPage:  int64(math.Ceil(float64(count) / float64(params.PageSize))),
+		},
+		Data: data,
 	}, nil
 }

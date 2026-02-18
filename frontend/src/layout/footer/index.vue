@@ -1,20 +1,3 @@
-<script setup lang="ts">
-import { Clock, Mail, MapPin, Phone, Printer } from "lucide-vue-next"
-
-import { systemConfig } from "@/config/header"
-
-const SocialIcon = {
-  props: {
-    color: String,
-  },
-  template: `
-    <div :class="['w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110 cursor-pointer', color]">
-      <slot></slot>
-    </div>
-  `,
-}
-</script>
-
 <template>
   <footer
     class="border-t border-slate-200 bg-slate-50 pt-16 font-sans text-slate-700"
@@ -178,3 +161,20 @@ const SocialIcon = {
     </div>
   </footer>
 </template>
+
+<script setup lang="ts">
+import { Clock, Mail, MapPin, Phone, Printer } from "lucide-vue-next"
+
+import { systemConfig } from "@/config/header"
+
+const SocialIcon = {
+  props: {
+    color: String,
+  },
+  template: `
+    <div :class="['w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110 cursor-pointer', color]">
+      <slot></slot>
+    </div>
+  `,
+}
+</script>

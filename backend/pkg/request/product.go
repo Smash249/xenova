@@ -22,7 +22,7 @@ type DeleteProductSeriesReq struct {
 type GetProductReq struct {
 	global.PaginateReq
 	Name     string `query:"name" json:"name"`
-	SeriesID uint   `query:"series_id" json:"series_id" validate:"required"`
+	SeriesID uint   `query:"series_id" json:"series_id"`
 }
 
 type CreateProductReq struct {
