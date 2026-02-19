@@ -1,8 +1,8 @@
 import request from "@/utils/request"
 
-export async function GetProductSeriesApi() {
+export async function GetNewsSeriesApi() {
   try {
-    const result = await request.get("/public/product_series")
+    const result = await request.get("/public/journalism_series")
     if (!result || !result.success) throw new Error("请求出错")
     return result.data
   } catch (error) {
@@ -10,18 +10,18 @@ export async function GetProductSeriesApi() {
   }
 }
 
-export async function GetProductListApi(
+export async function GetNewsListApi(
   page: number,
-  name: string,
+  title: string,
   series_id: number | null
 ) {
   const searchParams = new URLSearchParams()
   if (page) searchParams.append("page", String(page))
-  if (name) searchParams.append("name", name)
+  if (title) searchParams.append("name", title)
   if (series_id) searchParams.append("series_id", series_id.toString())
   const query = searchParams.toString()
   try {
-    const result = await request.get(`/public/products?${query}`)
+    const result = await request.get(`/public/journalisms?${query}`)
     if (!result || !result.success) throw new Error("请求出错")
     return result.data
   } catch (error) {
@@ -29,9 +29,9 @@ export async function GetProductListApi(
   }
 }
 
-export async function GetProductDetailApi(product_id: number) {
+export async function GetNewsDetailApi(newsId: number) {
   try {
-    const result = await request.get(`/private/products/${product_id}`)
+    const result = await request.get(`/private/journalisms/${newsId}`)
     if (!result || !result.success) throw new Error("请求出错")
     return result.data
   } catch (error) {

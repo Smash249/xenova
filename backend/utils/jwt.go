@@ -21,7 +21,7 @@ type CustomClaims struct {
 
 // BaseClaims 基础用户信息
 type BaseClaims struct {
-	ID       int    `json:"id"`
+	ID       uint   `json:"id"`
 	UserName string `json:"UserName"`
 }
 
@@ -47,14 +47,14 @@ func GetSigningKey() []byte {
 }
 
 // GetUserID 从 Context 中获取当前用户 ID
-func GetUserID(ctx *echo.Context) (int, bool) {
-	id, ok := ctx.Get("userID").(int)
+func GetUserID(ctx *echo.Context) (uint, bool) {
+	id, ok := ctx.Get("userID").(uint)
 	return id, ok
 }
 
 // GetUserName 从 Context 中获取当前用户名
 func GetUserName(ctx *echo.Context) (string, bool) {
-	name, ok := ctx.Get("UserName").(string)
+	name, ok := ctx.Get("userName").(string)
 	return name, ok
 }
 
@@ -190,8 +190,6 @@ func RefreshToken(refreshToken string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	// 修复：key 与 CreateRefreshToken 保持一致，使用 "jwt:refresh:"
 	redisKey := fmt.Sprintf("jwt:refresh:%d", claims.ID)
 	stored, err := global.RedisClient.Get(context.Background(), redisKey).Result()
 	if err != nil {

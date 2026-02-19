@@ -14,6 +14,7 @@ func initJournalism() {
 			private.DELETE("/journalism_series", api.JournalismApi.DeleteJournalismSeries)
 
 			public.GET("/journalisms", api.JournalismApi.GetJournalismList)
+			private.GET("/journalisms/:journalism_id", api.JournalismApi.GetJournalismDetail)
 			private.POST("/journalisms", api.JournalismApi.CreateJournalism)
 			private.PUT("/journalisms", api.JournalismApi.UpdateJournalism)
 			private.DELETE("/journalisms", api.JournalismApi.DeleteJournalism)

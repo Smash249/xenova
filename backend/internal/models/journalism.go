@@ -9,3 +9,7 @@ type Journalism struct {
 	SeriesID  uint   `gorm:"comment:新闻系列 id" json:"series_id"`
 	ViewCount uint   `gorm:"default:0;comment:浏览量" json:"view_count"`
 }
+
+func (Journalism) TableName() string {
+	return "journalism"
+}

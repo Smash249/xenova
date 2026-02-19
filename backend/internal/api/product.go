@@ -79,7 +79,7 @@ func (p *productApi) GetProductDetail(ctx *echo.Context) error {
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, "无效的产品ID", http.StatusBadRequest)
 	}
-	result, err := productServiceApp.GetProductById(productIdUint)
+	result, err := productServiceApp.GetProductDetail(productIdUint)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return utils.ErrorApiResponse(ctx, "产品不存在", 404)

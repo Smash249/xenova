@@ -5,8 +5,8 @@ type RequestResponse<T> = {
 }
 
 interface BaseResponse {
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
 }
 
 interface Paginate {

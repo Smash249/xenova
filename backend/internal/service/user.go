@@ -29,7 +29,7 @@ func (UserService) Login(params request.UserLoginReq) (*response.UserLoginResp, 
 	}
 
 	accessToken, refreshToken, err := utils.GenerateTokenPair(utils.BaseClaims{
-		ID:       int(user.ID),
+		ID:       user.ID,
 		UserName: user.UserName,
 	})
 	fmt.Println(err)

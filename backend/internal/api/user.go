@@ -29,6 +29,7 @@ func (userApi) Register(ctx *echo.Context) error {
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
+
 	if err := userServicesApp.Register(userRegisterReq); err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}

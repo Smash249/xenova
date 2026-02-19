@@ -1,5 +1,6 @@
 import axios from "axios"
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios"
+import { ElMessage } from "element-plus"
 
 import type { RequestResponse } from "@/types/common"
 
@@ -16,6 +17,32 @@ class Request {
     this.setupInterceptors()
   }
 
+  private handelErrorCode(code: number) {
+    switch (code) {
+      case 401:
+        localStorage.removeItem("user")
+        ElMessage.error({
+          message: "登录失效，请重新登录",
+          onClose: () => {
+            window.location.href = "/login"
+          },
+        })
+        break
+      case 403:
+        console.error("403 Forbidden")
+        break
+      case 404:
+        console.error("404 Not Found")
+        break
+      case 500:
+        console.error("500 Internal Server Error")
+        break
+      default:
+        console.error("Unknown Error")
+        break
+    }
+  }
+
   private setupInterceptors() {
     // 请求拦截器
     this.instance.interceptors.request.use(
@@ -25,7 +52,7 @@ class Request {
           try {
             const user = JSON.parse(userStore)
             if (user.accessToken) {
-              config.headers.Authorization = `Bearer ${user.accessToken}`
+              config.headers.Authorization = `${user.accessToken}`
             }
           } catch (e) {
             console.error("Failed to parse user store:", e)
@@ -44,8 +71,8 @@ class Request {
         return response.data
       },
       (error) => {
-        const message = error.response?.data?.message || error.message
-        console.error("Request error:", message)
+        const status = error.response?.status
+        this.handelErrorCode(status)
         return Promise.reject(error)
       }
     )

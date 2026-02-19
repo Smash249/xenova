@@ -4,6 +4,7 @@ import (
 	"github.com/Smash249/xenova/backend/internal/global"
 	"github.com/Smash249/xenova/backend/internal/models"
 	"github.com/Smash249/xenova/backend/pkg/request"
+	"github.com/Smash249/xenova/backend/pkg/response"
 	"github.com/Smash249/xenova/backend/utils"
 )
 
@@ -60,11 +61,26 @@ func (p *ProductService) GetProductList(params request.GetProductReq) (*global.P
 	return result, nil
 }
 
-// GetProductById 根据ID获取产品
-func (p *ProductService) GetProductById(id uint) (models.Product, error) {
-	var product models.Product
-	err := global.DB.First(&product, id).Error
-	return product, err
+// GetProductDetail 根据ID获取产品
+func (p *ProductService) GetProductDetail(id uint) (response.ProductDetailResp, error) {
+	var resp response.ProductDetailResp
+	err := global.DB.Table("product AS pd").
+		Select(`
+        pd.id,
+        pd.series_id,
+        ps.name AS series_name,
+        pd.name,
+        pd.description,
+        pd.cover,
+        pd.previews,
+        pd.price,
+        pd.created_at,
+        pd.updated_at
+    `).
+		Joins("LEFT JOIN product_series AS ps ON pd.series_id = ps.id").
+		Where("pd.id = ?", id).
+		Scan(&resp).Error
+	return resp, err
 }
 
 // CreateProduct 创建产品

@@ -79,7 +79,7 @@ func (j *journalismApi) GetJournalismDetail(ctx *echo.Context) error {
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, "无效的新闻ID", http.StatusBadRequest)
 	}
-	result, err := journalismServiceApp.GetJournalismById(journalismIdUint)
+	result, err := journalismServiceApp.GetJournalismDetail(journalismIdUint)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return utils.ErrorApiResponse(ctx, "新闻不存在", 404)

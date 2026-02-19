@@ -14,6 +14,7 @@ func initProductRouter() {
 			private.DELETE("/product_series", api.ProductApi.DeleteProductSeries)
 
 			public.GET("/products", api.ProductApi.GetProductList)
+			private.GET("/products/:product_id", api.ProductApi.GetProductDetail)
 			private.POST("/products", api.ProductApi.CreateProduct)
 			private.PUT("/products", api.ProductApi.UpdateProduct)
 			private.DELETE("/products", api.ProductApi.DeleteProduct)

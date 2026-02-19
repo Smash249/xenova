@@ -8,3 +8,7 @@ type JournalismSeries struct {
 	Description string       `gorm:"type:text;comment:新闻系列描述" json:"description"`
 	Journalism  []Journalism `gorm:"foreignKey:SeriesID" json:"-"`
 }
+
+func (JournalismSeries) TableName() string {
+	return "journalism_series"
+}

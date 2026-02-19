@@ -64,7 +64,7 @@ func NewAuthWithConfig(config AuthConfig) echo.MiddlewareFunc {
 				}
 			}
 			ctx.Set("userID", claims.ID)
-			ctx.Set("UserName", claims.UserName)
+			ctx.Set("userName", claims.UserName)
 			ctx.Set("claims", claims)
 			return next(ctx)
 		}

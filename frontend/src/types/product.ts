@@ -1,11 +1,24 @@
 import type { BaseResponse } from "./common"
 
-interface Product {
+interface Product extends BaseResponse {
   id: number
   name: string
-  ProductSeries: string
+  seriesId: string
   image: string
   description: string
+  cover: string
+  previews: string[]
+  price: number
+}
+interface ProductDetail extends BaseResponse {
+  id: number
+  name: string
+  description: string
+  cover: string
+  previews: string[] | null
+  price: number
+  series_id: number
+  series_name: string
 }
 
 interface ProductSeries extends BaseResponse {
@@ -13,4 +26,4 @@ interface ProductSeries extends BaseResponse {
   name: string
 }
 
-export type { ProductSeries, Product }
+export type { ProductSeries, Product, ProductDetail }

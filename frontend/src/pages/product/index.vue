@@ -67,60 +67,7 @@
               </li>
             </ul>
           </div>
-
-          <div
-            class="rounded-2xl border border-blue-100 bg-linear-to-br from-blue-50 to-white p-6 shadow-lg shadow-blue-900/5"
-          >
-            <h3 class="mb-4 flex items-center font-bold text-blue-800">
-              联系销售顾问
-              <span
-                class="ml-2 h-2 w-2 animate-pulse rounded-full bg-green-400"
-              ></span>
-            </h3>
-            <p class="mb-6 text-sm leading-relaxed text-slate-600">
-              需要定制方案或获取报价？我们的工程师随时为您服务。
-            </p>
-            <div class="space-y-4 text-sm">
-              <div
-                class="group flex cursor-pointer items-center text-slate-700"
-              >
-                <div
-                  class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 transition-colors group-hover:bg-blue-600"
-                >
-                  <Phone
-                    class="h-4 w-4 text-blue-600 transition-colors group-hover:text-white"
-                  />
-                </div>
-                <span
-                  class="font-medium transition-colors group-hover:text-blue-600"
-                  >0592-6818878</span
-                >
-              </div>
-              <div
-                class="group flex cursor-pointer items-center text-slate-700"
-              >
-                <div
-                  class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 transition-colors group-hover:bg-blue-600"
-                >
-                  <Mail
-                    class="h-4 w-4 text-blue-600 transition-colors group-hover:text-white"
-                  />
-                </div>
-                <span
-                  class="font-medium transition-colors group-hover:text-blue-600"
-                  >1888@xingshi.com</span
-                >
-              </div>
-              <div class="flex items-center text-slate-700">
-                <div
-                  class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100"
-                >
-                  <MapPin class="h-4 w-4 text-blue-600" />
-                </div>
-                <span>集美区软件园</span>
-              </div>
-            </div>
-          </div>
+          <ContactUs />
         </aside>
 
         <main class="lg:col-span-3">
@@ -167,7 +114,7 @@
           </div>
 
           <div
-            v-else-if="!isEmpty"
+            v-else-if="isEmpty"
             class="flex h-full items-center justify-center"
           >
             <el-empty description="暂无相关产品" :image-size="160">
@@ -187,24 +134,12 @@
               v-for="(product, index) in products"
               :key="product.id"
               class="group flex h-full transform cursor-pointer flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-500 hover:shadow-2xl hover:shadow-blue-900/10"
-              :class="[
-                loaded
-                  ? 'translate-y-0 opacity-100'
-                  : 'translate-y-8 opacity-0',
-              ]"
               :style="{ transitionDelay: `${index * 100}ms` }"
+              @click="HandelGotoDetail(product)"
             >
               <div class="relative h-56 overflow-hidden bg-gray-100">
-                <div class="absolute top-4 left-4 z-10">
-                  <span
-                    class="rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-blue-800 shadow-sm backdrop-blur-sm"
-                  >
-                    {{ product.ProductSeries }}
-                  </span>
-                </div>
-
                 <img
-                  :src="product.image"
+                  :src="product.cover"
                   :alt="product.name"
                   class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
@@ -258,23 +193,17 @@
 
 <script setup lang="ts">
 import { GetProductListApi, GetProductSeriesApi } from "@/api/product"
+import router from "@/router"
 import { ElMessage } from "element-plus"
-import {
-  ArrowRight,
-  ChevronRight,
-  Filter,
-  Mail,
-  MapPin,
-  Phone,
-  Search,
-} from "lucide-vue-next"
+import { ArrowRight, ChevronRight, Filter, Search } from "lucide-vue-next"
 import { computed, onMounted, ref, watch } from "vue"
 
 import type { Paginate } from "@/types/common"
 import type { Product, ProductSeries } from "@/types/product"
+import ContactUs from "@/components/contactUs/index.vue"
 
 const loading = ref(false)
-const loaded = ref(false)
+
 const productName = ref("")
 const categories = ref<ProductSeries[]>([])
 const activeProductSeriesId = ref<null | number>(null)
@@ -283,7 +212,7 @@ const paginate = ref<Paginate | null>(null)
 const currentPage = ref(1)
 
 const isEmpty = computed(() => {
-  return !loading && products.value.length === 0
+  return !loading && products.value.length != 0
 })
 
 const canShowPaginate = computed(() => {
@@ -300,6 +229,10 @@ function HandlePageChange(page: number) {
   GetProductList()
 }
 
+function HandelGotoDetail(product: Product) {
+  router.push({ name: "productDetail", params: { product_id: product.id } })
+}
+
 async function GetProductSeries() {
   try {
     const result = await GetProductSeriesApi()
@@ -313,7 +246,6 @@ async function GetProductSeries() {
 
 async function GetProductList() {
   loading.value = true
-  loaded.value = false
   try {
     const result = await GetProductListApi(
       currentPage.value,
