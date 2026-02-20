@@ -22,9 +22,13 @@ func initRouter() {
 	e := echo.New()
 	e.Validator = validator.InitCustomValidator()
 	e.Use(middleware.NewLogger())
+	// 不需要认证的路由
 	public := e.Group("/public")
+	// 需要认证的路由
 	private := e.Group("/private", middleware.NewAuth())
-	router.GroupRouterHubApp.InitRouterHub(public, private)
+	// 需要管理员权限的路由
+	admin := e.Group("/admin", middleware.NewAuth(), middleware.NewAdmin())
+	router.GroupRouterHubApp.InitRouterHub(public, private, admin)
 	server := &http.Server{
 		Addr:    ":8080",
 		Handler: e,

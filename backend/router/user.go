@@ -7,7 +7,7 @@ import (
 
 func initUserRouter() {
 	GroupRouterHubApp.RegisterRouterHub(
-		func(public, private *echo.Group) {
+		func(public, private, admin *echo.Group) {
 			public.POST("/login", api.UserApi.Login)
 			public.POST("/register", api.UserApi.Register)
 			public.GET("/health", api.UserApi.Health)

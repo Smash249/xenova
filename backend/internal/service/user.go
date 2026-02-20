@@ -31,6 +31,7 @@ func (UserService) Login(params request.UserLoginReq) (*response.UserLoginResp, 
 	accessToken, refreshToken, err := utils.GenerateTokenPair(utils.BaseClaims{
 		ID:       user.ID,
 		UserName: user.UserName,
+		Role:     user.Role,
 	})
 	fmt.Println(err)
 	if err != nil {
