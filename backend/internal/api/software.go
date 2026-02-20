@@ -14,44 +14,44 @@ var SoftwareApi = new(softwareApi)
 
 type softwareApi struct{}
 
-func (s *softwareApi) GetSoftwareCategory(ctx *echo.Context) error {
-	result, err := softwareServiceApp.GetSoftwareCategoryList()
+func (s *softwareApi) GetSoftwareSeries(ctx *echo.Context) error {
+	result, err := softwareServiceApp.GetSoftwareSeriesList()
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
 }
 
-func (s *softwareApi) CreateSoftwareCategory(ctx *echo.Context) error {
-	createCategoryReq, err := utils.BindAndValidate[request.CreateSoftwareCategoryReq](ctx)
+func (s *softwareApi) CreateSoftwareSeries(ctx *echo.Context) error {
+	createCategoryReq, err := utils.BindAndValidate[request.CreateSoftwareSeriesReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	err = softwareServiceApp.CreateSoftwareCategory(createCategoryReq)
+	err = softwareServiceApp.CreateSoftwareSeries(createCategoryReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, "创建成功", http.StatusOK)
 }
 
-func (s *softwareApi) UpdateSoftwareCategory(ctx *echo.Context) error {
-	updateCategoryReq, err := utils.BindAndValidate[request.UpdateSoftwareCategoryReq](ctx)
+func (s *softwareApi) UpdateSoftwareSeries(ctx *echo.Context) error {
+	updateCategoryReq, err := utils.BindAndValidate[request.UpdateSoftwareSeriesReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	err = softwareServiceApp.UpdateSoftwareCategory(updateCategoryReq)
+	err = softwareServiceApp.UpdateSoftwareSeries(updateCategoryReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, "更新成功", http.StatusOK)
 }
 
-func (s *softwareApi) DeleteSoftwareCategory(ctx *echo.Context) error {
-	deleteCategoryReq, err := utils.BindAndValidate[request.DeleteSoftwareCategoryReq](ctx)
+func (s *softwareApi) DeleteSoftwareSeries(ctx *echo.Context) error {
+	deleteCategoryReq, err := utils.BindAndValidate[request.DeleteSoftwareSeriesReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	err = softwareServiceApp.DeleteSoftwareCategory(deleteCategoryReq)
+	err = softwareServiceApp.DeleteSoftwareSeries(deleteCategoryReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}

@@ -15,6 +15,7 @@ func (r *routerHub) InitRouterHub(public, private *echo.Group) {
 	initProductRouter()
 	initJournalism()
 	initSoftwareRouter()
+	initHonorRouter()
 	for _, registerFunc := range r.routerHubList {
 		registerFunc(public, private)
 	}

@@ -6,7 +6,7 @@
       backdropFilter: `blur(${(1 - fadeProgress) * 12}px)`,
       borderBottom: `1px solid rgba(229, 231, 235, ${headerOpacity})`,
     }"
-    class="fixed inset-0 z-50 h-16 w-full transition-shadow duration-100 ease-linear"
+    class="fixed inset-0 z-50 h-16 w-full py-4 transition-shadow duration-100 ease-linear"
   >
     <div class="mx-auto flex h-full w-[90%] items-center justify-between">
       <div class="flex items-center">
@@ -112,7 +112,7 @@ const drawerVisible = ref(false)
 
 const fadeProgress = computed(() => {
   if (windowHeight.value === 0) return 0
-  const start = windowHeight.value * 0.5
+  const start = windowHeight.value * 0.3
   const end = windowHeight.value
   return Math.min(Math.max((scrollY.value - start) / (end - start), 0), 1)
 })

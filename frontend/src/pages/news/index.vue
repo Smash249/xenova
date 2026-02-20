@@ -145,7 +145,7 @@
                     </span>
                     <div class="flex items-center text-xs text-slate-400">
                       <Calendar class="mr-1 h-3.5 w-3.5" />
-                      {{ FormatDate(news.createdAt) }}
+                      {{ FormatDate(news.created_at) }}
                     </div>
                   </div>
                   <h3

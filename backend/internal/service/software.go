@@ -9,37 +9,35 @@ import (
 
 type SoftwareService struct{}
 
-// ==================== SoftwareCategory 软件分类 CRUD ====================
+// ==================== SoftwareSeries 软件分类 CRUD ====================
 
-// GetSoftwareCategoryList 获取软件分类列表
-func (s *SoftwareService) GetSoftwareCategoryList() ([]models.SoftwareCategory, error) {
-	var categoryList []models.SoftwareCategory
-	err := global.DB.Order("sort DESC").Find(&categoryList).Error
+// GetSoftwareSeriesList 获取软件分类列表
+func (s *SoftwareService) GetSoftwareSeriesList() ([]models.SoftwareSeries, error) {
+	var categoryList []models.SoftwareSeries
+	err := global.DB.Find(&categoryList).Error
 	return categoryList, err
 }
 
-// CreateSoftwareCategory 创建软件分类
-func (s *SoftwareService) CreateSoftwareCategory(params request.CreateSoftwareCategoryReq) error {
-	return global.DB.Create(&models.SoftwareCategory{
+// CreateSoftwareSeries 创建软件分类
+func (s *SoftwareService) CreateSoftwareSeries(params request.CreateSoftwareSeriesReq) error {
+	return global.DB.Create(&models.SoftwareSeries{
 		Name: params.Name,
-		Sort: params.Sort,
 	}).Error
 }
 
-// UpdateSoftwareCategory 更新软件分类
-func (s *SoftwareService) UpdateSoftwareCategory(params request.UpdateSoftwareCategoryReq) error {
-	return global.DB.Model(&models.SoftwareCategory{}).Where("id = ?", params.ID).Updates(models.SoftwareCategory{
+// UpdateSoftwareSeries 更新软件分类
+func (s *SoftwareService) UpdateSoftwareSeries(params request.UpdateSoftwareSeriesReq) error {
+	return global.DB.Model(&models.SoftwareSeries{}).Where("id = ?", params.ID).Updates(models.SoftwareSeries{
 		Name: params.Name,
-		Sort: params.Sort,
 	}).Error
 }
 
-// DeleteSoftwareCategory 删除软件分类
-func (s *SoftwareService) DeleteSoftwareCategory(params request.DeleteSoftwareCategoryReq) error {
+// DeleteSoftwareSeries 删除软件分类
+func (s *SoftwareService) DeleteSoftwareSeries(params request.DeleteSoftwareSeriesReq) error {
 	if len(params.IdList) == 0 {
 		return nil
 	}
-	return global.DB.Where("id in ?", params.IdList).Delete(&models.SoftwareCategory{}).Error
+	return global.DB.Where("id in ?", params.IdList).Delete(&models.SoftwareSeries{}).Error
 }
 
 // ==================== Software 软件资源 CRUD ====================
@@ -47,11 +45,11 @@ func (s *SoftwareService) DeleteSoftwareCategory(params request.DeleteSoftwareCa
 // GetSoftwareList 获取软件列表
 func (s *SoftwareService) GetSoftwareList(params request.GetSoftwareReq) (*global.PaginatorResp[models.Software], error) {
 	query := global.DB.Model(&models.Software{})
-	if params.CategoryID != 0 {
-		query = query.Where("category_id = ?", params.CategoryID)
+	if params.SeriesID != 0 {
+		query = query.Where("series_id = ?", params.SeriesID)
 	}
 	if params.Name != "" {
-		query = query.Where("name LIKE ? OR version LIKE ?", "%"+params.Name+"%", "%"+params.Name+"%")
+		query = query.Where("name LIKE ?", "%"+params.Name+"%")
 	}
 	query = query.Order("created_at DESC")
 	result, err := utils.Paginator[models.Software](query, params.PaginateReq)
@@ -73,11 +71,11 @@ func (s *SoftwareService) CreateSoftware(params request.CreateSoftwareReq) error
 	return global.DB.Create(&models.Software{
 		Name:        params.Name,
 		Description: params.Description,
-		Version:     params.Version,
 		FileSize:    params.FileSize,
 		FileURL:     params.FileURL,
+		FileType:    params.FileType,
 		IsHot:       params.IsHot,
-		CategoryID:  params.CategoryID,
+		SeriesID:    params.SeriesID,
 	}).Error
 }
 
@@ -86,11 +84,11 @@ func (s *SoftwareService) UpdateSoftware(params request.UpdateSoftwareReq) error
 	return global.DB.Where("id = ?", params.ID).Updates(models.Software{
 		Name:        params.Name,
 		Description: params.Description,
-		Version:     params.Version,
 		FileSize:    params.FileSize,
 		FileURL:     params.FileURL,
+		FileType:    params.FileType,
 		IsHot:       params.IsHot,
-		CategoryID:  params.CategoryID,
+		SeriesID:    params.SeriesID,
 	}).Error
 }
 
