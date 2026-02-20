@@ -1,5 +1,8 @@
 import axios from "axios"
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios"
+import { ElMessage } from "element-plus"
+
+import type { RequestResponse } from "@/types/common"
 
 let axiosCache: Request | null = null
 
@@ -14,10 +17,47 @@ class Request {
     this.setupInterceptors()
   }
 
+  private handelErrorCode(code: number) {
+    switch (code) {
+      case 401:
+        localStorage.removeItem("user")
+        ElMessage.error({
+          message: "登录失效，请重新登录",
+          onClose: () => {
+            window.location.href = "/login"
+          },
+        })
+        break
+      case 403:
+        console.error("403 Forbidden")
+        break
+      case 404:
+        console.error("404 Not Found")
+        break
+      case 500:
+        console.error("500 Internal Server Error")
+        break
+      default:
+        console.error("Unknown Error")
+        break
+    }
+  }
+
   private setupInterceptors() {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config) => {
+        const userStore = localStorage.getItem("user")
+        if (userStore) {
+          try {
+            const user = JSON.parse(userStore)
+            if (user.accessToken) {
+              config.headers.Authorization = `${user.accessToken}`
+            }
+          } catch (e) {
+            console.error("Failed to parse user store:", e)
+          }
+        }
         return config
       },
       (error) => {
@@ -31,8 +71,8 @@ class Request {
         return response.data
       },
       (error) => {
-        const message = error.response?.data?.message || error.message
-        console.error("Request error:", message)
+        const status = error.response?.status
+        this.handelErrorCode(status)
         return Promise.reject(error)
       }
     )
@@ -43,7 +83,10 @@ class Request {
     return axiosCache
   }
 
-  public get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public get<T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<RequestResponse<T>> {
     return this.instance.get(url, config)
   }
 
@@ -51,7 +94,7 @@ class Request {
     url: string,
     data?: any,
     config?: AxiosRequestConfig
-  ): Promise<T> {
+  ): Promise<RequestResponse<T>> {
     return this.instance.post(url, data, config)
   }
 
@@ -59,13 +102,18 @@ class Request {
     url: string,
     data?: any,
     config?: AxiosRequestConfig
-  ): Promise<T> {
+  ): Promise<RequestResponse<T>> {
     return this.instance.put(url, data, config)
   }
 
-  public delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public delete<T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<RequestResponse<T>> {
     return this.instance.delete(url, config)
   }
 }
 
-export default Request.getInstance()
+export default Request.getInstance({
+  baseURL: import.meta.env.VITE_PROXY_PATH,
+})

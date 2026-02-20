@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen w-full flex-col gap-2">
+  <div class="flex min-h-screen w-full flex-col">
     <CustomHeader />
     <main class="flex w-full flex-1 flex-col">
       <router-view />

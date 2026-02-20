@@ -17,7 +17,6 @@
     </div>
 
     <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-      <!-- 面包屑导航 -->
       <nav class="mb-10 flex items-center text-sm text-slate-500">
         <a class="transition-colors hover:text-blue-600" href="/">首页</a>
         <ChevronRight class="mx-2 h-4 w-4" />
@@ -25,120 +24,115 @@
       </nav>
 
       <div class="grid grid-cols-1 gap-10 lg:grid-cols-4">
-        <!-- 左侧侧边栏 -->
         <aside class="space-y-8 lg:col-span-1">
           <div
-            class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+            class="flex items-center rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
           >
-            <h2 class="mb-6 flex items-center text-xl font-bold text-slate-900">
-              <span class="mr-3 h-6 w-1 rounded-full bg-blue-600"></span>
-              新闻分类
-            </h2>
-            <ul class="space-y-2">
-              <li v-for="(cat, index) in categories" :key="index">
-                <a
+            <Search class="mr-3 h-5 w-5 text-slate-400" />
+            <input
+              v-model="title"
+              type="text"
+              placeholder="搜索新闻标题..."
+              class="w-full border-none bg-transparent text-sm text-slate-700 placeholder-slate-400 focus:ring-0"
+            />
+          </div>
+
+          <div
+            class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm"
+          >
+            <div
+              class="flex items-center justify-between border-b border-gray-50 bg-gray-50/50 p-5"
+            >
+              <h2 class="flex items-center font-bold text-slate-900">
+                <Filter class="mr-2 h-4 w-4 text-blue-600" />
+                新闻分类
+              </h2>
+            </div>
+            <ul class="cursor-pointer space-y-1 p-3">
+              <li v-for="cat in categories" :key="cat.id">
+                <button
+                  @click="SelectProductSeries(cat.id)"
+                  class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-all duration-200"
                   :class="[
-                    cat.active
-                      ? 'bg-blue-50 font-semibold text-blue-700 shadow-sm'
+                    activeProductSeriesId === cat.id
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
                       : 'text-slate-600 hover:bg-gray-50 hover:text-blue-600',
                   ]"
-                  class="group block rounded-xl px-4 py-3 transition-all duration-200"
-                  href="#"
                 >
-                  <div class="flex items-center justify-between">
-                    {{ cat.name }}
-                    <ChevronRight
-                      :class="
-                        cat.active
-                          ? 'opacity-100'
-                          : 'opacity-0 group-hover:opacity-100'
-                      "
-                      class="h-4 w-4 transition-transform"
-                    />
-                  </div>
-                </a>
+                  <span class="font-medium">{{ cat.name }}</span>
+                </button>
               </li>
             </ul>
           </div>
 
-          <!-- 联系方式卡片 (已更新为亮色风格) -->
-          <div
-            class="rounded-2xl border border-blue-100 bg-linear-to-br from-blue-50 to-white p-6 shadow-lg shadow-blue-900/5"
-          >
-            <h2 class="mb-6 flex items-center text-xl font-bold text-blue-800">
-              联系我们
-              <span
-                class="ml-2 h-2 w-2 animate-pulse rounded-full bg-green-400"
-              ></span>
-            </h2>
-            <div class="space-y-5">
-              <div class="flex items-start text-slate-700">
-                <div
-                  class="mt-1 mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100"
-                >
-                  <MapPin class="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <h3
-                    class="mb-1 text-xs tracking-wider text-slate-500 uppercase"
-                  >
-                    公司地址
-                  </h3>
-                  <p class="text-sm font-medium">星实（厦门）科技有限公司</p>
-                  <p class="mt-1 text-sm text-slate-500">集美区软件园</p>
-                </div>
-              </div>
-
-              <div class="flex items-start text-slate-700">
-                <div
-                  class="mt-1 mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100"
-                >
-                  <Phone class="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <h3
-                    class="mb-1 text-xs tracking-wider text-slate-500 uppercase"
-                  >
-                    咨询热线
-                  </h3>
-                  <p class="text-lg font-bold tracking-wide text-blue-900">
-                    0592-6818878
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex items-start text-slate-700">
-                <div
-                  class="mt-1 mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100"
-                >
-                  <Mail class="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <h3
-                    class="mb-1 text-xs tracking-wider text-slate-500 uppercase"
-                  >
-                    电子邮箱
-                  </h3>
-                  <p class="text-sm font-medium break-all">1888@xingshi.com</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ContactUs />
         </aside>
 
-        <!-- 右侧新闻列表 -->
-        <main class="lg:col-span-3">
-          <div class="space-y-6">
+        <main class="flex flex-col lg:col-span-3">
+          <div
+            class="mb-8 flex flex-col items-center justify-between border-b border-gray-200 pb-4 sm:flex-row"
+          >
+            <h2 class="mb-4 text-2xl font-bold text-slate-800 sm:mb-0">
+              全部动态
+              <span class="ml-2 text-base font-normal text-slate-400">
+                共 {{ paginate?.total_count ?? 0 }} 篇文章
+              </span>
+            </h2>
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-slate-500">排序:</span>
+              <select
+                class="cursor-pointer border-none bg-transparent text-sm font-medium text-slate-700 focus:ring-0"
+              >
+                <option>推荐排序</option>
+                <option>最新发布</option>
+              </select>
+            </div>
+          </div>
+
+          <div v-if="loading" class="space-y-6">
+            <div
+              v-for="n in 4"
+              :key="n"
+              class="overflow-hidden rounded-2xl border border-gray-100 bg-white"
+            >
+              <el-skeleton animated>
+                <template #template>
+                  <div class="p-6">
+                    <el-skeleton-item variant="h3" class="mb-3 w-3/4" />
+                    <el-skeleton-item variant="text" class="mb-2 w-full" />
+                    <el-skeleton-item variant="text" class="w-2/3" />
+                  </div>
+                </template>
+              </el-skeleton>
+            </div>
+          </div>
+
+          <div
+            v-else-if="isEmpty"
+            class="flex h-full items-center justify-center"
+          >
+            <el-empty description="暂无相关动态" :image-size="160">
+              <template #description>
+                <span class="text-sm text-slate-400">
+                  暂无相关动态，请尝试其他搜索条件
+                </span>
+              </template>
+            </el-empty>
+          </div>
+
+          <TransitionGroup
+            v-else
+            appear
+            name="list"
+            tag="div"
+            class="flex-1 space-y-6"
+          >
             <article
               v-for="(news, index) in newsData"
               :key="news.id"
-              class="group rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5 md:p-8"
-              :class="[
-                isLoaded
-                  ? 'translate-y-0 opacity-100'
-                  : 'translate-y-8 opacity-0',
-              ]"
-              :style="{ transitionDelay: `${index * 100}ms` }"
+              class="group cursor-pointer rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5 md:p-8"
+              :style="{ animationDelay: `${index * 50}ms` }"
+              @click="HandelGotoNewsDetail(news)"
             >
               <div
                 class="mb-4 flex flex-col justify-between gap-4 md:flex-row md:items-start"
@@ -148,23 +142,23 @@
                     <span
                       class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600"
                     >
-                      {{ news.category }}
+                      {{ GetCategoryName(news.series_id) }}
                     </span>
                     <div class="flex items-center text-xs text-slate-400">
                       <Calendar class="mr-1 h-3.5 w-3.5" />
-                      {{ news.date }}
+                      {{ FormatDate(news.created_at) }}
                     </div>
                   </div>
                   <h3
                     class="mb-3 line-clamp-2 text-xl font-bold text-slate-800 transition-colors group-hover:text-blue-700 md:text-2xl"
                   >
-                    <a :href="news.link">{{ news.title }}</a>
+                    <a :href="`/news/detail/${news.id}`">{{ news.title }}</a>
                   </h3>
                 </div>
               </div>
 
               <p class="mb-6 line-clamp-3 leading-relaxed text-slate-600">
-                {{ news.summary }}
+                {{ news.content }}
               </p>
 
               <div
@@ -172,130 +166,148 @@
               >
                 <div class="flex items-center text-sm text-slate-400">
                   <Eye class="mr-2 h-4 w-4" />
-                  <span>{{ news.views }} 次浏览</span>
+                  <span>{{ news.view_count }} 次浏览</span>
                 </div>
 
-                <a
-                  :href="news.link"
+                <div
                   class="group/btn inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
                 >
                   阅读更多
                   <ChevronRight
                     class="ml-1 h-4 w-4 transition-transform group-hover/btn:translate-x-1"
                   />
-                </a>
+                </div>
               </div>
             </article>
-          </div>
+          </TransitionGroup>
 
-          <!-- 分页 -->
-          <div class="mt-12 flex justify-center">
-            <nav class="flex items-center gap-2">
-              <button
-                class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <button
-                class="h-10 w-10 rounded-lg bg-blue-600 font-medium text-white shadow-md shadow-blue-200"
-              >
-                1
-              </button>
-              <button
-                class="h-10 w-10 rounded-lg font-medium text-slate-600 transition-colors hover:bg-gray-100 hover:text-blue-600"
-              >
-                2
-              </button>
-              <button
-                class="h-10 w-10 rounded-lg font-medium text-slate-600 transition-colors hover:bg-gray-100 hover:text-blue-600"
-              >
-                3
-              </button>
-              <span class="px-2 text-slate-400">...</span>
-              <button
-                class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
-              >
-                Next
-              </button>
-            </nav>
+          <div v-if="canShowPaginate" class="mt-12 flex justify-center">
+            <el-pagination
+              v-model:current-page="currentPage"
+              :page-size="paginate?.page_size ?? 0"
+              :total="paginate?.total_count ?? 0"
+              layout="prev, pager, next"
+              background
+              @current-change="HandlePageChange"
+            />
           </div>
         </main>
       </div>
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
-import {
-  Calendar,
-  ChevronRight,
-  Eye,
-  Mail,
-  MapPin,
-  Phone,
-} from "lucide-vue-next"
-import { onMounted, ref } from "vue"
+import { GetNewsListApi, GetNewsSeriesApi } from "@/api/news"
+import router from "@/router"
+import dayjs from "dayjs"
+import { ElMessage } from "element-plus"
+import { Calendar, ChevronRight, Eye, Filter, Search } from "lucide-vue-next"
+import { computed, onMounted, ref, watch } from "vue"
 
-interface NewsItem {
-  id: number
-  title: string
-  date: string
-  summary: string
-  views: number
-  category: string
-  link: string
+import type { Paginate } from "@/types/common"
+import type { News, NewsSeries } from "@/types/new"
+import ContactUs from "@/components/contactUs/index.vue"
+
+const loading = ref(false)
+const title = ref("")
+const categories = ref<NewsSeries[]>([])
+const activeProductSeriesId = ref<null | number>(null)
+const newsData = ref<News[]>([])
+const paginate = ref<Paginate | null>(null)
+const currentPage = ref(1)
+
+const isEmpty = computed(() => {
+  return !loading.value && newsData.value.length === 0
+})
+
+const canShowPaginate = computed(() => {
+  return (
+    !loading.value && newsData.value.length !== 0 && paginate.value !== null
+  )
+})
+
+function FormatDate(dateStr: string) {
+  if (!dateStr) return ""
+  return dayjs(dateStr).format("YYYY-MM-DD")
 }
 
-interface Category {
-  name: string
-  active: boolean
+function GetCategoryName(seriesId: number): string {
+  const category = categories.value.find((c) => c.id === seriesId)
+  return category ? category.name : "未分类"
 }
 
-const newsData: NewsItem[] = [
-  {
-    id: 1,
-    title: "星实的视觉打标机与其他行业内有什么区别?",
-    date: "2025-06-18",
-    summary:
-      "星实制造的激光器设备在行业上首次采用了AI视觉辅助功能，皆知无需人工干预即可实现自动打标。",
-    views: 1800,
-    category: "公司讯息",
-    link: "#",
-  },
-  {
-    id: 2,
-    title: "装盒机厂家与智能包装设备的未来趋势",
-    date: "2025-06-18",
-    summary:
-      "装盒机厂家与其他包装设备在功能、适用范围、操作便捷性、智能化程度以及设计细节等方面存在显著的区别。以下是对这些区别的详细分析...",
-    views: 1650,
-    category: "行业讯息",
-    link: "#",
-  },
-  {
-    id: 3,
-    title: "自动化产线升：如何提升生产效率",
-    date: "2025-06-18",
-    summary:
-      "深入探讨自动化产线在现代制造业中的应用，以及如何通过技术升级来降���成本并大幅提升生产效率。",
-    views: 1520,
-    category: "技术讯息",
-    link: "#",
-  },
-]
+function SelectProductSeries(id: number) {
+  activeProductSeriesId.value = id
+  currentPage.value = 1
+}
 
-const categories: Category[] = [
-  { name: "公司讯息", active: true },
-  { name: "行业讯息", active: false },
-  { name: "技术讯息", active: false },
-]
+function HandlePageChange(page: number) {
+  currentPage.value = page
+  GetNewsList()
+}
 
-const isLoaded = ref(false)
+function HandelGotoNewsDetail(news: News) {
+  router.push({
+    name: "newsDetail",
+    params: {
+      newsId: news.id,
+    },
+  })
+}
+
+async function GetNewsSeries() {
+  try {
+    const result = await GetNewsSeriesApi()
+    categories.value = result
+    if (result.length > 0) activeProductSeriesId.value = result[0].id
+  } catch (error) {
+    console.log(error)
+    ElMessage.error("获取新闻系列失败")
+  }
+}
+
+async function GetNewsList() {
+  loading.value = true
+  try {
+    const result = await GetNewsListApi(
+      currentPage.value,
+      title.value,
+      activeProductSeriesId.value
+    )
+
+    newsData.value = result.data
+    if (result.paginate) paginate.value = result.paginate
+  } catch (error) {
+    console.log(error)
+    ElMessage.error("获取新闻列表失败")
+  } finally {
+    loading.value = false
+  }
+}
+
+watch(title, (newVal) => {
+  if (!newVal.trim()) return
+  currentPage.value = 1
+  GetNewsList()
+})
+
+watch(activeProductSeriesId, () => {
+  if (!activeProductSeriesId.value) return
+  GetNewsList()
+})
 
 onMounted(() => {
-  setTimeout(() => {
-    isLoaded.value = true
-  }, 100)
+  GetNewsSeries()
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.list-enter-active {
+  animation: list-fade-in-up 0.5s ease-out both;
+}
+
+.list-leave-active {
+  animation: list-fade-in-up 0.3s ease-in reverse both;
+}
+</style>

@@ -1,0 +1,29 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Build artifacts
+bin/
+build/
+vendor/
+
+# Development files
+.git
+.gitignore
+.vscode
+.idea
+*.log
+
+# Test files
+*_test.go
+*.cover
+*.prof
+*.testcache
+
+# Documentation
+README.md
+LICENSE

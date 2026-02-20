@@ -2,6 +2,16 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router"
 
 const routes: RouteRecordRaw[] = [
   {
+    path: "/login",
+    name: "login",
+    component: () => import("@/pages/auth/login.vue"),
+  },
+  {
+    path: "/register",
+    name: "register",
+    component: () => import("@/pages/auth/register.vue"),
+  },
+  {
     path: "/",
     component: () => import("@/layout/index.vue"),
     redirect: "/dashboard",
@@ -17,9 +27,19 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/pages/product/index.vue"),
       },
       {
+        path: "product/:product_id",
+        name: "productDetail",
+        component: () => import("@/pages/product/detail/index.vue"),
+      },
+      {
         path: "news",
         name: "news",
         component: () => import("@/pages/news/index.vue"),
+      },
+      {
+        path: "news/:newsId",
+        name: "newsDetail",
+        component: () => import("@/pages/news/detail/index.vue"),
       },
       {
         path: "download",
@@ -41,7 +61,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.VITE_BASEPATH || ""),
+  history: createWebHistory(),
   scrollBehavior(to) {
     if (to.hash) {
       return {
