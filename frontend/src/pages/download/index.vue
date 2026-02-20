@@ -92,15 +92,18 @@
         </div>
       </div>
 
-      <div v-else-if="filteredDownloads.length > 0" class="space-y-4">
+      <TransitionGroup
+        v-else-if="filteredDownloads.length > 0"
+        appear
+        name="list"
+        tag="div"
+        class="space-y-4"
+      >
         <div
           v-for="(item, index) in filteredDownloads"
           :key="item.id"
           class="group transform rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-100 hover:shadow-xl"
-          :class="[
-            isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
-          ]"
-          :style="{ transitionDelay: `${index * 80}ms` }"
+          :style="{ animationDelay: `${index * 50}ms` }"
         >
           <div
             class="flex flex-col justify-between gap-6 md:flex-row md:items-center"
@@ -171,7 +174,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </TransitionGroup>
 
       <el-empty
         v-else-if="!loading"
@@ -219,7 +222,6 @@ interface TabItem {
 const loading = ref(false)
 const activeTab = ref<number>(0)
 const searchKeyword = ref("")
-const isLoaded = ref(false)
 const currentPage = ref(1)
 
 const seriesList = ref<SoftWareSeries[]>([])
@@ -320,8 +322,15 @@ watch(activeTab, () => {
 
 onMounted(async () => {
   await GetSoftWareSeries()
-  isLoaded.value = true
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.list-enter-active {
+  animation: list-fade-in-up 0.5s ease-out both;
+}
+
+.list-leave-active {
+  animation: list-fade-in-up 0.3s ease-in reverse both;
+}
+</style>

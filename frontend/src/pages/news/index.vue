@@ -120,17 +120,18 @@
             </el-empty>
           </div>
 
-          <div v-else class="flex-1 space-y-6">
+          <TransitionGroup
+            v-else
+            appear
+            name="list"
+            tag="div"
+            class="flex-1 space-y-6"
+          >
             <article
               v-for="(news, index) in newsData"
               :key="news.id"
               class="group cursor-pointer rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5 md:p-8"
-              :class="[
-                loaded
-                  ? 'translate-y-0 opacity-100'
-                  : 'translate-y-8 opacity-0',
-              ]"
-              :style="{ transitionDelay: `${index * 100}ms` }"
+              :style="{ animationDelay: `${index * 50}ms` }"
               @click="HandelGotoNewsDetail(news)"
             >
               <div
@@ -178,7 +179,7 @@
                 </div>
               </div>
             </article>
-          </div>
+          </TransitionGroup>
 
           <div v-if="canShowPaginate" class="mt-12 flex justify-center">
             <el-pagination
@@ -209,7 +210,6 @@ import type { News, NewsSeries } from "@/types/new"
 import ContactUs from "@/components/contactUs/index.vue"
 
 const loading = ref(false)
-const loaded = ref(false)
 const title = ref("")
 const categories = ref<NewsSeries[]>([])
 const activeProductSeriesId = ref<null | number>(null)
@@ -269,7 +269,6 @@ async function GetNewsSeries() {
 
 async function GetNewsList() {
   loading.value = true
-  loaded.value = false
   try {
     const result = await GetNewsListApi(
       currentPage.value,
@@ -284,7 +283,6 @@ async function GetNewsList() {
     ElMessage.error("获取新闻列表失败")
   } finally {
     loading.value = false
-    loaded.value = true
   }
 }
 
@@ -304,4 +302,12 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.list-enter-active {
+  animation: list-fade-in-up 0.5s ease-out both;
+}
+
+.list-leave-active {
+  animation: list-fade-in-up 0.3s ease-in reverse both;
+}
+</style>

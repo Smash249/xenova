@@ -70,7 +70,7 @@
           <ContactUs />
         </aside>
 
-        <main class="lg:col-span-3">
+        <main class="flex flex-col lg:col-span-3">
           <div
             class="mb-8 flex flex-col items-center justify-between border-b border-gray-200 pb-4 sm:flex-row"
           >
@@ -126,16 +126,19 @@
             </el-empty>
           </div>
 
-          <div
+          <TransitionGroup
             v-else
-            class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+            appear
+            name="list"
+            tag="div"
+            class="grid flex-1 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
           >
             <div
               v-for="(product, index) in products"
               :key="product.id"
-              class="group flex h-full transform cursor-pointer flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-500 hover:shadow-2xl hover:shadow-blue-900/10"
-              :style="{ transitionDelay: `${index * 100}ms` }"
-              @click="HandelGotoDetail(product)"
+              class="group flex h-full max-h-100 transform cursor-pointer flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-500 hover:shadow-2xl hover:shadow-blue-900/10"
+              :style="{ animationDelay: `${index * 50}ms` }"
+              @click="HandleGotoDetail(product)"
             >
               <div class="relative h-56 overflow-hidden bg-gray-100">
                 <img
@@ -173,9 +176,9 @@
                 </div>
               </div>
             </div>
-          </div>
+          </TransitionGroup>
 
-          <div v-if="canShowPaginate" class="flex justify-center">
+          <div v-if="canShowPaginate" class="mt-8 flex justify-center">
             <el-pagination
               v-model:current-page="currentPage"
               :page-size="paginate?.page_size ?? 0"
@@ -212,11 +215,11 @@ const paginate = ref<Paginate | null>(null)
 const currentPage = ref(1)
 
 const isEmpty = computed(() => {
-  return !loading && products.value.length != 0
+  return !loading.value && products.value.length === 0
 })
 
 const canShowPaginate = computed(() => {
-  return !loading && products.value.length != 0 && paginate
+  return !loading.value && products.value.length > 0 && !!paginate.value
 })
 
 function SelectProductSeries(id: number) {
@@ -229,7 +232,7 @@ function HandlePageChange(page: number) {
   GetProductList()
 }
 
-function HandelGotoDetail(product: Product) {
+function HandleGotoDetail(product: Product) {
   router.push({ name: "productDetail", params: { product_id: product.id } })
 }
 
@@ -278,4 +281,12 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.list-enter-active {
+  animation: list-fade-in-up 0.5s ease-out both;
+}
+
+.list-leave-active {
+  animation: list-fade-in-up 0.3s ease-in reverse both;
+}
+</style>

@@ -19,9 +19,6 @@
         >
           联系我们
         </h1>
-        <p class="text-blue-100 md:text-lg">
-          以创新的自动化技术，赋能制造，助力客户成功
-        </p>
       </div>
     </div>
 
