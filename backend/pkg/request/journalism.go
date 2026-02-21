@@ -2,6 +2,10 @@ package request
 
 import "github.com/Smash249/xenova/backend/internal/global"
 
+type GetJournalismSeriesReq struct {
+	global.PaginateReq
+	Name string `query:"name" json:"name"`
+}
 type CreateJournalismSeriesReq struct {
 	Name        string `json:"name" validate:"required"`
 	Description string `json:"description" validate:"required"`
@@ -19,7 +23,7 @@ type DeleteJournalismSeriesReq struct {
 
 type GetJournalismReq struct {
 	global.PaginateReq
-	SeriesID uint   `query:"series_id" validate:"required"`
+	SeriesID uint   `query:"series_id"`
 	Title    string `query:"title"`
 }
 

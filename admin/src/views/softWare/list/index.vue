@@ -11,30 +11,31 @@ import {
   useMessage,
   NPagination,
   NDropdown,
+  NTag,
 } from 'naive-ui'
 import { reactive, ref, useTemplateRef, computed, onMounted } from 'vue'
 
-import { GetProductSeriesListApi, DeleteProductSeriesApi } from '@/api/product'
+import { GetSoftWareListApi, DeleteSoftWareApi } from '@/api/softWare'
 import { ScrollContainer } from '@/components'
 
-import ProductSeriesModal from './component/ProductSeriesModal.vue'
+import SoftWareModal from './component/SoftWareModal.vue'
 
-import type { ProductSeries } from '@/types/product'
+import type { SoftWare } from '@/types/softWare'
 import type { DataTableColumns, PaginationProps, DropdownProps, FormInst } from 'naive-ui'
 
 defineOptions({
-  name: 'ProductSeriesAdmin',
+  name: 'SoftWareAdmin',
 })
 
 const message = useMessage()
 
 const formRef = useTemplateRef<FormInst>('formRef')
-const modalRef = ref<InstanceType<typeof ProductSeriesModal> | null>(null)
+const modalRef = ref<InstanceType<typeof SoftWareModal> | null>(null)
 
 const showDropdown = ref(false)
 const contextmenuId = ref<number | null>(null)
 
-const productSeriesData = ref<ProductSeries[]>([])
+const softWareData = ref<SoftWare[]>([])
 const checkedRowKeys = ref<Array<number | string>>([])
 const isLoading = ref(false)
 
@@ -52,12 +53,12 @@ const pagination = reactive<PaginationProps>({
   showQuickJumpDropdown: true,
   onUpdatePage: (page) => {
     pagination.page = page
-    GetProductSeries()
+    GetSoftWareList()
   },
   onUpdatePageSize: (pageSize) => {
     pagination.pageSize = pageSize
     pagination.page = 1
-    GetProductSeries()
+    GetSoftWareList()
   },
 })
 
@@ -79,7 +80,7 @@ const dropdownOptions = reactive<DropdownProps>({
   },
   onSelect: (v) => {
     if (contextmenuId.value !== null) {
-      const row = productSeriesData.value.find((item) => item.id === contextmenuId.value)
+      const row = softWareData.value.find((item) => item.id === contextmenuId.value)
       switch (v) {
         case 'edit':
           if (row) modalRef.value?.Open('update', row)
@@ -95,7 +96,7 @@ const dropdownOptions = reactive<DropdownProps>({
 
 const hasChecked = computed(() => checkedRowKeys.value.length > 0)
 
-const columns = computed<DataTableColumns<ProductSeries>>(() => {
+const columns = computed<DataTableColumns<SoftWare>>(() => {
   return [
     {
       type: 'selection',
@@ -110,13 +111,73 @@ const columns = computed<DataTableColumns<ProductSeries>>(() => {
     },
     {
       key: 'name',
-      title: '系列名称',
-      width: 200,
+      title: '软件名称',
+      minWidth: 180,
+      ellipsis: {
+        tooltip: true,
+      },
+    },
+    {
+      key: 'series_id',
+      title: '所属系列',
+      width: 120,
+      align: 'center',
+    },
+    {
+      key: 'file_type',
+      title: '文件类型',
+      width: 100,
+      align: 'center',
+      render: (row) => (
+        <NTag
+          type='info'
+          size='small'
+          round
+        >
+          {row.file_type.toUpperCase()}
+        </NTag>
+      ),
+    },
+    {
+      key: 'file_size',
+      title: '文件大小',
+      width: 120,
+      align: 'center',
+    },
+    {
+      key: 'is_hot',
+      title: '热门',
+      width: 80,
+      align: 'center',
+      render: (row) =>
+        row.is_hot ? (
+          <NTag
+            type='error'
+            size='small'
+            round
+          >
+            <div class='flex items-center gap-1'>
+              <span class='iconify text-sm ph--fire' />
+              热门
+            </div>
+          </NTag>
+        ) : (
+          <NTag
+            type='default'
+            size='small'
+            round
+          >
+            普通
+          </NTag>
+        ),
     },
     {
       key: 'description',
       title: '描述',
-      minWidth: 250,
+      minWidth: 200,
+      ellipsis: {
+        tooltip: true,
+      },
     },
     {
       key: 'created_at',
@@ -141,7 +202,7 @@ const columns = computed<DataTableColumns<ProductSeries>>(() => {
   ]
 })
 
-function CellActions(row: ProductSeries) {
+function CellActions(row: SoftWare) {
   return (
     <div class='flex justify-center gap-2'>
       <NButton
@@ -158,7 +219,7 @@ function CellActions(row: ProductSeries) {
         onPositiveClick={() => MutateDeleteData(row.id)}
       >
         {{
-          default: () => '确认删除该产品系列吗？',
+          default: () => '确认删除该下载项吗？',
           trigger: () => (
             <NButton
               secondary
@@ -191,7 +252,7 @@ function HandleQueryClick() {
   formRef.value?.validate((errors) => {
     if (!errors) {
       pagination.page = 1
-      GetProductSeries()
+      GetSoftWareList()
     }
   })
 }
@@ -199,16 +260,16 @@ function HandleQueryClick() {
 function ResetForm() {
   queryForm.name = ''
   pagination.page = 1
-  GetProductSeries()
+  GetSoftWareList()
 }
 
 async function MutateDeleteData(id: number) {
   isLoading.value = true
   try {
-    await DeleteProductSeriesApi([id])
+    await DeleteSoftWareApi([id])
     message.success('删除成功')
     checkedRowKeys.value = checkedRowKeys.value.filter((key) => key !== id)
-    GetProductSeries()
+    GetSoftWareList()
   } catch (error) {
     message.error('删除失败')
     console.error(error)
@@ -221,10 +282,10 @@ async function MutateBatchDeleteData() {
   if (!hasChecked.value) return
   isLoading.value = true
   try {
-    await DeleteProductSeriesApi(checkedRowKeys.value as number[])
+    await DeleteSoftWareApi(checkedRowKeys.value as number[])
     message.success(`成功删除 ${checkedRowKeys.value.length} 条记录`)
     checkedRowKeys.value = []
-    GetProductSeries()
+    GetSoftWareList()
   } catch (error) {
     message.error('批量删除失败')
     console.error(error)
@@ -233,16 +294,16 @@ async function MutateBatchDeleteData() {
   }
 }
 
-async function GetProductSeries() {
+async function GetSoftWareList() {
   isLoading.value = true
   try {
-    const result = await GetProductSeriesListApi(
+    const result = await GetSoftWareListApi(
       pagination.page || 1,
       pagination.pageSize || 10,
       queryForm.name,
     )
-    console.log('GetProductSeriesListApi result:', result.data)
-    productSeriesData.value = result.data
+    console.log('GetSoftWareListApi result:', result.data)
+    softWareData.value = result.data
     if (result.paginate) pagination.itemCount = result.paginate.total_count
   } catch (error) {
     message.error('获取列表失败')
@@ -253,7 +314,7 @@ async function GetProductSeries() {
 }
 
 onMounted(() => {
-  GetProductSeries()
+  GetSoftWareList()
 })
 </script>
 
@@ -274,13 +335,13 @@ onMounted(() => {
         class="max-lg:w-full max-lg:flex-col"
       >
         <NFormItem
-          label="系列名称"
+          label="软件名称"
           path="name"
         >
           <NInput
             v-model:value="queryForm.name"
             clearable
-            placeholder="请输入系列名称"
+            placeholder="请输入软件名称"
           />
         </NFormItem>
         <div class="flex gap-2">
@@ -291,11 +352,11 @@ onMounted(() => {
             <template #icon>
               <span class="iconify ph--plus-circle" />
             </template>
-            新增系列
+            新增下载
           </NButton>
           <NPopconfirm
-            :positive-text="'确定'"
-            :negative-text="'取消'"
+            positive-text="确定"
+            negative-text="取消"
             @positive-click="MutateBatchDeleteData"
           >
             <template #default> 确认删除选中的 {{ checkedRowKeys.length }} 条记录吗？ </template>
@@ -341,7 +402,7 @@ onMounted(() => {
           v-model:checked-row-keys="checkedRowKeys"
           :remote="true"
           :columns="columns"
-          :data="productSeriesData"
+          :data="softWareData"
           :row-key="(row) => row.id"
           :loading="isLoading"
         />
@@ -363,9 +424,9 @@ onMounted(() => {
       :show="showDropdown"
     />
 
-    <ProductSeriesModal
+    <SoftWareModal
       ref="modalRef"
-      @success="GetProductSeries"
+      @success="GetSoftWareList"
     />
   </ScrollContainer>
 </template>

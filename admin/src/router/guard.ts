@@ -15,7 +15,7 @@ export function setupRouterGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
     routerEventBus.emit({ type: 'beforeEach' })
 
-    if (to.name === 'signIn') {
+    if (to.name === 'login') {
       if (!userStore.token) {
         next()
       } else {

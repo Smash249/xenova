@@ -14,27 +14,27 @@ import {
 } from 'naive-ui'
 import { reactive, ref, useTemplateRef, computed, onMounted } from 'vue'
 
-import { GetProductSeriesListApi, DeleteProductSeriesApi } from '@/api/product'
+import { GetSoftWareSeriesListApi, DeleteSoftWareSeriesApi } from '@/api/softWare'
 import { ScrollContainer } from '@/components'
 
-import ProductSeriesModal from './component/ProductSeriesModal.vue'
+import SoftWareSeriesModal from './component/SoftWareSeriesModal.vue'
 
-import type { ProductSeries } from '@/types/product'
+import type { SoftWareSeries } from '@/types/softWare'
 import type { DataTableColumns, PaginationProps, DropdownProps, FormInst } from 'naive-ui'
 
 defineOptions({
-  name: 'ProductSeriesAdmin',
+  name: 'SoftWareSeriesAdmin',
 })
 
 const message = useMessage()
 
 const formRef = useTemplateRef<FormInst>('formRef')
-const modalRef = ref<InstanceType<typeof ProductSeriesModal> | null>(null)
+const modalRef = ref<InstanceType<typeof SoftWareSeriesModal> | null>(null)
 
 const showDropdown = ref(false)
 const contextmenuId = ref<number | null>(null)
 
-const productSeriesData = ref<ProductSeries[]>([])
+const softWareSeriesData = ref<SoftWareSeries[]>([])
 const checkedRowKeys = ref<Array<number | string>>([])
 const isLoading = ref(false)
 
@@ -52,12 +52,12 @@ const pagination = reactive<PaginationProps>({
   showQuickJumpDropdown: true,
   onUpdatePage: (page) => {
     pagination.page = page
-    GetProductSeries()
+    GetSoftWareSeries()
   },
   onUpdatePageSize: (pageSize) => {
     pagination.pageSize = pageSize
     pagination.page = 1
-    GetProductSeries()
+    GetSoftWareSeries()
   },
 })
 
@@ -79,7 +79,7 @@ const dropdownOptions = reactive<DropdownProps>({
   },
   onSelect: (v) => {
     if (contextmenuId.value !== null) {
-      const row = productSeriesData.value.find((item) => item.id === contextmenuId.value)
+      const row = softWareSeriesData.value.find((item) => item.id === contextmenuId.value)
       switch (v) {
         case 'edit':
           if (row) modalRef.value?.Open('update', row)
@@ -95,7 +95,7 @@ const dropdownOptions = reactive<DropdownProps>({
 
 const hasChecked = computed(() => checkedRowKeys.value.length > 0)
 
-const columns = computed<DataTableColumns<ProductSeries>>(() => {
+const columns = computed<DataTableColumns<SoftWareSeries>>(() => {
   return [
     {
       type: 'selection',
@@ -117,6 +117,9 @@ const columns = computed<DataTableColumns<ProductSeries>>(() => {
       key: 'description',
       title: '描述',
       minWidth: 250,
+      ellipsis: {
+        tooltip: true,
+      },
     },
     {
       key: 'created_at',
@@ -141,7 +144,7 @@ const columns = computed<DataTableColumns<ProductSeries>>(() => {
   ]
 })
 
-function CellActions(row: ProductSeries) {
+function CellActions(row: SoftWareSeries) {
   return (
     <div class='flex justify-center gap-2'>
       <NButton
@@ -158,7 +161,7 @@ function CellActions(row: ProductSeries) {
         onPositiveClick={() => MutateDeleteData(row.id)}
       >
         {{
-          default: () => '确认删除该产品系列吗？',
+          default: () => '确认删除该下载系列吗？',
           trigger: () => (
             <NButton
               secondary
@@ -191,7 +194,7 @@ function HandleQueryClick() {
   formRef.value?.validate((errors) => {
     if (!errors) {
       pagination.page = 1
-      GetProductSeries()
+      GetSoftWareSeries()
     }
   })
 }
@@ -199,16 +202,16 @@ function HandleQueryClick() {
 function ResetForm() {
   queryForm.name = ''
   pagination.page = 1
-  GetProductSeries()
+  GetSoftWareSeries()
 }
 
 async function MutateDeleteData(id: number) {
   isLoading.value = true
   try {
-    await DeleteProductSeriesApi([id])
+    await DeleteSoftWareSeriesApi([id])
     message.success('删除成功')
     checkedRowKeys.value = checkedRowKeys.value.filter((key) => key !== id)
-    GetProductSeries()
+    GetSoftWareSeries()
   } catch (error) {
     message.error('删除失败')
     console.error(error)
@@ -221,10 +224,10 @@ async function MutateBatchDeleteData() {
   if (!hasChecked.value) return
   isLoading.value = true
   try {
-    await DeleteProductSeriesApi(checkedRowKeys.value as number[])
+    await DeleteSoftWareSeriesApi(checkedRowKeys.value as number[])
     message.success(`成功删除 ${checkedRowKeys.value.length} 条记录`)
     checkedRowKeys.value = []
-    GetProductSeries()
+    GetSoftWareSeries()
   } catch (error) {
     message.error('批量删除失败')
     console.error(error)
@@ -233,16 +236,16 @@ async function MutateBatchDeleteData() {
   }
 }
 
-async function GetProductSeries() {
+async function GetSoftWareSeries() {
   isLoading.value = true
   try {
-    const result = await GetProductSeriesListApi(
+    const result = await GetSoftWareSeriesListApi(
       pagination.page || 1,
       pagination.pageSize || 10,
       queryForm.name,
     )
-    console.log('GetProductSeriesListApi result:', result.data)
-    productSeriesData.value = result.data
+    console.log('GetSoftWareSeriesListApi result:', result.data)
+    softWareSeriesData.value = result.data
     if (result.paginate) pagination.itemCount = result.paginate.total_count
   } catch (error) {
     message.error('获取列表失败')
@@ -253,7 +256,7 @@ async function GetProductSeries() {
 }
 
 onMounted(() => {
-  GetProductSeries()
+  GetSoftWareSeries()
 })
 </script>
 
@@ -294,8 +297,8 @@ onMounted(() => {
             新增系列
           </NButton>
           <NPopconfirm
-            :positive-text="'确定'"
-            :negative-text="'取消'"
+            positive-text="确定"
+            negative-text="取消"
             @positive-click="MutateBatchDeleteData"
           >
             <template #default> 确认删除选中的 {{ checkedRowKeys.length }} 条记录吗？ </template>
@@ -341,7 +344,7 @@ onMounted(() => {
           v-model:checked-row-keys="checkedRowKeys"
           :remote="true"
           :columns="columns"
-          :data="productSeriesData"
+          :data="softWareSeriesData"
           :row-key="(row) => row.id"
           :loading="isLoading"
         />
@@ -363,9 +366,9 @@ onMounted(() => {
       :show="showDropdown"
     />
 
-    <ProductSeriesModal
+    <SoftWareSeriesModal
       ref="modalRef"
-      @success="GetProductSeries"
+      @success="GetSoftWareSeries"
     />
   </ScrollContainer>
 </template>

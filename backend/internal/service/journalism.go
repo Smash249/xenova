@@ -14,10 +14,13 @@ type JournalismService struct{}
 // ==================== JournalismSeries 新闻系列 CRUD ====================
 
 // GetJournalismSeriesList 获取新闻系列列表
-func (j *JournalismService) GetJournalismSeriesList() ([]models.JournalismSeries, error) {
-	var seriesList []models.JournalismSeries
-	err := global.DB.Find(&seriesList).Error
-	return seriesList, err
+func (j *JournalismService) GetJournalismSeriesList(params request.GetJournalismSeriesReq) (*global.PaginatorResp[models.JournalismSeries], error) {
+	query := global.DB.Model(&models.JournalismSeries{})
+	result, err := utils.Paginator[models.JournalismSeries](query, params.PaginateReq)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // CreateJournalismSeries 创建新闻系列
@@ -48,7 +51,10 @@ func (j *JournalismService) DeleteJournalismSeries(params request.DeleteJournali
 
 // GetJournalismList 获取新闻列表
 func (j *JournalismService) GetJournalismList(params request.GetJournalismReq) (*global.PaginatorResp[models.Journalism], error) {
-	query := global.DB.Model(&models.Journalism{}).Where("series_id = ?", params.SeriesID)
+	query := global.DB.Model(&models.Journalism{})
+	if params.SeriesID != 0 {
+		query = query.Where("series_id = ?", params.SeriesID)
+	}
 	if params.Title != "" {
 		query = query.Where("title LIKE ?", "%"+params.Title+"%")
 	}
@@ -94,7 +100,7 @@ func (j *JournalismService) GetJournalismDetail(id uint) (response.JournalismDet
 		tx.Rollback()
 		return result, err
 	}
-	
+
 	if err := tx.Commit().Error; err != nil {
 		return result, err
 	}

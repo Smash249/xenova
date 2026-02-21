@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
-  { path: '/sign-in', name: 'signIn', component: () => import('@/views/sign-in/index.vue') },
+  { path: '/login', name: 'login', component: () => import('@/views/login/index.vue') },
 ]
 
 export const router = createRouter({

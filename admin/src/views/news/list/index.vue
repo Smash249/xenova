@@ -11,35 +11,36 @@ import {
   useMessage,
   NPagination,
   NDropdown,
+  NTag,
 } from 'naive-ui'
 import { reactive, ref, useTemplateRef, computed, onMounted } from 'vue'
 
-import { GetProductSeriesListApi, DeleteProductSeriesApi } from '@/api/product'
+import { GetNewsListApi, DeleteNewsApi } from '@/api/news'
 import { ScrollContainer } from '@/components'
 
-import ProductSeriesModal from './component/ProductSeriesModal.vue'
+import NewsModal from './component/NewsModal.vue'
 
-import type { ProductSeries } from '@/types/product'
+import type { News } from '@/types/news'
 import type { DataTableColumns, PaginationProps, DropdownProps, FormInst } from 'naive-ui'
 
 defineOptions({
-  name: 'ProductSeriesAdmin',
+  name: 'NewsAdmin',
 })
 
 const message = useMessage()
 
 const formRef = useTemplateRef<FormInst>('formRef')
-const modalRef = ref<InstanceType<typeof ProductSeriesModal> | null>(null)
+const modalRef = ref<InstanceType<typeof NewsModal> | null>(null)
 
 const showDropdown = ref(false)
 const contextmenuId = ref<number | null>(null)
 
-const productSeriesData = ref<ProductSeries[]>([])
+const newsData = ref<News[]>([])
 const checkedRowKeys = ref<Array<number | string>>([])
 const isLoading = ref(false)
 
 const queryForm = reactive({
-  name: '',
+  title: '',
 })
 
 const pagination = reactive<PaginationProps>({
@@ -52,12 +53,12 @@ const pagination = reactive<PaginationProps>({
   showQuickJumpDropdown: true,
   onUpdatePage: (page) => {
     pagination.page = page
-    GetProductSeries()
+    GetNews()
   },
   onUpdatePageSize: (pageSize) => {
     pagination.pageSize = pageSize
     pagination.page = 1
-    GetProductSeries()
+    GetNews()
   },
 })
 
@@ -79,7 +80,7 @@ const dropdownOptions = reactive<DropdownProps>({
   },
   onSelect: (v) => {
     if (contextmenuId.value !== null) {
-      const row = productSeriesData.value.find((item) => item.id === contextmenuId.value)
+      const row = newsData.value.find((item) => item.id === contextmenuId.value)
       switch (v) {
         case 'edit':
           if (row) modalRef.value?.Open('update', row)
@@ -95,7 +96,7 @@ const dropdownOptions = reactive<DropdownProps>({
 
 const hasChecked = computed(() => checkedRowKeys.value.length > 0)
 
-const columns = computed<DataTableColumns<ProductSeries>>(() => {
+const columns = computed<DataTableColumns<News>>(() => {
   return [
     {
       type: 'selection',
@@ -109,14 +110,51 @@ const columns = computed<DataTableColumns<ProductSeries>>(() => {
       width: 80,
     },
     {
-      key: 'name',
-      title: '系列名称',
-      width: 200,
+      key: 'title',
+      title: '新闻标题',
+      minWidth: 250,
+      ellipsis: {
+        tooltip: true,
+      },
     },
     {
-      key: 'description',
-      title: '描述',
-      minWidth: 250,
+      key: 'series_id',
+      title: '所属系列',
+      width: 120,
+      align: 'center',
+    },
+    {
+      key: 'view_count',
+      title: '浏览量',
+      width: 120,
+      align: 'center',
+      render: (row) => (
+        <NTag
+          type='info'
+          size='small'
+          round
+        >
+          <div class='flex items-center gap-1'>
+            <span class='iconify text-sm ph--eye' />
+            {row.view_count}
+          </div>
+        </NTag>
+      ),
+    },
+    {
+      key: 'content',
+      title: '内容摘要',
+      minWidth: 200,
+      ellipsis: {
+        tooltip: true,
+      },
+      render: (row) => {
+        const plainText = row.content
+          .replace(/[#*`~>\-|[\]()!]/g, '')
+          .replace(/\n+/g, ' ')
+          .trim()
+        return plainText.length > 80 ? `${plainText.slice(0, 80)}...` : plainText
+      },
     },
     {
       key: 'created_at',
@@ -141,7 +179,7 @@ const columns = computed<DataTableColumns<ProductSeries>>(() => {
   ]
 })
 
-function CellActions(row: ProductSeries) {
+function CellActions(row: News) {
   return (
     <div class='flex justify-center gap-2'>
       <NButton
@@ -158,7 +196,7 @@ function CellActions(row: ProductSeries) {
         onPositiveClick={() => MutateDeleteData(row.id)}
       >
         {{
-          default: () => '确认删除该产品系列吗？',
+          default: () => '确认删除该新闻吗？',
           trigger: () => (
             <NButton
               secondary
@@ -191,24 +229,24 @@ function HandleQueryClick() {
   formRef.value?.validate((errors) => {
     if (!errors) {
       pagination.page = 1
-      GetProductSeries()
+      GetNews()
     }
   })
 }
 
 function ResetForm() {
-  queryForm.name = ''
+  queryForm.title = ''
   pagination.page = 1
-  GetProductSeries()
+  GetNews()
 }
 
 async function MutateDeleteData(id: number) {
   isLoading.value = true
   try {
-    await DeleteProductSeriesApi([id])
+    await DeleteNewsApi([id])
     message.success('删除成功')
     checkedRowKeys.value = checkedRowKeys.value.filter((key) => key !== id)
-    GetProductSeries()
+    GetNews()
   } catch (error) {
     message.error('删除失败')
     console.error(error)
@@ -221,10 +259,10 @@ async function MutateBatchDeleteData() {
   if (!hasChecked.value) return
   isLoading.value = true
   try {
-    await DeleteProductSeriesApi(checkedRowKeys.value as number[])
+    await DeleteNewsApi(checkedRowKeys.value as number[])
     message.success(`成功删除 ${checkedRowKeys.value.length} 条记录`)
     checkedRowKeys.value = []
-    GetProductSeries()
+    GetNews()
   } catch (error) {
     message.error('批量删除失败')
     console.error(error)
@@ -233,16 +271,16 @@ async function MutateBatchDeleteData() {
   }
 }
 
-async function GetProductSeries() {
+async function GetNews() {
   isLoading.value = true
   try {
-    const result = await GetProductSeriesListApi(
+    const result = await GetNewsListApi(
       pagination.page || 1,
       pagination.pageSize || 10,
-      queryForm.name,
+      queryForm.title,
     )
-    console.log('GetProductSeriesListApi result:', result.data)
-    productSeriesData.value = result.data
+    console.log('GetNewsListApi result:', result.data)
+    newsData.value = result.data
     if (result.paginate) pagination.itemCount = result.paginate.total_count
   } catch (error) {
     message.error('获取列表失败')
@@ -253,7 +291,7 @@ async function GetProductSeries() {
 }
 
 onMounted(() => {
-  GetProductSeries()
+  GetNews()
 })
 </script>
 
@@ -274,13 +312,13 @@ onMounted(() => {
         class="max-lg:w-full max-lg:flex-col"
       >
         <NFormItem
-          label="系列名称"
-          path="name"
+          label="新闻标题"
+          path="title"
         >
           <NInput
-            v-model:value="queryForm.name"
+            v-model:value="queryForm.title"
             clearable
-            placeholder="请输入系列名称"
+            placeholder="请输入新闻标题"
           />
         </NFormItem>
         <div class="flex gap-2">
@@ -291,11 +329,11 @@ onMounted(() => {
             <template #icon>
               <span class="iconify ph--plus-circle" />
             </template>
-            新增系列
+            发布新闻
           </NButton>
           <NPopconfirm
-            :positive-text="'确定'"
-            :negative-text="'取消'"
+            positive-text="确定"
+            negative-text="取消"
             @positive-click="MutateBatchDeleteData"
           >
             <template #default> 确认删除选中的 {{ checkedRowKeys.length }} 条记录吗？ </template>
@@ -341,7 +379,7 @@ onMounted(() => {
           v-model:checked-row-keys="checkedRowKeys"
           :remote="true"
           :columns="columns"
-          :data="productSeriesData"
+          :data="newsData"
           :row-key="(row) => row.id"
           :loading="isLoading"
         />
@@ -363,9 +401,9 @@ onMounted(() => {
       :show="showDropdown"
     />
 
-    <ProductSeriesModal
+    <NewsModal
       ref="modalRef"
-      @success="GetProductSeries"
+      @success="GetNews"
     />
   </ScrollContainer>
 </template>

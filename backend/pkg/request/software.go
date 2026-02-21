@@ -2,6 +2,11 @@ package request
 
 import "github.com/Smash249/xenova/backend/internal/global"
 
+type GetSoftwareSeriesReq struct {
+	global.PaginateReq
+	Name string `query:"name"`
+}
+
 type CreateSoftwareSeriesReq struct {
 	Name string `json:"name" binding:"required"`
 	Sort uint   `json:"sort"`

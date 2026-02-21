@@ -76,6 +76,82 @@ export const useUserStore = defineStore('userStore', () => {
         },
       ],
     },
+    {
+      path: 'news',
+      name: 'news',
+      icon: 'icon-[lucide--newspaper]',
+      label: '新闻管理',
+      meta: {
+        componentName: 'News',
+        pinned: true,
+        showTab: true,
+      },
+      component: 'news/index',
+      children: [
+        {
+          path: 'series',
+          name: 'newsSeries',
+          icon: 'icon-[lucide--shapes]',
+          label: '新闻系列',
+          meta: {
+            componentName: 'NewsSeries',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'news/series/index',
+        },
+        {
+          path: 'list',
+          name: 'newsList',
+          icon: 'icon-[lucide--list]',
+          label: '新闻列表',
+          meta: {
+            componentName: 'NewsList',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'news/list/index',
+        },
+      ],
+    },
+    {
+      path: 'softWare',
+      name: 'softWare',
+      icon: 'icon-[lucide--code]',
+      label: '软件管理',
+      meta: {
+        componentName: 'Software',
+        pinned: true,
+        showTab: true,
+      },
+      component: 'softWare/index',
+      children: [
+        {
+          path: 'series',
+          name: 'softwareSeries',
+          icon: 'icon-[lucide--shapes]',
+          label: '软件系列',
+          meta: {
+            componentName: 'SoftwareSeries',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'softWare/series/index',
+        },
+        {
+          path: 'list',
+          name: 'softwareList',
+          icon: 'icon-[lucide--list]',
+          label: '软件列表',
+          meta: {
+            componentName: 'SoftwareList',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'softWare/list/index',
+        },
+      ],
+    },
   ])
 
   async function Login(data: Parameters<typeof LoginApi>[0]) {
@@ -93,7 +169,7 @@ export const useUserStore = defineStore('userStore', () => {
 
   function cleanup(redirectPath?: string) {
     router.replace({
-      name: 'signIn',
+      name: 'login',
       ...(redirectPath ? { query: { r: redirectPath } } : {}),
     })
     token.value = null

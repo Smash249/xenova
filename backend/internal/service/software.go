@@ -12,10 +12,16 @@ type SoftwareService struct{}
 // ==================== SoftwareSeries 软件分类 CRUD ====================
 
 // GetSoftwareSeriesList 获取软件分类列表
-func (s *SoftwareService) GetSoftwareSeriesList() ([]models.SoftwareSeries, error) {
-	var categoryList []models.SoftwareSeries
-	err := global.DB.Find(&categoryList).Error
-	return categoryList, err
+func (s *SoftwareService) GetSoftwareSeriesList(params request.GetSoftwareSeriesReq) (*global.PaginatorResp[models.SoftwareSeries], error) {
+	query := global.DB.Model(&models.SoftwareSeries{})
+	if params.Name != "" {
+		query = query.Where("name LIKE ?", "%"+params.Name+"%")
+	}
+	result, err := utils.Paginator[models.SoftwareSeries](query, params.PaginateReq)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // CreateSoftwareSeries 创建软件分类

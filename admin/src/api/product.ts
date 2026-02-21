@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+import type {
+  CreateProductParams,
+  CreateProductSeriesParams,
+  UpdateProductParams,
+  UpdateProductSeriesParams,
+} from '@/types/product'
+
 export async function GetProductSeriesListApi(page: number, page_size: number, name: string) {
   try {
     const searchParams = new URLSearchParams()
@@ -15,18 +22,18 @@ export async function GetProductSeriesListApi(page: number, page_size: number, n
   }
 }
 
-export async function CreateProductSeriesApi() {
+export async function CreateProductSeriesApi(params: CreateProductSeriesParams) {
   try {
-    const result = await request.post('/admin/product_series')
+    const result = await request.post('/admin/product_series', params)
     if (!result || !result.success) throw new Error('请求出错')
     return result.data
   } catch (error) {
     throw error
   }
 }
-export async function UpdateProductSeriesApi() {
+export async function UpdateProductSeriesApi(parmas: UpdateProductSeriesParams) {
   try {
-    const result = await request.put('/admin/product_series')
+    const result = await request.put('/admin/product_series', parmas)
     if (!result || !result.success) throw new Error('请求出错')
     return result.data
   } catch (error) {
@@ -45,14 +52,46 @@ export async function DeleteProductSeriesApi(id_list: number[]) {
   }
 }
 
-export async function GetProductListApi(page: number, name: string, series_id: number | null) {
+export async function GetProductListApi(page: number, pageSize: number, name: string) {
   const searchParams = new URLSearchParams()
   if (page) searchParams.append('page', String(page))
   if (name) searchParams.append('name', name)
-  if (series_id) searchParams.append('series_id', series_id.toString())
+  if (pageSize) searchParams.append('page_size', pageSize.toString())
   const query = searchParams.toString()
   try {
     const result = await request.get(`/public/products?${query}`)
+    if (!result || !result.success) throw new Error('请求出错')
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export async function CreateProductApi(params: CreateProductParams) {
+  try {
+    const result = await request.post('/admin/product', params)
+    if (!result || !result.success) throw new Error('请求出错')
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export async function UpdateProductApi(params: UpdateProductParams) {
+  try {
+    const result = await request.put('/admin/product', params)
+    if (!result || !result.success) throw new Error('请求出错')
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export async function DeleteProductApi(id_list: number[]) {
+  try {
+    const result = await request.delete('/admin/product', {
+      data: { id_list },
+    })
     if (!result || !result.success) throw new Error('请求出错')
     return result.data
   } catch (error) {
