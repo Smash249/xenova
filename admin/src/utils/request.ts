@@ -1,14 +1,12 @@
-import type { RequestResponse } from '@/types/common'
 import axios from 'axios'
+
+import type { RequestResponse } from '@/types/common'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import type { MessageApiInjection } from 'naive-ui/es/message/src/MessageProvider'
-import { useMessage } from 'naive-ui'
+
 let axiosCache: Request | null = null
 
 class Request {
   private instance: AxiosInstance
-
-  private messageApi: MessageApiInjection = useMessage()
 
   private constructor(config?: AxiosRequestConfig) {
     this.instance = axios.create({
@@ -23,7 +21,7 @@ class Request {
     switch (code) {
       case 401:
         localStorage.removeItem('user')
-        this.messageApi?.error('登录失效，请重新登录')
+        // this.messageApi?.error('登录失效，请重新登录')
         break
       case 403:
         console.error('403 Forbidden')
@@ -44,17 +42,8 @@ class Request {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config) => {
-        const userStore = localStorage.getItem('user')
-        if (userStore) {
-          try {
-            const user = JSON.parse(userStore)
-            if (user.accessToken) {
-              config.headers.Authorization = `${user.accessToken}`
-            }
-          } catch (e) {
-            console.error('Failed to parse user store:', e)
-          }
-        }
+        const token = localStorage.getItem('token')
+        if (token) config.headers.Authorization = `${token}`
         return config
       },
       (error) => {

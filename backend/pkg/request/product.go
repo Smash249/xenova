@@ -4,6 +4,11 @@ import (
 	"github.com/Smash249/xenova/backend/internal/global"
 )
 
+type GetProductSeriesReq struct {
+	global.PaginateReq
+	Name string `query:"name" json:"name"`
+}
+
 type CreateProductSeriesReq struct {
 	Name        string `json:"name" validate:"required"`
 	Description string `json:"description" validate:"required"`

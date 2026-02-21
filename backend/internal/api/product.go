@@ -15,7 +15,11 @@ var ProductApi = new(productApi)
 type productApi struct{}
 
 func (p *productApi) GetProductSeries(ctx *echo.Context) error {
-	result, err := productServiceApp.GetProductSeriesList()
+	getProductSeriesReq, err := utils.BindAndValidate[request.GetProductSeriesReq](ctx)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	result, err := productServiceApp.GetProductSeriesList(getProductSeriesReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
