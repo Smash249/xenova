@@ -12,12 +12,24 @@ var UserApi = new(userApi)
 
 type userApi struct{}
 
-func (userApi) Login(ctx *echo.Context) error {
+func (userApi) FrontendLogin(ctx *echo.Context) error {
 	userLoginReq, err := utils.BindAndValidate[request.UserLoginReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	result, err := userServicesApp.Login(userLoginReq)
+	result, err := userServicesApp.FrontendLogin(userLoginReq)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
+}
+
+func (userApi) AdminLogin(ctx *echo.Context) error {
+	userLoginReq, err := utils.BindAndValidate[request.UserLoginReq](ctx)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	result, err := userServicesApp.AdminLogin(userLoginReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
@@ -36,8 +48,47 @@ func (userApi) Register(ctx *echo.Context) error {
 	return utils.SuccessApiResponse(ctx, "注册成功", http.StatusOK)
 }
 
-func (userApi) Health(ctx *echo.Context) error {
-	return utils.SuccessApiResponse(ctx, "ok", http.StatusOK)
+func (userApi) GetUserInfo(ctx *echo.Context) error {
+	userId, exists := utils.GetUserID(ctx)
+	if !exists {
+		return utils.ErrorApiResponse(ctx, "获取用户失败", http.StatusBadRequest)
+	}
+	result, err := userServicesApp.GetUserInfo(userId)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
+}
+
+func (userApi) UpdateUserInfo(ctx *echo.Context) error {
+	userId, exists := utils.GetUserID(ctx)
+	if !exists {
+		return utils.ErrorApiResponse(ctx, "获取用户失败", http.StatusBadRequest)
+	}
+	userUpdateInfoReq, err := utils.BindAndValidate[request.UpdateUserInfoReq](ctx)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	result, err := userServicesApp.UpdateUserInfo(userId, userUpdateInfoReq)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
+}
+
+func (userApi) ChangePassword(ctx *echo.Context) error {
+	userId, exists := utils.GetUserID(ctx)
+	if !exists {
+		return utils.ErrorApiResponse(ctx, "获取用户失败", http.StatusBadRequest)
+	}
+	changePasswordReq, err := utils.BindAndValidate[request.ChangePasswordReq](ctx)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	if err := userServicesApp.ChangePassword(userId, changePasswordReq); err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	return utils.SuccessApiResponse(ctx, "密码修改成功", http.StatusOK)
 }
 
 func (userApi) Upload(ctx *echo.Context) error {

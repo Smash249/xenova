@@ -21,19 +21,10 @@ import (
 type UserService struct {
 }
 
-func (UserService) Login(params request.UserLoginReq) (*response.UserLoginResp, error) {
-	var user models.User
-	err := global.DB.Where("email = ?", params.Email).First(&user).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("用户不存在")
-		}
-		return nil, err
-	}
+func (u *UserService) baseLogin(user models.User, params request.UserLoginReq) (*response.UserLoginResp, error) {
 	if !utils.CheckPasswordHash(params.Password, user.Password) {
 		return nil, errors.New("密码错误")
 	}
-
 	accessToken, refreshToken, err := utils.GenerateTokenPair(utils.BaseClaims{
 		ID:       user.ID,
 		UserName: user.UserName,
@@ -43,7 +34,6 @@ func (UserService) Login(params request.UserLoginReq) (*response.UserLoginResp, 
 	if err != nil {
 		return nil, errors.New("生成 token 失败")
 	}
-
 	result := &response.UserLoginResp{
 		User:         user,
 		AccessToken:  accessToken,
@@ -52,7 +42,34 @@ func (UserService) Login(params request.UserLoginReq) (*response.UserLoginResp, 
 	return result, nil
 }
 
-func (UserService) Register(params request.UserRegisterReq) error {
+func (u *UserService) FrontendLogin(params request.UserLoginReq) (*response.UserLoginResp, error) {
+	var user models.User
+	err := global.DB.Where("email = ?", params.Email).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("用户不存在")
+		}
+		return nil, err
+	}
+	return u.baseLogin(user, params)
+}
+
+func (u *UserService) AdminLogin(params request.UserLoginReq) (*response.UserLoginResp, error) {
+	var user models.User
+	err := global.DB.Where("email = ?", params.Email).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("用户不存在")
+		}
+		return nil, err
+	}
+	if user.Role != "admin" {
+		return nil, errors.New("没有管理员权限")
+	}
+	return u.baseLogin(user, params)
+}
+
+func (u *UserService) Register(params request.UserRegisterReq) error {
 	// todo: 校验邮箱
 	return global.DB.Create(&models.User{
 		UserName: params.UserName,
@@ -61,7 +78,52 @@ func (UserService) Register(params request.UserRegisterReq) error {
 	}).Error
 }
 
-func (UserService) Upload(file *multipart.FileHeader) (string, error) {
+func (u *UserService) GetUserInfo(userID uint) (*models.User, error) {
+	var user models.User
+	err := global.DB.First(&user, userID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("用户不存在")
+		}
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (u *UserService) UpdateUserInfo(userID uint, params request.UpdateUserInfoReq) (*models.User, error) {
+	var user models.User
+	err := global.DB.First(&user, userID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("用户不存在")
+		}
+		return nil, err
+	}
+	user.UserName = params.UserName
+	user.Phone = params.Phone
+	if err := global.DB.Save(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (u *UserService) ChangePassword(userID uint, params request.ChangePasswordReq) error {
+	var user models.User
+	err := global.DB.First(&user, userID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("用户不存在")
+		}
+		return err
+	}
+	if !utils.CheckPasswordHash(params.OldPassword, user.Password) {
+		return errors.New("旧密码错误")
+	}
+	user.Password = params.NewPassword
+	return global.DB.Save(&user).Error
+}
+
+func (u *UserService) Upload(file *multipart.FileHeader) (string, error) {
 	src, err := file.Open()
 	if err != nil {
 		return "", err
