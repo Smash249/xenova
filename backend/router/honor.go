@@ -13,15 +13,14 @@ func initHonorRouter() {
 			admin.PUT("/company_honor", api.HonorApi.UpdateCompanyHonor)
 			admin.DELETE("/company_honor", api.HonorApi.DeleteCompanyHonor)
 
+			public.GET("/company_patnet", api.HonorApi.GetCompanyPatentList)
+			admin.POST("/company_patnet", api.HonorApi.CreateCompanyPatent)
+			admin.PUT("/company_patnet", api.HonorApi.UpdateCompanyPatent)
+			admin.DELETE("/company_patnet", api.HonorApi.DeleteCompanyPatent)
+
 			public.GET("/love_activity", api.HonorApi.GetLoveActivityList)
 			admin.POST("/love_activity", api.HonorApi.CreateLoveActivity)
 			admin.PUT("/love_activity", api.HonorApi.UpdateLoveActivity)
 			admin.DELETE("/love_activity", api.HonorApi.DeleteLoveActivity)
-
-			public.GET("/company_patnet", api.HonorApi.GetCompanyPatentList)
-			admin.POST("/company_patent", api.HonorApi.CreateCompanyPatent)
-			admin.PUT("/company_patent", api.HonorApi.UpdateCompanyPatent)
-			admin.DELETE("/company_patent", api.HonorApi.DeleteCompanyPatent)
-
 		})
 }

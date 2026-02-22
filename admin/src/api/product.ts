@@ -69,7 +69,7 @@ export async function GetProductListApi(page: number, pageSize: number, name: st
 
 export async function CreateProductApi(params: CreateProductParams) {
   try {
-    const result = await request.post('/admin/product', params)
+    const result = await request.post('/admin/products', params)
     if (!result || !result.success) throw new Error('请求出错')
     return result.data
   } catch (error) {
@@ -79,7 +79,7 @@ export async function CreateProductApi(params: CreateProductParams) {
 
 export async function UpdateProductApi(params: UpdateProductParams) {
   try {
-    const result = await request.put('/admin/product', params)
+    const result = await request.put('/admin/products', params)
     if (!result || !result.success) throw new Error('请求出错')
     return result.data
   } catch (error) {
@@ -89,7 +89,7 @@ export async function UpdateProductApi(params: UpdateProductParams) {
 
 export async function DeleteProductApi(id_list: number[]) {
   try {
-    const result = await request.delete('/admin/product', {
+    const result = await request.delete('/admin/products', {
       data: { id_list },
     })
     if (!result || !result.success) throw new Error('请求出错')

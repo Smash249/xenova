@@ -3,6 +3,12 @@ package service
 import (
 	"errors"
 	"fmt"
+	"io"
+	"math/rand"
+	"mime/multipart"
+	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/Smash249/xenova/backend/internal/global"
 	"github.com/Smash249/xenova/backend/internal/models"
@@ -53,5 +59,29 @@ func (UserService) Register(params request.UserRegisterReq) error {
 		Email:    params.Email,
 		Password: params.Password,
 	}).Error
+}
 
+func (UserService) Upload(file *multipart.FileHeader) (string, error) {
+	src, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+	defer src.Close()
+	uploadDir := "uploads"
+	if err := os.MkdirAll(uploadDir, 0755); err != nil {
+		return "", err
+	}
+	ext := filepath.Ext(file.Filename)
+	filename := fmt.Sprintf("%d_%d%s", time.Now().UnixNano(), rand.Intn(10000), ext)
+	dst := filepath.Join(uploadDir, filename)
+	out, err := os.Create(dst)
+	if err != nil {
+		return "", err
+	}
+	defer out.Close()
+	if _, err := io.Copy(out, src); err != nil {
+		return "", err
+	}
+	fileURL := fmt.Sprintf("/static/%s", filename)
+	return fileURL, nil
 }

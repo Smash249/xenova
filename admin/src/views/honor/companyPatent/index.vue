@@ -16,33 +16,39 @@ import {
 } from 'naive-ui'
 import { reactive, ref, useTemplateRef, computed, onMounted } from 'vue'
 
-import { GetProductListApi, DeleteProductApi } from '@/api/product'
+import { GetCompanyPatentListApi, DeleteCompanyPatentApi } from '@/api/honor'
 import { ScrollContainer } from '@/components'
 
-import ProductModal from './component/ProductModal.vue'
+import CompanyPatentModal from './component/CompanyPatentModal.vue'
 
-import type { Product } from '@/types/product'
+import type { CompanyPatent } from '@/types/honor'
 import type { DataTableColumns, PaginationProps, DropdownProps, FormInst } from 'naive-ui'
 
 defineOptions({
-  name: 'ProductAdmin',
+  name: 'CompanyPatentAdmin',
 })
 
 const message = useMessage()
 
 const formRef = useTemplateRef<FormInst>('formRef')
-const modalRef = ref<InstanceType<typeof ProductModal> | null>(null)
+const modalRef = ref<InstanceType<typeof CompanyPatentModal> | null>(null)
 
 const showDropdown = ref(false)
 const contextmenuId = ref<number | null>(null)
 
-const productData = ref<Product[]>([])
+const patentData = ref<CompanyPatent[]>([])
 const checkedRowKeys = ref<Array<number | string>>([])
 const isLoading = ref(false)
 
 const queryForm = reactive({
-  name: '',
+  title: '',
 })
+
+const patentTypeColorMap: Record<string, 'success' | 'info' | 'warning'> = {
+  发明专利: 'success',
+  实用新型专利: 'info',
+  外观设计专利: 'warning',
+}
 
 const pagination = reactive<PaginationProps>({
   page: 1,
@@ -54,12 +60,12 @@ const pagination = reactive<PaginationProps>({
   showQuickJumpDropdown: true,
   onUpdatePage: (page) => {
     pagination.page = page
-    GetProducts()
+    GetCompanyPatentList()
   },
   onUpdatePageSize: (pageSize) => {
     pagination.pageSize = pageSize
     pagination.page = 1
-    GetProducts()
+    GetCompanyPatentList()
   },
 })
 
@@ -81,7 +87,7 @@ const dropdownOptions = reactive<DropdownProps>({
   },
   onSelect: (v) => {
     if (contextmenuId.value !== null) {
-      const row = productData.value.find((item) => item.id === contextmenuId.value)
+      const row = patentData.value.find((item) => item.id === contextmenuId.value)
       switch (v) {
         case 'edit':
           if (row) modalRef.value?.Open('update', row)
@@ -97,7 +103,7 @@ const dropdownOptions = reactive<DropdownProps>({
 
 const hasChecked = computed(() => checkedRowKeys.value.length > 0)
 
-const columns = computed<DataTableColumns<Product>>(() => {
+const columns = computed<DataTableColumns<CompanyPatent>>(() => {
   return [
     {
       type: 'selection',
@@ -111,19 +117,22 @@ const columns = computed<DataTableColumns<Product>>(() => {
       width: 80,
     },
     {
-      key: 'name',
-      title: '产品名称',
-      width: 150,
+      key: 'title',
+      title: '专利名称',
+      minWidth: 200,
+      ellipsis: {
+        tooltip: true,
+      },
     },
     {
-      key: 'cover',
-      title: '封面',
+      key: 'image',
+      title: '专利图片',
       width: 100,
       align: 'center',
       render: (row) =>
-        row.cover ? (
+        row.image ? (
           <NImage
-            src={import.meta.env.VITE_SITE_BASE_API + row.cover}
+            src={import.meta.env.VITE_SITE_BASE_API + row.image}
             width={60}
             height={60}
             object-fit='cover'
@@ -135,35 +144,65 @@ const columns = computed<DataTableColumns<Product>>(() => {
         ),
     },
     {
-      key: 'price',
-      title: '价格',
-      width: 120,
-      align: 'right',
+      key: 'type',
+      title: '专利类型',
+      width: 130,
+      align: 'center',
       render: (row) => (
         <NTag
-          type='warning'
+          type={patentTypeColorMap[row.type] || 'default'}
           size='small'
+          round
         >
-          ¥{row.price.toFixed(2)}
+          {row.type}
         </NTag>
       ),
     },
     {
-      key: 'previews',
-      title: '预览图',
-      width: 120,
+      key: 'patent_no',
+      title: '专利号',
+      width: 180,
+      align: 'center',
+      render: (row) => (
+        <NTag
+          type='info'
+          size='small'
+          bordered={false}
+        >
+          {row.patent_no}
+        </NTag>
+      ),
+    },
+    {
+      key: 'auth_date',
+      title: '授权日期',
+      width: 130,
       align: 'center',
       render: (row) =>
-        row.previews && row.previews.length > 0 ? (
-          <span class='text-blue-500'>{row.previews.length} 张</span>
+        row.auth_date ? (
+          <NTag
+            type='success'
+            size='small'
+            round
+          >
+            {dayjs(row.auth_date).format('YYYY-MM-DD')}
+          </NTag>
         ) : (
-          <span class='text-gray-400'>暂无</span>
+          <span class='text-gray-400'>—</span>
         ),
     },
     {
-      key: 'description',
-      title: '描述',
-      width: 200,
+      key: 'inventor',
+      title: '发明人',
+      width: 150,
+      ellipsis: {
+        tooltip: true,
+      },
+    },
+    {
+      key: 'summary',
+      title: '摘要',
+      minWidth: 200,
       ellipsis: {
         tooltip: true,
       },
@@ -191,7 +230,7 @@ const columns = computed<DataTableColumns<Product>>(() => {
   ]
 })
 
-function CellActions(row: Product) {
+function CellActions(row: CompanyPatent) {
   return (
     <div class='flex justify-center gap-2'>
       <NButton
@@ -208,7 +247,7 @@ function CellActions(row: Product) {
         onPositiveClick={() => MutateDeleteData(row.id)}
       >
         {{
-          default: () => '确认删除该产品吗？',
+          default: () => '确认删除该专利吗？',
           trigger: () => (
             <NButton
               secondary
@@ -241,24 +280,24 @@ function HandleQueryClick() {
   formRef.value?.validate((errors) => {
     if (!errors) {
       pagination.page = 1
-      GetProducts()
+      GetCompanyPatentList()
     }
   })
 }
 
 function ResetForm() {
-  queryForm.name = ''
+  queryForm.title = ''
   pagination.page = 1
-  GetProducts()
+  GetCompanyPatentList()
 }
 
 async function MutateDeleteData(id: number) {
   isLoading.value = true
   try {
-    await DeleteProductApi([id])
+    await DeleteCompanyPatentApi([id])
     message.success('删除成功')
     checkedRowKeys.value = checkedRowKeys.value.filter((key) => key !== id)
-    GetProducts()
+    GetCompanyPatentList()
   } catch (error) {
     message.error('删除失败')
     console.error(error)
@@ -271,10 +310,10 @@ async function MutateBatchDeleteData() {
   if (!hasChecked.value) return
   isLoading.value = true
   try {
-    await DeleteProductApi(checkedRowKeys.value as number[])
+    await DeleteCompanyPatentApi(checkedRowKeys.value as number[])
     message.success(`成功删除 ${checkedRowKeys.value.length} 条记录`)
     checkedRowKeys.value = []
-    GetProducts()
+    GetCompanyPatentList()
   } catch (error) {
     message.error('批量删除失败')
     console.error(error)
@@ -283,16 +322,16 @@ async function MutateBatchDeleteData() {
   }
 }
 
-async function GetProducts() {
+async function GetCompanyPatentList() {
   isLoading.value = true
   try {
-    const result = await GetProductListApi(
+    const result = await GetCompanyPatentListApi(
       pagination.page || 1,
       pagination.pageSize || 10,
-      queryForm.name,
+      queryForm.title,
     )
-    console.log('GetProductListApi result:', result.data)
-    productData.value = result.data
+    console.log('GetCompanyPatentListApi result:', result.data)
+    patentData.value = result.data
     if (result.paginate) pagination.itemCount = result.paginate.total_count
   } catch (error) {
     message.error('获取列表失败')
@@ -303,7 +342,7 @@ async function GetProducts() {
 }
 
 onMounted(() => {
-  GetProducts()
+  GetCompanyPatentList()
 })
 </script>
 
@@ -324,13 +363,13 @@ onMounted(() => {
         class="max-lg:w-full max-lg:flex-col"
       >
         <NFormItem
-          label="产品名称"
-          path="name"
+          label="专利名称"
+          path="title"
         >
           <NInput
-            v-model:value="queryForm.name"
+            v-model:value="queryForm.title"
             clearable
-            placeholder="请输入产品名称"
+            placeholder="请输入专利名称"
           />
         </NFormItem>
         <div class="flex gap-2">
@@ -341,7 +380,7 @@ onMounted(() => {
             <template #icon>
               <span class="iconify ph--plus-circle" />
             </template>
-            新增产品
+            新增专利
           </NButton>
           <NPopconfirm
             positive-text="确定"
@@ -391,10 +430,9 @@ onMounted(() => {
           v-model:checked-row-keys="checkedRowKeys"
           :remote="true"
           :columns="columns"
-          :data="productData"
+          :data="patentData"
           :row-key="(row) => row.id"
           :loading="isLoading"
-          scroll-x="1800"
         />
 
         <div class="mt-3 flex items-end justify-end max-xl:flex-col max-xl:gap-y-2">
@@ -414,9 +452,9 @@ onMounted(() => {
       :show="showDropdown"
     />
 
-    <ProductModal
+    <CompanyPatentModal
       ref="modalRef"
-      @success="GetProducts"
+      @success="GetCompanyPatentList"
     />
   </ScrollContainer>
 </template>

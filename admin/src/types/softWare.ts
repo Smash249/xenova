@@ -21,9 +21,9 @@ interface SoftWare extends BaseResponse {
   series_id: number
 }
 
-type CreateSoftWareParams = Omit<SoftWare, 'id'>
+type CreateSoftWareParams = Omit<SoftWare, 'id' | 'created_at' | 'updated_at'>
 
-type UpdateSoftWareParams = SoftWare
+type UpdateSoftWareParams = CreateSoftWareParams & Pick<SoftWare, 'id'>
 
 export type {
   SoftWareSeries,

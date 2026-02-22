@@ -44,7 +44,7 @@
       >
         <div class="relative h-52 w-full overflow-hidden bg-slate-100">
           <img
-            :src="item.cover"
+            :src="BaseUrl + item.cover"
             :alt="item.title"
             class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
@@ -53,10 +53,10 @@
             class="absolute top-4 left-4 flex flex-col items-center justify-center rounded-lg bg-white/95 px-3 py-1.5 text-center shadow-sm backdrop-blur-sm"
           >
             <span class="text-xs font-bold text-rose-600">{{
-              GetMonth(item.date)
+              GetMonth(item.activity_date)
             }}</span>
             <span class="text-lg leading-none font-black text-slate-800">{{
-              GetDay(item.date)
+              GetDay(item.activity_date)
             }}</span>
           </div>
 
@@ -127,6 +127,8 @@ import type { Paginate } from "@/types/common"
 import type { LoveActivity } from "@/types/honor"
 
 import LoveActivityModal from "../components/LoveActivityModal.vue"
+
+const BaseUrl = import.meta.env.VITE_BASE_URL
 
 const loading = ref(false)
 const isModalOpen = ref(false)

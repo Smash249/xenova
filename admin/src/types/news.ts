@@ -5,6 +5,9 @@ interface NewsSeries extends BaseResponse {
   name: string
   description: string
 }
+type CreateNewsSeriesParams = Pick<NewsSeries, 'name' | 'description'>
+
+type UpdateNewsSeriesParams = CreateNewsSeriesParams & { id: number }
 
 interface News extends BaseResponse {
   id: number
@@ -13,10 +16,6 @@ interface News extends BaseResponse {
   view_count: number
   series_id: number
 }
-
-type CreateNewsSeriesParams = Pick<NewsSeries, 'name' | 'description'>
-
-type UpdateNewsSeriesParams = CreateNewsSeriesParams & { id: number }
 
 type CreateNewsParams = Pick<News, 'title' | 'content' | 'series_id'>
 

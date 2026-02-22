@@ -121,6 +121,7 @@ function HandleModalSubmit() {
           })
           break
       }
+      emit('success')
       showModal.value = false
     } catch (error) {
       message.error(modalType.value === 'create' ? '新增失败' : '更新失败')

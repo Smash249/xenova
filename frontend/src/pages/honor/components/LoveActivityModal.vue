@@ -13,7 +13,7 @@
           <div class="relative h-64 w-full shrink-0 sm:h-80">
             <img
               v-if="activity?.cover"
-              :src="activity.cover"
+              :src="BaseUrl + activity.cover"
               :alt="activity.title"
               class="h-full w-full object-cover"
             />
@@ -34,7 +34,7 @@
                   class="inline-flex items-center rounded-full bg-rose-500/90 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm"
                 >
                   <Calendar class="mr-1.5 h-3.5 w-3.5" />
-                  {{ activity?.date }}
+                  {{ activity?.activity_date }}
                 </span>
                 <span
                   class="inline-flex items-center rounded-full bg-white/20 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm"
@@ -94,6 +94,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits(["close"])
+const BaseUrl = import.meta.env.VITE_BASE_URL
 
 function HandleClose() {
   emit("close")

@@ -16,32 +16,32 @@ import {
 } from 'naive-ui'
 import { reactive, ref, useTemplateRef, computed, onMounted } from 'vue'
 
-import { GetProductListApi, DeleteProductApi } from '@/api/product'
+import { GetLoveActivityListApi, DeleteLoveActivityApi } from '@/api/honor'
 import { ScrollContainer } from '@/components'
 
-import ProductModal from './component/ProductModal.vue'
+import LoveActivityModal from './component/LoveActivityModal.vue'
 
-import type { Product } from '@/types/product'
+import type { LoveActivity } from '@/types/honor'
 import type { DataTableColumns, PaginationProps, DropdownProps, FormInst } from 'naive-ui'
 
 defineOptions({
-  name: 'ProductAdmin',
+  name: 'LoveActivityAdmin',
 })
 
 const message = useMessage()
 
 const formRef = useTemplateRef<FormInst>('formRef')
-const modalRef = ref<InstanceType<typeof ProductModal> | null>(null)
+const modalRef = ref<InstanceType<typeof LoveActivityModal> | null>(null)
 
 const showDropdown = ref(false)
 const contextmenuId = ref<number | null>(null)
 
-const productData = ref<Product[]>([])
+const activityData = ref<LoveActivity[]>([])
 const checkedRowKeys = ref<Array<number | string>>([])
 const isLoading = ref(false)
 
 const queryForm = reactive({
-  name: '',
+  title: '',
 })
 
 const pagination = reactive<PaginationProps>({
@@ -54,12 +54,12 @@ const pagination = reactive<PaginationProps>({
   showQuickJumpDropdown: true,
   onUpdatePage: (page) => {
     pagination.page = page
-    GetProducts()
+    GetLoveActivityList()
   },
   onUpdatePageSize: (pageSize) => {
     pagination.pageSize = pageSize
     pagination.page = 1
-    GetProducts()
+    GetLoveActivityList()
   },
 })
 
@@ -81,7 +81,7 @@ const dropdownOptions = reactive<DropdownProps>({
   },
   onSelect: (v) => {
     if (contextmenuId.value !== null) {
-      const row = productData.value.find((item) => item.id === contextmenuId.value)
+      const row = activityData.value.find((item) => item.id === contextmenuId.value)
       switch (v) {
         case 'edit':
           if (row) modalRef.value?.Open('update', row)
@@ -97,7 +97,7 @@ const dropdownOptions = reactive<DropdownProps>({
 
 const hasChecked = computed(() => checkedRowKeys.value.length > 0)
 
-const columns = computed<DataTableColumns<Product>>(() => {
+const columns = computed<DataTableColumns<LoveActivity>>(() => {
   return [
     {
       type: 'selection',
@@ -111,9 +111,12 @@ const columns = computed<DataTableColumns<Product>>(() => {
       width: 80,
     },
     {
-      key: 'name',
-      title: '产品名称',
-      width: 150,
+      key: 'title',
+      title: '活动标题',
+      minWidth: 200,
+      ellipsis: {
+        tooltip: true,
+      },
     },
     {
       key: 'cover',
@@ -135,35 +138,59 @@ const columns = computed<DataTableColumns<Product>>(() => {
         ),
     },
     {
-      key: 'price',
-      title: '价格',
+      key: 'activity_date',
+      title: '活动日期',
+      width: 130,
+      align: 'center',
+      render: (row) =>
+        row.activity_date ? (
+          <NTag
+            type='success'
+            size='small'
+            round
+          >
+            {dayjs(row.activity_date).format('YYYY-MM-DD')}
+          </NTag>
+        ) : (
+          <span class='text-gray-400'>—</span>
+        ),
+    },
+    {
+      key: 'location',
+      title: '活动地点',
+      width: 160,
+      ellipsis: {
+        tooltip: true,
+      },
+      render: (row) => (
+        <div class='flex items-center gap-1'>
+          <span class='iconify text-sm text-gray-400 ph--map-pin' />
+          {row.location}
+        </div>
+      ),
+    },
+    {
+      key: 'participants',
+      title: '参与人数',
       width: 120,
-      align: 'right',
+      align: 'center',
       render: (row) => (
         <NTag
           type='warning'
           size='small'
+          round
         >
-          ¥{row.price.toFixed(2)}
+          <div class='flex items-center gap-1'>
+            <span class='iconify text-sm ph--users' />
+            {row.participants} 人
+          </div>
         </NTag>
       ),
     },
     {
-      key: 'previews',
-      title: '预览图',
-      width: 120,
-      align: 'center',
-      render: (row) =>
-        row.previews && row.previews.length > 0 ? (
-          <span class='text-blue-500'>{row.previews.length} 张</span>
-        ) : (
-          <span class='text-gray-400'>暂无</span>
-        ),
-    },
-    {
-      key: 'description',
-      title: '描述',
-      width: 200,
+      key: 'summary',
+      title: '摘要',
+      minWidth: 200,
       ellipsis: {
         tooltip: true,
       },
@@ -191,7 +218,7 @@ const columns = computed<DataTableColumns<Product>>(() => {
   ]
 })
 
-function CellActions(row: Product) {
+function CellActions(row: LoveActivity) {
   return (
     <div class='flex justify-center gap-2'>
       <NButton
@@ -208,7 +235,7 @@ function CellActions(row: Product) {
         onPositiveClick={() => MutateDeleteData(row.id)}
       >
         {{
-          default: () => '确认删除该产品吗？',
+          default: () => '确认删除该活动吗？',
           trigger: () => (
             <NButton
               secondary
@@ -241,24 +268,24 @@ function HandleQueryClick() {
   formRef.value?.validate((errors) => {
     if (!errors) {
       pagination.page = 1
-      GetProducts()
+      GetLoveActivityList()
     }
   })
 }
 
 function ResetForm() {
-  queryForm.name = ''
+  queryForm.title = ''
   pagination.page = 1
-  GetProducts()
+  GetLoveActivityList()
 }
 
 async function MutateDeleteData(id: number) {
   isLoading.value = true
   try {
-    await DeleteProductApi([id])
+    await DeleteLoveActivityApi([id])
     message.success('删除成功')
     checkedRowKeys.value = checkedRowKeys.value.filter((key) => key !== id)
-    GetProducts()
+    GetLoveActivityList()
   } catch (error) {
     message.error('删除失败')
     console.error(error)
@@ -271,10 +298,10 @@ async function MutateBatchDeleteData() {
   if (!hasChecked.value) return
   isLoading.value = true
   try {
-    await DeleteProductApi(checkedRowKeys.value as number[])
+    await DeleteLoveActivityApi(checkedRowKeys.value as number[])
     message.success(`成功删除 ${checkedRowKeys.value.length} 条记录`)
     checkedRowKeys.value = []
-    GetProducts()
+    GetLoveActivityList()
   } catch (error) {
     message.error('批量删除失败')
     console.error(error)
@@ -283,16 +310,16 @@ async function MutateBatchDeleteData() {
   }
 }
 
-async function GetProducts() {
+async function GetLoveActivityList() {
   isLoading.value = true
   try {
-    const result = await GetProductListApi(
+    const result = await GetLoveActivityListApi(
       pagination.page || 1,
       pagination.pageSize || 10,
-      queryForm.name,
+      queryForm.title,
     )
-    console.log('GetProductListApi result:', result.data)
-    productData.value = result.data
+    console.log('GetLoveActivityListApi result:', result.data)
+    activityData.value = result.data
     if (result.paginate) pagination.itemCount = result.paginate.total_count
   } catch (error) {
     message.error('获取列表失败')
@@ -303,7 +330,7 @@ async function GetProducts() {
 }
 
 onMounted(() => {
-  GetProducts()
+  GetLoveActivityList()
 })
 </script>
 
@@ -324,13 +351,13 @@ onMounted(() => {
         class="max-lg:w-full max-lg:flex-col"
       >
         <NFormItem
-          label="产品名称"
-          path="name"
+          label="活动标题"
+          path="title"
         >
           <NInput
-            v-model:value="queryForm.name"
+            v-model:value="queryForm.title"
             clearable
-            placeholder="请输入产品名称"
+            placeholder="请输入活动标题"
           />
         </NFormItem>
         <div class="flex gap-2">
@@ -341,7 +368,7 @@ onMounted(() => {
             <template #icon>
               <span class="iconify ph--plus-circle" />
             </template>
-            新增产品
+            新增活动
           </NButton>
           <NPopconfirm
             positive-text="确定"
@@ -391,10 +418,9 @@ onMounted(() => {
           v-model:checked-row-keys="checkedRowKeys"
           :remote="true"
           :columns="columns"
-          :data="productData"
+          :data="activityData"
           :row-key="(row) => row.id"
           :loading="isLoading"
-          scroll-x="1800"
         />
 
         <div class="mt-3 flex items-end justify-end max-xl:flex-col max-xl:gap-y-2">
@@ -414,9 +440,9 @@ onMounted(() => {
       :show="showDropdown"
     />
 
-    <ProductModal
+    <LoveActivityModal
       ref="modalRef"
-      @success="GetProducts"
+      @success="GetLoveActivityList"
     />
   </ScrollContainer>
 </template>

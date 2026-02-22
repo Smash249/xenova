@@ -11,6 +11,7 @@ func initUserRouter() {
 			public.POST("/login", api.UserApi.Login)
 			public.POST("/register", api.UserApi.Register)
 			public.GET("/health", api.UserApi.Health)
+			private.POST("/upload", api.UserApi.Upload)
 		},
 	)
 }

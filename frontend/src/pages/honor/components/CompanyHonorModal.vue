@@ -31,7 +31,7 @@
               >
                 <img
                   v-if="honor?.image"
-                  :src="honor.image"
+                  :src="BaseUrl + honor.image"
                   :alt="honor.title"
                   class="max-h-80 rounded-lg object-contain drop-shadow-sm"
                 />
@@ -49,7 +49,7 @@
                       class="flex items-center text-sm font-semibold text-slate-800"
                     >
                       <Calendar class="mr-2 h-4 w-4 text-blue-500" />
-                      {{ honor?.date }}
+                      {{ honor?.issue_date }}
                     </span>
                   </div>
                   <div class="h-px w-full bg-blue-100/50"></div>
@@ -61,7 +61,7 @@
                       class="flex items-center font-mono text-sm font-semibold text-slate-800"
                     >
                       <ShieldCheck class="mr-2 h-4 w-4 text-blue-500" />
-                      {{ honor?.certNo || "无" }}
+                      {{ honor?.cert_no || "无" }}
                     </span>
                   </div>
                   <div class="h-px w-full bg-blue-100/50"></div>
@@ -111,7 +111,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits(["close"])
-
+const BaseUrl = import.meta.env.VITE_BASE_URL
 function HandleClose() {
   emit("close")
 }

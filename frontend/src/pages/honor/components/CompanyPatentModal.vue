@@ -42,7 +42,7 @@
                 ></div>
                 <img
                   v-if="patent?.image"
-                  :src="patent.image"
+                  :src="BaseUrl + patent.image"
                   :alt="patent.title"
                   class="relative z-10 max-h-80 rounded-lg object-contain mix-blend-multiply drop-shadow-sm"
                 />
@@ -60,7 +60,7 @@
                       class="flex items-center font-mono text-sm font-semibold text-slate-800"
                     >
                       <FileCheck class="mr-2 h-4 w-4 text-indigo-500" />
-                      {{ patent?.patentNo }}
+                      {{ patent?.patent_no || "无" }}
                     </span>
                   </div>
                   <div class="h-px w-full bg-indigo-100/50"></div>
@@ -72,7 +72,7 @@
                       class="flex items-center text-sm font-semibold text-slate-800"
                     >
                       <Calendar class="mr-2 h-4 w-4 text-indigo-500" />
-                      {{ patent?.date }}
+                      {{ patent?.auth_date || "无" }}
                     </span>
                   </div>
                   <div class="h-px w-full bg-indigo-100/50"></div>
@@ -84,7 +84,7 @@
                       class="flex items-center text-sm font-semibold text-slate-800"
                     >
                       <Users class="mr-2 h-4 w-4 text-indigo-500" />
-                      {{ patent?.inventor }}
+                      {{ patent?.inventor || "无" }}
                     </span>
                   </div>
                 </div>
@@ -124,6 +124,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits(["close"])
+const BaseUrl = import.meta.env.VITE_BASE_URL
 
 function HandleClose() {
   emit("close")

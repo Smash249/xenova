@@ -22,6 +22,7 @@ func initRouter() {
 	e := echo.New()
 	e.Validator = validator.InitCustomValidator()
 	e.Use(middleware.NewLogger())
+	e.Static("/static", "uploads")
 	// 不需要认证的路由
 	public := e.Group("/public")
 	// 需要认证的路由

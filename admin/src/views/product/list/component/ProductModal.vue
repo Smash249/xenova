@@ -8,20 +8,25 @@ import {
   NModal,
   NSelect,
   NSpace,
-  NUpload,
   useMessage,
 } from 'naive-ui'
-import { reactive, ref, useTemplateRef, computed } from 'vue'
+import { ref, useTemplateRef, computed } from 'vue'
 
-import { GetProductSeriesListApi } from '@/api/product'
+import { CreateProductApi, GetProductSeriesListApi, UpdateProductApi } from '@/api/product'
+import ImageUpload from '@/components/ImageUpload.vue'
 
-import type { Product, ProductSeries } from '@/types/product'
-import type { FormInst, FormRules, UploadFileInfo } from 'naive-ui'
+import type {
+  CreateProductParams,
+  Product,
+  ProductSeries,
+  UpdateProductParams,
+} from '@/types/product'
+import type { FormInst, FormRules } from 'naive-ui'
 
 interface ModelForm {
   id?: number
   name: string
-  seriesId: number | null
+  series_id: number
   image: string
   description: string
   cover: string
@@ -37,17 +42,28 @@ const emit = defineEmits<{
   (e: 'success'): void
 }>()
 
+const DEFAULT_MODAL_FORM: ModelForm = {
+  name: '',
+  series_id: 0,
+  image: '',
+  description: '',
+  cover: '',
+  previews: [],
+  price: 0,
+}
+
 const message = useMessage()
 
 const modalFormRef = useTemplateRef<FormInst>('modalFormRef')
 
 const rules: FormRules = {
   name: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
-  seriesId: [
+  series_id: [
     { required: true, type: 'number', message: '请选择所属系列', trigger: ['blur', 'change'] },
   ],
   price: [{ required: true, type: 'number', message: '请输入产品价格', trigger: 'blur' }],
   cover: [{ required: true, message: '请上传封面图', trigger: 'change' }],
+  description: [{ required: true, message: '请输入产品描述', trigger: 'blur' }],
 }
 
 const showModal = ref(false)
@@ -64,18 +80,7 @@ const seriesOptions = computed(() =>
   })),
 )
 
-const modalForm = reactive<ModelForm>({
-  name: '',
-  seriesId: null,
-  image: '',
-  description: '',
-  cover: '',
-  previews: [],
-  price: 0,
-})
-
-const coverFileList = ref<UploadFileInfo[]>([])
-const previewFileList = ref<UploadFileInfo[]>([])
+const modalForm = ref<ModelForm>({ ...DEFAULT_MODAL_FORM, previews: [] })
 
 async function FetchSeriesList() {
   seriesLoading.value = true
@@ -90,68 +95,21 @@ async function FetchSeriesList() {
   }
 }
 
-function HandleCoverUploadChange(fileList: UploadFileInfo[]) {
-  coverFileList.value = fileList.slice(-1)
-  const file = coverFileList.value[0]
-  if (file?.file) {
-    modalForm.cover = URL.createObjectURL(file.file)
-  } else if (fileList.length === 0) {
-    modalForm.cover = ''
-  }
-}
-
-function HandleCoverRemove() {
-  coverFileList.value = []
-  modalForm.cover = ''
-  return true
-}
-
-function HandlePreviewUploadChange(fileList: UploadFileInfo[]) {
-  previewFileList.value = fileList
-  modalForm.previews = fileList
-    .filter((f) => f.file || f.url)
-    .map((f) => (f.file ? URL.createObjectURL(f.file) : f.url!))
-}
-
-function HandlePreviewRemove(options: { file: UploadFileInfo; fileList: UploadFileInfo[] }) {
-  previewFileList.value = options.fileList
-  modalForm.previews = options.fileList
-    .filter((f) => f.file || f.url)
-    .map((f) => (f.file ? URL.createObjectURL(f.file) : f.url!))
-  return true
-}
-
 function Open(action: 'create' | 'update', row?: Product) {
   modalType.value = action
   if (action === 'create') {
-    modalForm.id = undefined
-    modalForm.name = ''
-    modalForm.seriesId = null
-    modalForm.image = ''
-    modalForm.description = ''
-    modalForm.cover = ''
-    modalForm.previews = []
-    modalForm.price = 0
-    coverFileList.value = []
-    previewFileList.value = []
+    modalForm.value = { ...DEFAULT_MODAL_FORM, previews: [] }
   } else if (row) {
-    modalForm.id = row.id
-    modalForm.name = row.name
-    modalForm.seriesId = Number(row.seriesId)
-    modalForm.image = row.image
-    modalForm.description = row.description
-    modalForm.cover = row.cover
-    modalForm.previews = [...row.previews]
-    modalForm.price = row.price
-    coverFileList.value = row.cover
-      ? [{ id: 'cover', name: 'cover', status: 'finished', url: row.cover }]
-      : []
-    previewFileList.value = row.previews.map((url, index) => ({
-      id: `preview-${index}`,
-      name: `preview-${index}`,
-      status: 'finished' as const,
-      url,
-    }))
+    modalForm.value = {
+      id: row.id,
+      name: row.name,
+      series_id: row.series_id,
+      image: row.image,
+      description: row.description,
+      cover: row.cover,
+      previews: [...row.previews],
+      price: row.price,
+    }
   }
   showModal.value = true
   FetchSeriesList()
@@ -160,17 +118,66 @@ function Open(action: 'create' | 'update', row?: Product) {
 function HandleModalSubmit() {
   modalFormRef.value?.validate(async (errors) => {
     if (errors) return
-    isLoading.value = true
+    const form = modalForm.value
     try {
-      showModal.value = false
-      emit('success')
+      switch (modalType.value) {
+        case 'create':
+          await CreateProduct({
+            name: form.name,
+            series_id: form.series_id,
+            image: form.image,
+            description: form.description,
+            cover: form.cover,
+            previews: form.previews,
+            price: form.price,
+          })
+          break
+        case 'update':
+          await UpdateProduct({
+            id: form.id!,
+            name: form.name,
+            series_id: form.series_id,
+            image: form.image,
+            description: form.description,
+            cover: form.cover,
+            previews: form.previews,
+            price: form.price,
+          })
+          break
+      }
     } catch (error) {
       message.error(modalType.value === 'create' ? '新增失败' : '更新失败')
       console.error(error)
-    } finally {
-      isLoading.value = false
     }
   })
+}
+
+async function CreateProduct(params: CreateProductParams) {
+  try {
+    await CreateProductApi(params)
+    message.success('产品创建成功')
+    showModal.value = false
+    emit('success')
+  } catch (error) {
+    message.error('产品创建失败')
+    console.error(error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function UpdateProduct(params: UpdateProductParams) {
+  try {
+    await UpdateProductApi(params)
+    message.success('产品更新成功')
+    showModal.value = false
+    emit('success')
+  } catch (error) {
+    message.error('产品更新失败')
+    console.error(error)
+  } finally {
+    isLoading.value = false
+  }
 }
 
 defineExpose({
@@ -206,10 +213,10 @@ defineExpose({
           </NFormItem>
           <NFormItem
             label="所属系列"
-            path="seriesId"
+            path="series_id"
           >
             <NSelect
-              v-model:value="modalForm.seriesId"
+              v-model:value="modalForm.series_id"
               :options="seriesOptions"
               :loading="seriesLoading"
               placeholder="请选择所属系列"
@@ -243,28 +250,18 @@ defineExpose({
             label="封面图"
             path="cover"
           >
-            <NUpload
-              :file-list="coverFileList"
+            <ImageUpload
+              v-model="modalForm.cover"
               :max="1"
-              list-type="image-card"
-              accept="image/*"
-              :default-upload="false"
-              @update:file-list="HandleCoverUploadChange"
-              @remove="HandleCoverRemove"
             />
           </NFormItem>
           <NFormItem
             label="预览图（最多10张）"
             path="previews"
           >
-            <NUpload
-              :file-list="previewFileList"
+            <ImageUpload
+              v-model="modalForm.previews"
               :max="10"
-              list-type="image-card"
-              accept="image/*"
-              :default-upload="false"
-              @update:file-list="HandlePreviewUploadChange"
-              @remove="HandlePreviewRemove"
             />
           </NFormItem>
         </div>
@@ -272,23 +269,17 @@ defineExpose({
 
       <div class="mb-4 border-t border-gray-200 dark:border-gray-700" />
 
-      <div>
-        <div class="mb-3 flex items-center gap-2 text-base font-medium">
-          <span class="iconify text-lg text-primary ph--article" />
-          产品描述
-        </div>
-        <NFormItem
-          path="description"
-          :show-label="false"
-        >
-          <NInput
-            v-model:value="modalForm.description"
-            type="textarea"
-            placeholder="请输入产品描述信息..."
-            :rows="4"
-          />
-        </NFormItem>
-      </div>
+      <NFormItem
+        path="description"
+        label="产品描述"
+      >
+        <NInput
+          v-model:value="modalForm.description"
+          type="textarea"
+          placeholder="请输入产品描述信息..."
+          :rows="4"
+        />
+      </NFormItem>
     </NForm>
 
     <template #footer>

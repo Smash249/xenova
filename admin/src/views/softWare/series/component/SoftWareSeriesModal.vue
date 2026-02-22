@@ -2,7 +2,13 @@
 import { NButton, NForm, NFormItem, NInput, NModal, NSpace, useMessage } from 'naive-ui'
 import { reactive, ref, useTemplateRef } from 'vue'
 
-import type { SoftWareSeries } from '@/types/softWare'
+import { CreateSoftWareSeriesApi, UpdateSoftWareSeriesApi } from '@/api/softWare'
+
+import type {
+  CreateSoftWareSeriesParams,
+  SoftWareSeries,
+  UpdateSoftWareSeriesParams,
+} from '@/types/softWare'
 import type { FormInst, FormRules } from 'naive-ui'
 
 interface ModelForm {
@@ -55,6 +61,22 @@ function HandleModalSubmit() {
     if (errors) return
     isLoading.value = true
     try {
+      switch (modalType.value) {
+        case 'create':
+          await CreateSoftWareSeries({
+            name: modalForm.name,
+            description: modalForm.description,
+          })
+          break
+        case 'update':
+          if (!modalForm.id) throw new Error('缺少系列ID')
+          await UpdateSoftWareSeries({
+            id: modalForm.id,
+            name: modalForm.name,
+            description: modalForm.description,
+          })
+          break
+      }
       showModal.value = false
       emit('success')
     } catch (error) {
@@ -64,6 +86,16 @@ function HandleModalSubmit() {
       isLoading.value = false
     }
   })
+}
+
+async function CreateSoftWareSeries(params: CreateSoftWareSeriesParams) {
+  await CreateSoftWareSeriesApi(params)
+  message.success('新增下载系列成功')
+}
+
+async function UpdateSoftWareSeries(params: UpdateSoftWareSeriesParams) {
+  await UpdateSoftWareSeriesApi(params)
+  message.success('更新下载系列成功')
 }
 
 defineExpose({

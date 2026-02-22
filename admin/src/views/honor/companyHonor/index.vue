@@ -16,32 +16,32 @@ import {
 } from 'naive-ui'
 import { reactive, ref, useTemplateRef, computed, onMounted } from 'vue'
 
-import { GetProductListApi, DeleteProductApi } from '@/api/product'
+import { GetCompanyHonorListApi, DeleteCompanyHonorApi } from '@/api/honor'
 import { ScrollContainer } from '@/components'
 
-import ProductModal from './component/ProductModal.vue'
+import CompanyHonorModal from './component/CompanyHonorModal.vue'
 
-import type { Product } from '@/types/product'
+import type { CompanyHonor } from '@/types/honor'
 import type { DataTableColumns, PaginationProps, DropdownProps, FormInst } from 'naive-ui'
 
 defineOptions({
-  name: 'ProductAdmin',
+  name: 'CompanyHonorAdmin',
 })
 
 const message = useMessage()
 
 const formRef = useTemplateRef<FormInst>('formRef')
-const modalRef = ref<InstanceType<typeof ProductModal> | null>(null)
+const modalRef = ref<InstanceType<typeof CompanyHonorModal> | null>(null)
 
 const showDropdown = ref(false)
 const contextmenuId = ref<number | null>(null)
 
-const productData = ref<Product[]>([])
+const honorData = ref<CompanyHonor[]>([])
 const checkedRowKeys = ref<Array<number | string>>([])
 const isLoading = ref(false)
 
 const queryForm = reactive({
-  name: '',
+  title: '',
 })
 
 const pagination = reactive<PaginationProps>({
@@ -54,12 +54,12 @@ const pagination = reactive<PaginationProps>({
   showQuickJumpDropdown: true,
   onUpdatePage: (page) => {
     pagination.page = page
-    GetProducts()
+    GetCompanyHonorList()
   },
   onUpdatePageSize: (pageSize) => {
     pagination.pageSize = pageSize
     pagination.page = 1
-    GetProducts()
+    GetCompanyHonorList()
   },
 })
 
@@ -81,7 +81,7 @@ const dropdownOptions = reactive<DropdownProps>({
   },
   onSelect: (v) => {
     if (contextmenuId.value !== null) {
-      const row = productData.value.find((item) => item.id === contextmenuId.value)
+      const row = honorData.value.find((item) => item.id === contextmenuId.value)
       switch (v) {
         case 'edit':
           if (row) modalRef.value?.Open('update', row)
@@ -97,7 +97,7 @@ const dropdownOptions = reactive<DropdownProps>({
 
 const hasChecked = computed(() => checkedRowKeys.value.length > 0)
 
-const columns = computed<DataTableColumns<Product>>(() => {
+const columns = computed<DataTableColumns<CompanyHonor>>(() => {
   return [
     {
       type: 'selection',
@@ -111,19 +111,22 @@ const columns = computed<DataTableColumns<Product>>(() => {
       width: 80,
     },
     {
-      key: 'name',
-      title: '产品名称',
-      width: 150,
+      key: 'title',
+      title: '荣誉名称',
+      width: 100,
+      ellipsis: {
+        tooltip: true,
+      },
     },
     {
-      key: 'cover',
-      title: '封面',
+      key: 'image',
+      title: '荣誉图片',
       width: 100,
       align: 'center',
       render: (row) =>
-        row.cover ? (
+        row.image ? (
           <NImage
-            src={import.meta.env.VITE_SITE_BASE_API + row.cover}
+            src={import.meta.env.VITE_SITE_BASE_API + row.image}
             width={60}
             height={60}
             object-fit='cover'
@@ -135,29 +138,46 @@ const columns = computed<DataTableColumns<Product>>(() => {
         ),
     },
     {
-      key: 'price',
-      title: '价格',
-      width: 120,
-      align: 'right',
-      render: (row) => (
-        <NTag
-          type='warning'
-          size='small'
-        >
-          ¥{row.price.toFixed(2)}
-        </NTag>
-      ),
+      key: 'issuer',
+      title: '颁发机构',
+      width: 160,
+      ellipsis: {
+        tooltip: true,
+      },
     },
     {
-      key: 'previews',
-      title: '预览图',
-      width: 120,
+      key: 'issue_date',
+      title: '获得日期',
+      width: 130,
       align: 'center',
       render: (row) =>
-        row.previews && row.previews.length > 0 ? (
-          <span class='text-blue-500'>{row.previews.length} 张</span>
+        row.issue_date ? (
+          <NTag
+            type='success'
+            size='small'
+            round
+          >
+            {dayjs(row.issue_date).format('YYYY-MM-DD')}
+          </NTag>
         ) : (
-          <span class='text-gray-400'>暂无</span>
+          <span class='text-gray-400'>—</span>
+        ),
+    },
+    {
+      key: 'cert_no',
+      title: '证书编号',
+      width: 150,
+      align: 'center',
+      render: (row) =>
+        row.cert_no ? (
+          <NTag
+            type='info'
+            size='small'
+          >
+            {row.cert_no}
+          </NTag>
+        ) : (
+          <span class='text-gray-400'>—</span>
         ),
     },
     {
@@ -191,7 +211,7 @@ const columns = computed<DataTableColumns<Product>>(() => {
   ]
 })
 
-function CellActions(row: Product) {
+function CellActions(row: CompanyHonor) {
   return (
     <div class='flex justify-center gap-2'>
       <NButton
@@ -208,7 +228,7 @@ function CellActions(row: Product) {
         onPositiveClick={() => MutateDeleteData(row.id)}
       >
         {{
-          default: () => '确认删除该产品吗？',
+          default: () => '确认删除该荣誉吗？',
           trigger: () => (
             <NButton
               secondary
@@ -241,24 +261,24 @@ function HandleQueryClick() {
   formRef.value?.validate((errors) => {
     if (!errors) {
       pagination.page = 1
-      GetProducts()
+      GetCompanyHonorList()
     }
   })
 }
 
 function ResetForm() {
-  queryForm.name = ''
+  queryForm.title = ''
   pagination.page = 1
-  GetProducts()
+  GetCompanyHonorList()
 }
 
 async function MutateDeleteData(id: number) {
   isLoading.value = true
   try {
-    await DeleteProductApi([id])
+    await DeleteCompanyHonorApi([id])
     message.success('删除成功')
     checkedRowKeys.value = checkedRowKeys.value.filter((key) => key !== id)
-    GetProducts()
+    GetCompanyHonorList()
   } catch (error) {
     message.error('删除失败')
     console.error(error)
@@ -271,10 +291,10 @@ async function MutateBatchDeleteData() {
   if (!hasChecked.value) return
   isLoading.value = true
   try {
-    await DeleteProductApi(checkedRowKeys.value as number[])
+    await DeleteCompanyHonorApi(checkedRowKeys.value as number[])
     message.success(`成功删除 ${checkedRowKeys.value.length} 条记录`)
     checkedRowKeys.value = []
-    GetProducts()
+    GetCompanyHonorList()
   } catch (error) {
     message.error('批量删除失败')
     console.error(error)
@@ -283,16 +303,16 @@ async function MutateBatchDeleteData() {
   }
 }
 
-async function GetProducts() {
+async function GetCompanyHonorList() {
   isLoading.value = true
   try {
-    const result = await GetProductListApi(
+    const result = await GetCompanyHonorListApi(
       pagination.page || 1,
       pagination.pageSize || 10,
-      queryForm.name,
+      queryForm.title,
     )
-    console.log('GetProductListApi result:', result.data)
-    productData.value = result.data
+    console.log('GetCompanyHonorListApi result:', result.data)
+    honorData.value = result.data
     if (result.paginate) pagination.itemCount = result.paginate.total_count
   } catch (error) {
     message.error('获取列表失败')
@@ -303,7 +323,7 @@ async function GetProducts() {
 }
 
 onMounted(() => {
-  GetProducts()
+  GetCompanyHonorList()
 })
 </script>
 
@@ -324,13 +344,13 @@ onMounted(() => {
         class="max-lg:w-full max-lg:flex-col"
       >
         <NFormItem
-          label="产品名称"
-          path="name"
+          label="荣誉名称"
+          path="title"
         >
           <NInput
-            v-model:value="queryForm.name"
+            v-model:value="queryForm.title"
             clearable
-            placeholder="请输入产品名称"
+            placeholder="请输入荣誉名称"
           />
         </NFormItem>
         <div class="flex gap-2">
@@ -341,7 +361,7 @@ onMounted(() => {
             <template #icon>
               <span class="iconify ph--plus-circle" />
             </template>
-            新增产品
+            新增荣誉
           </NButton>
           <NPopconfirm
             positive-text="确定"
@@ -391,7 +411,7 @@ onMounted(() => {
           v-model:checked-row-keys="checkedRowKeys"
           :remote="true"
           :columns="columns"
-          :data="productData"
+          :data="honorData"
           :row-key="(row) => row.id"
           :loading="isLoading"
           scroll-x="1800"
@@ -414,9 +434,9 @@ onMounted(() => {
       :show="showDropdown"
     />
 
-    <ProductModal
+    <CompanyHonorModal
       ref="modalRef"
-      @success="GetProducts"
+      @success="GetCompanyHonorList"
     />
   </ScrollContainer>
 </template>

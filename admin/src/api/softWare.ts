@@ -1,6 +1,11 @@
 import request from '@/utils/request'
 
-import type { CreateSoftWareParams, UpdateSoftWareParams } from '@/types/softWare'
+import type {
+  CreateSoftWareParams,
+  CreateSoftWareSeriesParams,
+  UpdateSoftWareParams,
+  UpdateSoftWareSeriesParams,
+} from '@/types/softWare'
 
 export async function GetSoftWareSeriesListApi(
   page: number = 1,
@@ -21,7 +26,7 @@ export async function GetSoftWareSeriesListApi(
   }
 }
 
-export async function CreateSoftWareSeriesApi(params: CreateSoftWareParams) {
+export async function CreateSoftWareSeriesApi(params: CreateSoftWareSeriesParams) {
   try {
     const result = await request.post('/admin/software_series', params)
     if (!result.success) throw new Error('创建软件系列失败')
@@ -31,7 +36,7 @@ export async function CreateSoftWareSeriesApi(params: CreateSoftWareParams) {
   }
 }
 
-export async function UpdateSoftWareSeriesApi(params: UpdateSoftWareParams) {
+export async function UpdateSoftWareSeriesApi(params: UpdateSoftWareSeriesParams) {
   try {
     const result = await request.put(`/admin/software_series`, params)
     if (!result.success) throw new Error('更新软件系列失败')

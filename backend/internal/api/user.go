@@ -39,3 +39,18 @@ func (userApi) Register(ctx *echo.Context) error {
 func (userApi) Health(ctx *echo.Context) error {
 	return utils.SuccessApiResponse(ctx, "ok", http.StatusOK)
 }
+
+func (userApi) Upload(ctx *echo.Context) error {
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	result, err := userServicesApp.Upload(file)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	return utils.SuccessApiResponse(ctx,
+		map[string]string{
+			"url": result,
+		}, http.StatusOK)
+}

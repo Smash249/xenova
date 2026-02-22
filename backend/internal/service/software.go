@@ -27,14 +27,16 @@ func (s *SoftwareService) GetSoftwareSeriesList(params request.GetSoftwareSeries
 // CreateSoftwareSeries 创建软件分类
 func (s *SoftwareService) CreateSoftwareSeries(params request.CreateSoftwareSeriesReq) error {
 	return global.DB.Create(&models.SoftwareSeries{
-		Name: params.Name,
+		Name:        params.Name,
+		Description: params.Description,
 	}).Error
 }
 
 // UpdateSoftwareSeries 更新软件分类
 func (s *SoftwareService) UpdateSoftwareSeries(params request.UpdateSoftwareSeriesReq) error {
 	return global.DB.Model(&models.SoftwareSeries{}).Where("id = ?", params.ID).Updates(models.SoftwareSeries{
-		Name: params.Name,
+		Name:        params.Name,
+		Description: params.Description,
 	}).Error
 }
 

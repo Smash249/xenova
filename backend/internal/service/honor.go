@@ -16,6 +16,9 @@ type HonorService struct{}
 // GetCompanyHonorList 分页获取公司荣誉列表
 func (h *HonorService) GetCompanyHonorList(params request.GetCompanyHonorListReq) (*global.PaginatorResp[models.CompanyHonor], error) {
 	query := global.DB.Model(&models.CompanyHonor{})
+	if params.Title != "" {
+		query = query.Where("title LIKE ?", "%"+params.Title+"%")
+	}
 	result, err := utils.Paginator[models.CompanyHonor](query, params.PaginateReq)
 	if err != nil {
 		return nil, err

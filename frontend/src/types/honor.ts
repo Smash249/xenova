@@ -1,8 +1,8 @@
 interface CompanyHonor {
   id: number
   title: string
-  date: string
-  certNo: string
+  issue_date: string
+  cert_no: string
   issuer: string
   image: string
   description: string
@@ -12,8 +12,8 @@ interface CompanyPatent {
   id: number
   title: string
   type: string
-  patentNo: string
-  date: string
+  patent_no: string
+  auth_date: string
   inventor: string
   image: string
   summary: string
@@ -22,7 +22,7 @@ interface CompanyPatent {
 interface LoveActivity {
   id: number
   title: string
-  date: string
+  activity_date: string
   location: string
   participants: number
   cover: string

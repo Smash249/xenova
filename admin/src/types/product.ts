@@ -13,7 +13,7 @@ type UpdateProductSeriesParams = Pick<ProductSeries, 'id' | 'name' | 'descriptio
 interface Product extends BaseResponse {
   id: number
   name: string
-  seriesId: string
+  series_id: number
   image: string
   description: string
   cover: string
@@ -21,9 +21,9 @@ interface Product extends BaseResponse {
   price: number
 }
 
-type CreateProductParams = Omit<Product, 'id'>
+type CreateProductParams = Omit<Product, 'id' | 'created_at' | 'updated_at'>
 
-type UpdateProductParams = Product
+type UpdateProductParams = CreateProductParams & { id: number }
 
 export type {
   ProductSeries,

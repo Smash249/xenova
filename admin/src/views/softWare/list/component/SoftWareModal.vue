@@ -9,13 +9,21 @@ import {
   NSpace,
   NSwitch,
   NUpload,
+  NProgress,
+  NTag,
   useMessage,
 } from 'naive-ui'
-import { reactive, ref, useTemplateRef, computed } from 'vue'
+import { ref, useTemplateRef, computed, nextTick } from 'vue'
 
-import { GetSoftWareSeriesListApi } from '@/api/softWare'
+import { CreateSoftWareApi, GetSoftWareSeriesListApi, UpdateSoftWareApi } from '@/api/softWare'
+import { useUserStore } from '@/stores'
 
-import type { SoftWare, SoftWareSeries } from '@/types/softWare'
+import type {
+  CreateSoftWareParams,
+  SoftWare,
+  SoftWareSeries,
+  UpdateSoftWareParams,
+} from '@/types/softWare'
 import type { FormInst, FormRules, UploadFileInfo } from 'naive-ui'
 
 interface ModelForm {
@@ -37,6 +45,19 @@ const emit = defineEmits<{
   (e: 'success'): void
 }>()
 
+const DEFAULT_MODAL_FORM: ModelForm = {
+  name: '',
+  description: '',
+  file_type: '',
+  file_size: '',
+  file_url: '',
+  is_hot: false,
+  series_id: null,
+}
+
+const uploadAction = import.meta.env.VITE_PROXY_PATH + '/private/upload'
+const usser = useUserStore()
+
 const message = useMessage()
 
 const modalFormRef = useTemplateRef<FormInst>('modalFormRef')
@@ -46,8 +67,8 @@ const rules: FormRules = {
   series_id: [
     { required: true, type: 'number', message: '请选择所属系列', trigger: ['blur', 'change'] },
   ],
-  file_type: [{ required: true, message: '请输入文件类型', trigger: 'blur' }],
-  file_url: [{ required: true, message: '请上传文件或输入下载地址', trigger: 'blur' }],
+  file_url: [{ required: true, message: '请上传文件', trigger: 'change' }],
+  description: [{ required: true, message: '请输入软件描述', trigger: 'blur' }],
 }
 
 const showModal = ref(false)
@@ -57,6 +78,10 @@ const isLoading = ref(false)
 const seriesList = ref<SoftWareSeries[]>([])
 const seriesLoading = ref(false)
 
+const fileList = ref<UploadFileInfo[]>([])
+const uploadProgress = ref(0)
+const isUploading = ref(false)
+
 const seriesOptions = computed(() =>
   seriesList.value.map((item) => ({
     label: item.name,
@@ -64,29 +89,91 @@ const seriesOptions = computed(() =>
   })),
 )
 
-const modalForm = reactive<ModelForm>({
-  name: '',
-  description: '',
-  file_type: '',
-  file_size: '',
-  file_url: '',
-  is_hot: false,
-  series_id: null,
-})
+const uploadHeaders = computed(() => ({
+  Authorization: `${usser.token}`,
+}))
 
-const fileList = ref<UploadFileInfo[]>([])
+const modalForm = ref<ModelForm>({ ...DEFAULT_MODAL_FORM })
 
-const fileTypeOptions = [
-  { label: 'EXE', value: 'exe' },
-  { label: 'MSI', value: 'msi' },
-  { label: 'DMG', value: 'dmg' },
-  { label: 'ZIP', value: 'zip' },
-  { label: 'RAR', value: 'rar' },
-  { label: 'APK', value: 'apk' },
-  { label: 'ISO', value: 'iso' },
-  { label: 'PDF', value: 'pdf' },
-  { label: '其他', value: 'other' },
-]
+function FormatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${units[i]}`
+}
+
+function DetectFileType(fileName: string): string {
+  const ext = fileName.split('.').pop()?.toLowerCase() || ''
+  const knownTypes = [
+    'exe',
+    'msi',
+    'dmg',
+    'zip',
+    'rar',
+    'apk',
+    'iso',
+    'pdf',
+    '7z',
+    'tar',
+    'gz',
+    'deb',
+    'pkg',
+  ]
+  return knownTypes.includes(ext) ? ext : ext || 'other'
+}
+
+function HandleBeforeUpload({ file }: { file: UploadFileInfo }) {
+  if (file.file) {
+    modalForm.value.file_size = FormatFileSize(file.file.size)
+    modalForm.value.file_type = DetectFileType(file.file.name)
+  }
+  uploadProgress.value = 0
+  isUploading.value = true
+  return true
+}
+
+function HandleProgress({ event }: { file: UploadFileInfo; event?: ProgressEvent }) {
+  if (event && event.lengthComputable) {
+    uploadProgress.value = Math.round((event.loaded / event.total) * 100)
+  }
+}
+
+function HandleFinish({ file, event }: { file: UploadFileInfo; event?: ProgressEvent }) {
+  try {
+    const response = JSON.parse((event?.target as XMLHttpRequest).response)
+    modalForm.value.file_url = response.data.url
+    file.status = 'finished'
+    file.name = file.file?.name || file.name
+    uploadProgress.value = 100
+  } catch {
+    file.status = 'error'
+    message.error('上传解析失败')
+  }
+
+  nextTick().then(() => {
+    isUploading.value = false
+  })
+
+  return file
+}
+
+function HandleError({ file }: { file: UploadFileInfo }) {
+  message.error(`「${file.name}」上传失败`)
+  isUploading.value = false
+  uploadProgress.value = 0
+  modalForm.value.file_type = ''
+  modalForm.value.file_size = ''
+  return file
+}
+
+function HandleRemove() {
+  fileList.value = []
+  modalForm.value.file_url = ''
+  modalForm.value.file_type = ''
+  modalForm.value.file_size = ''
+  uploadProgress.value = 0
+  return true
+}
 
 async function FetchSeriesList() {
   seriesLoading.value = true
@@ -101,57 +188,28 @@ async function FetchSeriesList() {
   }
 }
 
-function HandleFileUploadChange(options: { fileList: UploadFileInfo[] }) {
-  fileList.value = options.fileList.slice(-1)
-  const file = fileList.value[0]
-  if (file?.file) {
-    modalForm.file_url = URL.createObjectURL(file.file)
-    modalForm.file_size = FormatFileSize(file.file.size)
-    const ext = file.file.name.split('.').pop()?.toLowerCase() || ''
-    const matched = fileTypeOptions.find((opt) => opt.value === ext)
-    if (matched) modalForm.file_type = matched.value
-  }
-}
-
-function HandleFileRemove() {
-  fileList.value = []
-  modalForm.file_url = ''
-  modalForm.file_size = ''
-  return true
-}
-
-function FormatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const units = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(1024))
-  return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${units[i]}`
-}
-
 function Open(action: 'create' | 'update', row?: SoftWare) {
   modalType.value = action
   if (action === 'create') {
-    modalForm.id = undefined
-    modalForm.name = ''
-    modalForm.description = ''
-    modalForm.file_type = ''
-    modalForm.file_size = ''
-    modalForm.file_url = ''
-    modalForm.is_hot = false
-    modalForm.series_id = null
+    modalForm.value = { ...DEFAULT_MODAL_FORM }
     fileList.value = []
   } else if (row) {
-    modalForm.id = row.id
-    modalForm.name = row.name
-    modalForm.description = row.description
-    modalForm.file_type = row.file_type
-    modalForm.file_size = row.file_size
-    modalForm.file_url = row.file_url
-    modalForm.is_hot = row.is_hot
-    modalForm.series_id = row.series_id
+    modalForm.value = {
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      file_type: row.file_type,
+      file_size: row.file_size,
+      file_url: row.file_url,
+      is_hot: row.is_hot,
+      series_id: row.series_id,
+    }
     fileList.value = row.file_url
-      ? [{ id: 'file', name: row.name, status: 'finished', url: row.file_url }]
+      ? [{ id: 'file', name: row.name, status: 'finished' as const }]
       : []
   }
+  uploadProgress.value = 0
+  isUploading.value = false
   showModal.value = true
   FetchSeriesList()
 }
@@ -160,9 +218,35 @@ function HandleModalSubmit() {
   modalFormRef.value?.validate(async (errors) => {
     if (errors) return
     isLoading.value = true
+    const form = modalForm.value
     try {
-      showModal.value = false
+      switch (modalType.value) {
+        case 'create':
+          await CreateSoftWare({
+            name: form.name,
+            description: form.description,
+            file_type: form.file_type,
+            file_size: form.file_size,
+            file_url: form.file_url,
+            is_hot: form.is_hot,
+            series_id: form.series_id!,
+          })
+          break
+        case 'update':
+          await UpdateSoftWare({
+            id: form.id!,
+            name: form.name,
+            description: form.description,
+            file_type: form.file_type,
+            file_size: form.file_size,
+            file_url: form.file_url,
+            is_hot: form.is_hot,
+            series_id: form.series_id!,
+          })
+          break
+      }
       emit('success')
+      showModal.value = false
     } catch (error) {
       message.error(modalType.value === 'create' ? '新增失败' : '更新失败')
       console.error(error)
@@ -170,6 +254,16 @@ function HandleModalSubmit() {
       isLoading.value = false
     }
   })
+}
+
+async function CreateSoftWare(params: CreateSoftWareParams) {
+  await CreateSoftWareApi(params)
+  message.success('软件创建成功')
+}
+
+async function UpdateSoftWare(params: UpdateSoftWareParams) {
+  await UpdateSoftWareApi(params)
+  message.success('软件更新成功')
 }
 
 defineExpose({
@@ -216,88 +310,112 @@ defineExpose({
               filterable
             />
           </NFormItem>
-          <NFormItem
-            label="文件类型"
-            path="file_type"
-          >
-            <NSelect
-              v-model:value="modalForm.file_type"
-              :options="fileTypeOptions"
-              placeholder="请选择文件类型"
-              clearable
-            />
-          </NFormItem>
-          <NFormItem
-            label="热门推荐"
-            path="is_hot"
-          >
-            <NSwitch v-model:value="modalForm.is_hot">
-              <template #checked>是</template>
-              <template #unchecked>否</template>
-            </NSwitch>
-          </NFormItem>
         </div>
+        <NFormItem
+          label="热门推荐"
+          path="is_hot"
+        >
+          <NSwitch v-model:value="modalForm.is_hot">
+            <template #checked>是</template>
+            <template #unchecked>否</template>
+          </NSwitch>
+        </NFormItem>
       </div>
 
       <div class="mb-4 border-t border-gray-200 dark:border-gray-700" />
 
       <div class="mb-4">
         <div class="mb-3 flex items-center gap-2 text-base font-medium">文件管理</div>
-        <div class="grid grid-cols-2 gap-x-6 max-md:grid-cols-1">
-          <NFormItem
-            label="上传文件"
-            path="file_url"
-          >
+        <NFormItem
+          label="上传文件"
+          path="file_url"
+        >
+          <div class="w-full">
             <NUpload
-              :file-list="fileList"
+              v-model:file-list="fileList"
               :max="1"
-              :default-upload="false"
-              @change="HandleFileUploadChange"
-              @remove="HandleFileRemove"
+              :action="uploadAction"
+              :headers="uploadHeaders"
+              :show-file-list="false"
+              name="file"
+              @before-upload="HandleBeforeUpload"
+              @progress="HandleProgress"
+              @finish="HandleFinish"
+              @error="HandleError"
+              @remove="HandleRemove"
             >
               <NButton
                 type="primary"
                 ghost
+                :disabled="isUploading"
               >
                 <template #icon>
                   <span class="iconify ph--upload-simple" />
                 </template>
-                选择文件
+                {{ isUploading ? '上传中...' : '选择文件' }}
               </NButton>
             </NUpload>
-          </NFormItem>
-          <NFormItem
-            label="文件大小"
-            path="file_size"
-          >
-            <NInput
-              v-model:value="modalForm.file_size"
-              placeholder="上传文件后自动填充"
-              readonly
-            />
-          </NFormItem>
-        </div>
+
+            <div
+              v-if="isUploading"
+              class="mt-3"
+            >
+              <NProgress
+                type="line"
+                :percentage="uploadProgress"
+                :height="8"
+                indicator-placement="inside"
+                processing
+              />
+            </div>
+
+            <div
+              v-if="modalForm.file_url && !isUploading"
+              class="mt-3 flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-800"
+            >
+              <div class="flex items-center gap-3">
+                <span class="iconify text-2xl text-primary ph--file-arrow-down" />
+                <div>
+                  <div class="text-sm font-medium">
+                    {{ fileList[0]?.name || modalForm.name }}
+                  </div>
+                  <div class="mt-0.5 flex items-center gap-2 text-xs text-gray-400">
+                    <NTag
+                      v-if="modalForm.file_type"
+                      size="small"
+                      :bordered="false"
+                      type="info"
+                    >
+                      {{ modalForm.file_type.toUpperCase() }}
+                    </NTag>
+                    <span v-if="modalForm.file_size">{{ modalForm.file_size }}</span>
+                  </div>
+                </div>
+              </div>
+              <NButton
+                text
+                type="error"
+                @click="HandleRemove"
+              >
+                <span class="iconify text-lg ph--trash" />
+              </NButton>
+            </div>
+          </div>
+        </NFormItem>
       </div>
 
       <div class="mb-4 border-t border-gray-200 dark:border-gray-700" />
-
-      <div>
-        <div class="mb-3 flex items-center gap-2 text-base font-medium">
-          <span class="iconify text-lg text-primary ph--article" />
-          软件描述
-        </div>
-        <NFormItem
-          path="description"
-          :show-label="false"
-        >
-          <NInput
-            v-model:value="modalForm.description"
-            type="textarea"
-            placeholder="请输入软件描述信息..."
-            :rows="4"
-          />
-        </NFormItem>
-      </div>
+      <NFormItem
+        path="description"
+        label="软件描述"
+      >
+        <NInput
+          v-model:value="modalForm.description"
+          type="textarea"
+          placeholder="请输入软件描述信息..."
+          :rows="4"
+        />
+      </NFormItem>
     </NForm>
 
     <template #footer>
@@ -308,6 +426,7 @@ defineExpose({
             type="primary"
             @click="HandleModalSubmit"
             :loading="isLoading"
+            :disabled="isUploading"
           >
             {{ modalType === 'create' ? '立即创建' : '保存修改' }}
           </NButton>

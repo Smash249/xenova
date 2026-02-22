@@ -2,7 +2,9 @@
 import { NButton, NForm, NFormItem, NInput, NModal, NSpace, useMessage } from 'naive-ui'
 import { reactive, ref, useTemplateRef } from 'vue'
 
-import type { NewsSeries } from '@/types/news'
+import { CreateNewsSeriesApi, UpdateNewsSeriesApi } from '@/api/news'
+
+import type { CreateNewsSeriesParams, NewsSeries, UpdateNewsSeriesParams } from '@/types/news'
 import type { FormInst, FormRules } from 'naive-ui'
 
 defineOptions({
@@ -50,8 +52,20 @@ function HandleModalSubmit() {
     if (errors) return
     isLoading.value = true
     try {
-      showModal.value = false
+      switch (modalType.value) {
+        case 'create':
+          await CreateNewsSeries(modalForm)
+          break
+        case 'update':
+          await UpdateNewsSeries({
+            id: modalForm.id!,
+            name: modalForm.name,
+            description: modalForm.description,
+          })
+          break
+      }
       emit('success')
+      showModal.value = false
     } catch (error) {
       message.error(modalType.value === 'create' ? '新增失败' : '更新失败')
       console.error(error)
@@ -59,6 +73,28 @@ function HandleModalSubmit() {
       isLoading.value = false
     }
   })
+}
+
+async function CreateNewsSeries(params: CreateNewsSeriesParams) {
+  try {
+    await CreateNewsSeriesApi(params)
+    message.success('新增成功')
+    emit('success')
+  } catch (error) {
+    message.error('新增失败')
+    console.error(error)
+  }
+}
+
+async function UpdateNewsSeries(params: UpdateNewsSeriesParams) {
+  try {
+    await UpdateNewsSeriesApi(params)
+    message.success('更新成功')
+    emit('success')
+  } catch (error) {
+    message.error('更新失败')
+    console.error(error)
+  }
 }
 
 defineExpose({

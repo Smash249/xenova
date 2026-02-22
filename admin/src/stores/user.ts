@@ -26,6 +26,7 @@ export const useUserStore = defineStore('userStore', () => {
   const token = useStorage<string | null>('token', null)
 
   const refreshToken = useStorage<string | null>('refreshToken', null)
+
   const menu = useStorage<MenuMixedOptions[]>('menu', [
     {
       path: 'dashboard',
@@ -152,20 +153,64 @@ export const useUserStore = defineStore('userStore', () => {
         },
       ],
     },
+    {
+      path: 'honor',
+      name: 'honor',
+      icon: 'icon-[lucide--award]',
+      label: '荣誉管理',
+      meta: {
+        componentName: 'Honor',
+        pinned: true,
+        showTab: true,
+      },
+      children: [
+        {
+          path: 'companyHonor',
+          name: 'companyHonor',
+          icon: 'icon-[lucide--trophy]',
+          label: '公司荣誉',
+          meta: {
+            componentName: 'CompanyHonor',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'honor/companyHonor/index',
+        },
+        {
+          path: 'companyPatent',
+          name: 'companyPatent',
+          icon: 'icon-[lucide--file-badge]',
+          label: '公司专利',
+          meta: {
+            componentName: 'CompanyPatent',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'honor/companyPatent/index',
+        },
+        {
+          path: 'loveActivity',
+          name: 'loveActivity',
+          icon: 'icon-[lucide--heart-handshake]',
+          label: '公益活动',
+          meta: {
+            componentName: 'LoveActivity',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'honor/loveActivity/index',
+        },
+      ],
+    },
   ])
 
-  async function Login(data: Parameters<typeof LoginApi>[0]) {
-    try {
-      const result = await LoginApi(data)
-      console.log('登录成功:', result)
-      token.value = result.accessToken
-      refreshToken.value = result.refreshToken
-      user.value = result.user
-    } catch (error) {
-      console.error('登录失败:', error)
-      throw new Error('登录失败')
-    }
-  }
+  const userMenu = computed(() => {
+    return resolveMenu(menu.value)
+  })
+
+  const userRoute = computed(() => {
+    return resolveRoute(menu.value)
+  })
 
   function cleanup(redirectPath?: string) {
     router.replace({
@@ -179,13 +224,18 @@ export const useUserStore = defineStore('userStore', () => {
     }
   }
 
-  const userMenu = computed(() => {
-    return resolveMenu(menu.value)
-  })
-  const userRoute = computed(() => {
-    console.log('menu.value:', menu.value)
-    return resolveRoute(menu.value)
-  })
+  async function Login(data: Parameters<typeof LoginApi>[0]) {
+    try {
+      const result = await LoginApi(data)
+      console.log('登录成功:', result)
+      token.value = result.accessToken
+      refreshToken.value = result.refreshToken
+      user.value = result.user
+    } catch (error) {
+      console.error('登录失败:', error)
+      throw new Error('登录失败')
+    }
+  }
 
   return {
     user,

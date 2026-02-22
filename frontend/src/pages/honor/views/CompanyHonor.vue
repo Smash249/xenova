@@ -50,7 +50,7 @@
           ></div>
 
           <img
-            :src="item.image"
+            :src="BaseUrl + item.image"
             :alt="item.title"
             class="relative z-10 max-h-full max-w-full object-contain drop-shadow-md transition-transform duration-500 group-hover:scale-105"
           />
@@ -76,21 +76,21 @@
             <span
               class="shrink-0 rounded-md border border-blue-100/50 bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600"
             >
-              {{ GetYear(item.date) }}
+              {{ GetYear(item.issue_date) }}
             </span>
           </div>
 
           <div class="mt-auto space-y-2.5 border-t border-slate-100 pt-4">
             <div
               class="flex items-center text-sm text-slate-500"
-              v-if="item.certNo"
+              v-if="item.cert_no"
             >
               <ShieldCheck class="mr-2 h-4 w-4 shrink-0 text-slate-400" />
-              <span class="truncate font-mono">{{ item.certNo }}</span>
+              <span class="truncate font-mono">{{ item.cert_no }}</span>
             </div>
             <div class="flex items-center text-sm text-slate-500">
               <Calendar class="mr-2 h-4 w-4 shrink-0 text-slate-400" />
-              <span>{{ item.date }}</span>
+              <span>{{ item.issue_date }}</span>
             </div>
           </div>
         </div>
@@ -126,6 +126,8 @@ import type { Paginate } from "@/types/common"
 import type { CompanyHonor } from "@/types/honor"
 
 import CompanyHonorModal from "../components/CompanyHonorModal.vue"
+
+const BaseUrl = import.meta.env.VITE_BASE_URL
 
 const loading = ref(false)
 const isModalOpen = ref(false)

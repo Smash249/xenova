@@ -118,12 +118,6 @@ const columns = computed<DataTableColumns<News>>(() => {
       },
     },
     {
-      key: 'series_id',
-      title: '所属系列',
-      width: 120,
-      align: 'center',
-    },
-    {
       key: 'view_count',
       title: '浏览量',
       width: 120,
