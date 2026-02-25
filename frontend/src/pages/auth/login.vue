@@ -10,26 +10,24 @@
     <div
       class="fixed inset-0 z-10 bg-linear-to-br from-blue-900/90 via-blue-800/80 to-indigo-900/80 mix-blend-multiply"
     ></div>
+    <div class="fixed top-10 left-10 z-50 text-white">
+      <button
+        @click="router.push('/')"
+        class="group flex cursor-pointer items-center gap-2 rounded-full text-sm font-medium backdrop-blur-md transition-all hover:scale-105"
+      >
+        <el-icon class="transition-transform group-hover:-translate-x-1"
+          ><Back
+        /></el-icon>
+        返回首页
+      </button>
+    </div>
 
     <div
-      class="relative z-20 grid h-screen w-full grid-cols-2 items-center justify-center"
+      class="relative z-20 grid h-screen w-full grid-cols-2 items-center justify-evenly"
     >
       <div
         class="hidden h-full flex-col justify-evenly px-12 py-6 text-white lg:flex"
       >
-        <!-- 顶部返回 -->
-        <div>
-          <button
-            @click="router.push('/')"
-            class="group -mt-10 flex cursor-pointer items-center gap-2 rounded-full text-sm font-medium backdrop-blur-md transition-all hover:scale-105"
-          >
-            <el-icon class="transition-transform group-hover:-translate-x-1"
-              ><Back
-            /></el-icon>
-            返回首页
-          </button>
-        </div>
-
         <div class="space-y-12">
           <div class="flex items-center gap-4">
             <div

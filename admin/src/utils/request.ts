@@ -21,7 +21,9 @@ class Request {
     switch (code) {
       case 401:
         localStorage.removeItem('user')
-        // this.messageApi?.error('登录失效，请重新登录')
+        localStorage.removeItem('token')
+        console.error('401 Unauthorized')
+        window.location.href = '/login'
         break
       case 403:
         console.error('403 Forbidden')

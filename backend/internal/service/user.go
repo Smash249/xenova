@@ -51,6 +51,9 @@ func (u *UserService) FrontendLogin(params request.UserLoginReq) (*response.User
 		}
 		return nil, err
 	}
+	if user.IsBanned {
+		return nil, errors.New("用户已被封禁")
+	}
 	return u.baseLogin(user, params)
 }
 

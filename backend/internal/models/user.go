@@ -13,6 +13,7 @@ type User struct {
 	Phone    string `gorm:"type:varchar(20);comment:手机号" json:"phone"`
 	Role     string `gorm:"type:varchar(20);default:user;comment:用户角色;check:role IN ('user','admin')" json:"role"`
 	Password string `gorm:"type:varchar(255);not null;comment:密码" json:"-"`
+	IsBanned bool   `gorm:"type:boolean;default:false;comment:是否被封禁" json:"isBanned"`
 }
 
 func (u *User) TableName() string {

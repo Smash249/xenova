@@ -76,7 +76,7 @@
                 </span>
               </div>
               <el-image
-                :src="productDetail.cover ?? ''"
+                :src="Baseurl + (productDetail.cover ?? '')"
                 :alt="productDetail.name ?? ''"
                 fit="contain"
                 class="h-full w-full rounded-lg transition-transform duration-500 group-hover:scale-105"
@@ -268,6 +268,8 @@ import { onMounted, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
 import type { ProductDetail } from "@/types/product"
+
+const Baseurl = import.meta.env.VITE_BASE_URL
 
 const route = useRoute()
 const router = useRouter()

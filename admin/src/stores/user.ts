@@ -202,6 +202,31 @@ export const useUserStore = defineStore('userStore', () => {
         },
       ],
     },
+    {
+      path: 'system',
+      name: 'system',
+      icon: 'icon-[lucide--settings]',
+      label: '系统设置',
+      meta: {
+        componentName: 'System',
+        pinned: true,
+        showTab: true,
+      },
+      children: [
+        {
+          path: 'user',
+          name: 'systemUser',
+          icon: 'icon-[lucide--users]',
+          label: '用户管理',
+          meta: {
+            componentName: 'SystemUser',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'system/user/index',
+        },
+      ],
+    },
   ])
 
   const userMenu = computed(() => {

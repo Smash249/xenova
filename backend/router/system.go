@@ -9,6 +9,8 @@ func initSystemRouter() {
 	GroupRouterHubApp.RegisterRouterHub(
 		func(public, private, admin *echo.Group) {
 			public.GET("/health", api.SystemApi.Health)
+			admin.GET("/users", api.SystemApi.GetSystemUserList)
+			admin.GET("/users/:id", api.SystemApi.BanedUserById)
 		},
 	)
 }
