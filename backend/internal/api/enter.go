@@ -8,3 +8,4 @@ var productServiceApp = service.ServicesApp.ProductService
 var journalismServiceApp = service.ServicesApp.JournalismService
 var softwareServiceApp = service.ServicesApp.SoftwareService
 var honorServiceApp = service.ServicesApp.HonorService
+var systemServiceApp = service.ServicesApp.SystemService

@@ -2,19 +2,24 @@ package request
 
 import "github.com/Smash249/xenova/backend/internal/global"
 
+type GetSoftwareSeriesReq struct {
+	global.PaginateReq
+	Name string `query:"name"`
+}
+
 type CreateSoftwareSeriesReq struct {
-	Name string `json:"name" binding:"required"`
-	Sort uint   `json:"sort"`
+	Name        string `json:"name" validate:"required"`
+	Description string `query:"description" validate:"required"`
 }
 
 type UpdateSoftwareSeriesReq struct {
-	ID   uint   `json:"id" binding:"required"`
-	Name string `json:"name" binding:"required"`
-	Sort uint   `json:"sort"`
+	ID          uint   `json:"id" validate:"required"`
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description" validate:"required"`
 }
 
 type DeleteSoftwareSeriesReq struct {
-	IdList []uint `json:"id_list" binding:"required"`
+	IdList []uint `json:"id_list" validate:"required"`
 }
 
 type GetSoftwareReq struct {
@@ -24,26 +29,26 @@ type GetSoftwareReq struct {
 }
 
 type CreateSoftwareReq struct {
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"required"`
-	FileType    string `json:"file_type" binding:"required"`
-	FileSize    string `json:"file_size" binding:"required"`
-	FileURL     string `json:"file_url" binding:"required"`
-	IsHot       bool   `json:"is_hot" binding:"required"`
-	SeriesID    uint   `json:"series_id" binding:"required"`
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	FileType    string `json:"file_type" validate:"required"`
+	FileSize    string `json:"file_size" validate:"required"`
+	FileURL     string `json:"file_url" validate:"required"`
+	IsHot       bool   `json:"is_hot" validate:"required"`
+	SeriesID    uint   `json:"series_id" validate:"required"`
 }
 
 type UpdateSoftwareReq struct {
-	ID          uint   `json:"id" binding:"required"`
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"required"`
-	FileType    string `json:"file_type" binding:"required"`
-	FileSize    string `json:"file_size" binding:"required"`
-	FileURL     string `json:"file_url" binding:"required"`
-	IsHot       bool   `json:"is_hot" binding:"required"`
-	SeriesID    uint   `json:"series_id" binding:"required"`
+	ID          uint   `json:"id" validate:"required"`
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	FileType    string `json:"file_type" validate:"required"`
+	FileSize    string `json:"file_size" validate:"required"`
+	FileURL     string `json:"file_url" validate:"required"`
+	IsHot       bool   `json:"is_hot" validate:"required"`
+	SeriesID    uint   `json:"series_id" validate:"required"`
 }
 
 type DeleteSoftwareReq struct {
-	IdList []uint `json:"id_list" binding:"required"`
+	IdList []uint `json:"id_list" validate:"required"`
 }

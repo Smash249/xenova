@@ -1,10 +1,11 @@
 import { LoginApi, RegisterApi } from "@/api/auth"
+import { UpdateUserInfoApi } from "@/api/user"
 import { defineStore } from "pinia"
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 
 import type { LoginParams, RegisterParams } from "@/types/auth"
-import type { User } from "@/types/user"
+import type { UpdateUserInfoParams, User } from "@/types/user"
 
 const userStore = defineStore(
   "user",
@@ -43,6 +44,15 @@ const userStore = defineStore(
       }
     }
 
+    async function UpdateUserInfo(params: UpdateUserInfoParams) {
+      try {
+        const result = await UpdateUserInfoApi(params)
+        user.value = result.data
+      } catch (error) {
+        throw error
+      }
+    }
+
     function Logout() {
       user.value = null
       accessToken.value = ""
@@ -61,6 +71,7 @@ const userStore = defineStore(
       Login,
       Register,
       Logout,
+      UpdateUserInfo,
     }
   },
   {

@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -20,7 +19,7 @@ var DefaultAuthConfig = AuthConfig{
 	TokenLookup: "header:Authorization",
 }
 
-// NewAuth 使
+// NewAuth 返回一个 JWT 认证中间件，默认从 Authorization header 中提取 token
 func NewAuth() echo.MiddlewareFunc {
 	return NewAuthWithConfig(DefaultAuthConfig)
 }
@@ -37,11 +36,6 @@ func NewAuthWithConfig(config AuthConfig) echo.MiddlewareFunc {
 				return next(ctx)
 			}
 
-			// 白名单放行
-			if isWhiteListed(ctx.Request().URL.Path, config.WhiteList) {
-				return next(ctx)
-			}
-
 			// 提取 token
 			tokenStr, err := extractTokenFromLookup(ctx, config.TokenLookup)
 			if err != nil {
@@ -50,7 +44,6 @@ func NewAuthWithConfig(config AuthConfig) echo.MiddlewareFunc {
 
 			// 解析验证 token
 			claims, err := utils.ParseToken(tokenStr)
-			fmt.Println(claims, err)
 			if err != nil {
 				switch {
 				case errors.Is(err, utils.ErrTokenExpired):
@@ -65,6 +58,7 @@ func NewAuthWithConfig(config AuthConfig) echo.MiddlewareFunc {
 			}
 			ctx.Set("userID", claims.ID)
 			ctx.Set("userName", claims.UserName)
+			ctx.Set("role", claims.Role)
 			ctx.Set("claims", claims)
 			return next(ctx)
 		}
@@ -96,20 +90,4 @@ func extractTokenFromLookup(ctx *echo.Context, lookup string) (string, error) {
 	default:
 		return "", utils.ErrTokenNotFound
 	}
-}
-
-// isWhiteListed 检查路径是否在白名单中
-// 支持前缀匹配: "/public/*" 匹配所有 /public/ 开头的路径
-func isWhiteListed(path string, whiteList []string) bool {
-	for _, w := range whiteList {
-		if strings.HasSuffix(w, "*") {
-			prefix := strings.TrimSuffix(w, "*")
-			if strings.HasPrefix(path, prefix) {
-				return true
-			}
-		} else if path == w {
-			return true
-		}
-	}
-	return false
 }

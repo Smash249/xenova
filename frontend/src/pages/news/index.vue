@@ -259,8 +259,8 @@ function HandelGotoNewsDetail(news: News) {
 async function GetNewsSeries() {
   try {
     const result = await GetNewsSeriesApi()
-    categories.value = result
-    if (result.length > 0) activeProductSeriesId.value = result[0].id
+    categories.value = result.data
+    if (result.data.length > 0) activeProductSeriesId.value = result.data[0].id
   } catch (error) {
     console.log(error)
     ElMessage.error("获取新闻系列失败")

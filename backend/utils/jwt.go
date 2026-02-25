@@ -22,7 +22,8 @@ type CustomClaims struct {
 // BaseClaims 基础用户信息
 type BaseClaims struct {
 	ID       uint   `json:"id"`
-	UserName string `json:"UserName"`
+	UserName string `json:"userName"`
+	Role     string `json:"role"`
 }
 
 // JWT 错误定义

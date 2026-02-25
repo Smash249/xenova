@@ -15,7 +15,11 @@ var JournalismApi = new(journalismApi)
 type journalismApi struct{}
 
 func (j *journalismApi) GetJournalismSeries(ctx *echo.Context) error {
-	result, err := journalismServiceApp.GetJournalismSeriesList()
+	getJournalismSeriesReq, err := utils.BindAndValidate[request.GetJournalismSeriesReq](ctx)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	result, err := journalismServiceApp.GetJournalismSeriesList(getJournalismSeriesReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}

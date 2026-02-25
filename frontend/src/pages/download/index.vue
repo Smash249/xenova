@@ -270,7 +270,7 @@ function HandleAction(item: SoftWare) {
   }
 
   const link = document.createElement("a")
-  link.href = item.file_url
+  link.href = import.meta.env.VITE_BASE_URL + item.file_url
   link.download = item.name || ""
   link.target = "_blank"
   document.body.appendChild(link)
@@ -281,9 +281,9 @@ function HandleAction(item: SoftWare) {
 async function GetSoftWareSeries() {
   try {
     const result = await GetSoftWareSeriesApi()
-    seriesList.value = result
-    if (result.length > 0) {
-      activeTab.value = result[0].id
+    seriesList.value = result.data
+    if (result.data.length > 0) {
+      activeTab.value = result.data[0].id
     }
   } catch (error) {
     console.error(error)

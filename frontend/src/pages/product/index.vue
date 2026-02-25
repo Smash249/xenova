@@ -142,7 +142,7 @@
             >
               <div class="relative h-56 overflow-hidden bg-gray-100">
                 <img
-                  :src="product.cover"
+                  :src="BASE_URL + product.cover"
                   :alt="product.name"
                   class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
@@ -205,6 +205,8 @@ import type { Paginate } from "@/types/common"
 import type { Product, ProductSeries } from "@/types/product"
 import ContactUs from "@/components/contactUs/index.vue"
 
+const BASE_URL = import.meta.env.VITE_BASE_URL
+
 const loading = ref(false)
 
 const productName = ref("")
@@ -239,8 +241,8 @@ function HandleGotoDetail(product: Product) {
 async function GetProductSeries() {
   try {
     const result = await GetProductSeriesApi()
-    categories.value = result
-    if (result.length > 0) activeProductSeriesId.value = result[0].id
+    categories.value = result.data
+    if (result.data.length > 0) activeProductSeriesId.value = result.data[0].id
   } catch (error) {
     console.log(error)
     ElMessage.error("获取产品系列失败")

@@ -15,7 +15,11 @@ var SoftwareApi = new(softwareApi)
 type softwareApi struct{}
 
 func (s *softwareApi) GetSoftwareSeries(ctx *echo.Context) error {
-	result, err := softwareServiceApp.GetSoftwareSeriesList()
+	getSoftwareSeriesReq, err := utils.BindAndValidate[request.GetSoftwareSeriesReq](ctx)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	result, err := softwareServiceApp.GetSoftwareSeriesList(getSoftwareSeriesReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}

@@ -50,7 +50,7 @@
           ></div>
 
           <img
-            :src="item.image"
+            :src="BaseUrl + item.image"
             :alt="item.title"
             class="relative z-10 max-h-full max-w-full object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-105"
           />
@@ -83,11 +83,11 @@
           <div class="mt-auto space-y-2.5 border-t border-slate-100 pt-4">
             <div class="flex items-center text-sm text-slate-500">
               <FileCheck class="mr-2 h-4 w-4 shrink-0 text-slate-400" />
-              <span class="truncate font-mono">{{ item.patentNo }}</span>
+              <span class="truncate font-mono">{{ item.patent_no }}</span>
             </div>
             <div class="flex items-center text-sm text-slate-500">
               <Calendar class="mr-2 h-4 w-4 shrink-0 text-slate-400" />
-              <span>授权日：{{ item.date }}</span>
+              <span>授权日：{{ item.auth_date }}</span>
             </div>
           </div>
         </div>
@@ -123,6 +123,8 @@ import type { Paginate } from "@/types/common"
 import type { CompanyPatent } from "@/types/honor"
 
 import CompanyPatentModal from "../components/CompanyPatentModal.vue"
+
+const BaseUrl = import.meta.env.VITE_BASE_URL
 
 const loading = ref(false)
 const isModalOpen = ref(false)

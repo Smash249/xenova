@@ -8,6 +8,7 @@ import (
 
 type GetCompanyHonorListReq struct {
 	global.PaginateReq
+	Title string `query:"title" json:"title"`
 }
 
 type CreateCompanyHonorReq struct {

@@ -10,7 +10,10 @@ type User struct {
 	global.BaseModel
 	UserName string `gorm:"type:varchar(100);uniqueIndex;not null;comment:用户名" json:"userName"`
 	Email    string `gorm:"type:varchar(100);uniqueIndex;not null;comment:邮箱" json:"email"`
+	Phone    string `gorm:"type:varchar(20);comment:手机号" json:"phone"`
+	Role     string `gorm:"type:varchar(20);default:user;comment:用户角色;check:role IN ('user','admin')" json:"role"`
 	Password string `gorm:"type:varchar(255);not null;comment:密码" json:"-"`
+	IsBanned bool   `gorm:"type:boolean;default:false;comment:是否被封禁" json:"isBanned"`
 }
 
 func (u *User) TableName() string {
@@ -22,6 +25,6 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	if err != nil {
 		return err
 	}
-	u.Password = string(hashed)
+	u.Password = hashed
 	return nil
 }

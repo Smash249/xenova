@@ -7,10 +7,15 @@ import (
 
 func initUserRouter() {
 	GroupRouterHubApp.RegisterRouterHub(
-		func(public, private *echo.Group) {
-			public.POST("/login", api.UserApi.Login)
+		func(public, private, admin *echo.Group) {
+			public.POST("/login", api.UserApi.FrontendLogin)
 			public.POST("/register", api.UserApi.Register)
-			public.GET("/health", api.UserApi.Health)
+			public.POST("/sigin", api.UserApi.AdminLogin)
+
+			private.GET("/userInfo", api.UserApi.GetUserInfo)
+			private.PUT("/userInfo", api.UserApi.UpdateUserInfo)
+			private.POST("/changePassword", api.UserApi.ChangePassword)
+			private.POST("/upload", api.UserApi.Upload)
 		},
 	)
 }

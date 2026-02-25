@@ -8,4 +8,5 @@ type servicesApp struct {
 	JournalismService
 	SoftwareService
 	HonorService
+	SystemService
 }

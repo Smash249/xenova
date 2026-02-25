@@ -7,17 +7,17 @@ import (
 
 func initSoftwareRouter() {
 	GroupRouterHubApp.RegisterRouterHub(
-		func(public, private *echo.Group) {
+		func(public, private, admin *echo.Group) {
 			public.GET("/software_series", api.SoftwareApi.GetSoftwareSeries)
-			private.POST("/software_series", api.SoftwareApi.CreateSoftwareSeries)
-			private.PUT("/software_series", api.SoftwareApi.UpdateSoftwareSeries)
-			private.DELETE("/software_series", api.SoftwareApi.DeleteSoftwareSeries)
+			admin.POST("/software_series", api.SoftwareApi.CreateSoftwareSeries)
+			admin.PUT("/software_series", api.SoftwareApi.UpdateSoftwareSeries)
+			admin.DELETE("/software_series", api.SoftwareApi.DeleteSoftwareSeries)
 
 			public.GET("/softwares", api.SoftwareApi.GetSoftwareList)
-			public.GET("/softwares/:software_id", api.SoftwareApi.GetSoftwareDetail)
-			private.POST("/softwares", api.SoftwareApi.CreateSoftware)
-			private.PUT("/softwares", api.SoftwareApi.UpdateSoftware)
-			private.DELETE("/softwares", api.SoftwareApi.DeleteSoftware)
+			private.GET("/softwares/:software_id", api.SoftwareApi.GetSoftwareDetail)
+			admin.POST("/softwares", api.SoftwareApi.CreateSoftware)
+			admin.PUT("/softwares", api.SoftwareApi.UpdateSoftware)
+			admin.DELETE("/softwares", api.SoftwareApi.DeleteSoftware)
 		},
 	)
 }

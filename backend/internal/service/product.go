@@ -13,10 +13,17 @@ type ProductService struct{}
 // ==================== ProductSeries 产品系列 CRUD ====================
 
 // GetProductSeriesList 获取产品系列列表
-func (p *ProductService) GetProductSeriesList() ([]models.ProductSeries, error) {
-	var seriesList []models.ProductSeries
-	err := global.DB.Select("id,name").Find(&seriesList).Error
-	return seriesList, err
+func (p *ProductService) GetProductSeriesList(params request.GetProductSeriesReq) (*global.PaginatorResp[models.ProductSeries], error) {
+	query := global.DB.Model(&models.ProductSeries{})
+	if params.Name != "" {
+		query = query.Where("name LIKE ?", "%"+params.Name+"%")
+	}
+	result, err := utils.Paginator[models.ProductSeries](query, params.PaginateReq)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+
 }
 
 // CreateProductSeries 创建产品系列
