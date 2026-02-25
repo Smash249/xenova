@@ -1,8 +1,8 @@
 # Docker 使用指南 / Docker Usage Guide
 
-本项目已为后端和前端添加 Dockerfile，可以使用 Docker 容器化部署应用。
+本项目已为后端、前端和后台管理系统添加 Dockerfile，可以使用 Docker 容器化部署应用。
 
-This project includes Dockerfiles for both backend and frontend for containerized deployment.
+This project includes Dockerfiles for backend, frontend, and admin panel for containerized deployment.
 
 ## 后端 / Backend
 
@@ -69,6 +69,36 @@ docker run -d \
   xenova-frontend
 ```
 
+## 后台管理系统 / Admin Panel
+
+### 构建镜像 / Build Image
+
+```bash
+cd admin
+docker build -t xenova-admin .
+```
+
+### 运行容器 / Run Container
+
+```bash
+docker run -d \
+  -p 8080:80 \
+  --name xenova-admin \
+  xenova-admin
+```
+
+或指定其他端口 / Or specify a different port:
+```bash
+docker run -d \
+  -p 8888:80 \
+  --name xenova-admin \
+  xenova-admin
+```
+
+后台管理系统使用 Nginx 提供服务，并支持 Vue Router 的 HTML5 History 模式。
+
+The admin panel is served by Nginx and supports Vue Router's HTML5 History mode.
+
 ## Docker Compose (推荐 / Recommended)
 
 创建 `docker-compose.yml` 文件可以同时运行后端和前端：
@@ -96,6 +126,14 @@ services:
     build: ./frontend
     ports:
       - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  admin:
+    build: ./admin
+    ports:
+      - "8080:80"
     depends_on:
       - backend
     restart: unless-stopped
@@ -150,10 +188,14 @@ docker-compose down
    
    **Frontend Dockerfile** uses Nginx as the web server, suitable for production deployment
 
-3. 确保在生产环境中更新所有默认密码和密钥
+3. **后台管理 Dockerfile** 使用多阶段构建（Node 22 构建 + Nginx 运行），并配有自定义 nginx.conf 支持 Vue Router HTML5 History 模式
+   
+   **Admin Dockerfile** uses multi-stage builds (Node 22 build + Nginx runtime) with a custom nginx.conf supporting Vue Router HTML5 History mode
+
+4. 确保在生产环境中更新所有默认密码和密钥
    
    Make sure to update all default passwords and keys in production
 
-4. 建议使用 `.dockerignore` 文件排除不必要的文件以加快构建速度
+5. 建议使用 `.dockerignore` 文件排除不必要的文件以加快构建速度
    
    Use `.dockerignore` files to exclude unnecessary files for faster builds

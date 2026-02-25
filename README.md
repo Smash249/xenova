@@ -8,7 +8,13 @@
 
 ### 项目简介
 
-Xenova 是一个前后端分离的全栈 Web 应用，面向企业官网场景，提供产品展示、新闻资讯、软件下载、荣誉资质、联系我们等功能模块，并支持用户注册与登录。
+Xenova 是一个前后端分离的全栈 Web 应用，面向企业官网场景。项目包含三个子模块：
+
+- **backend**：Go 语言编写的 RESTful API 服务
+- **frontend**：面向用户的 Vue 3 官网前端
+- **admin**：面向管理员的 Vue 3 后台管理系统
+
+提供产品展示、新闻资讯、软件下载、荣誉资质、联系我们等功能模块，并支持用户注册与登录。
 
 ### 技术栈
 
@@ -20,12 +26,16 @@ Xenova 是一个前后端分离的全栈 Web 应用，面向企业官网场景�
 | 认证 | JWT (golang-jwt/jwt v5) |
 | 配置管理 | Viper (YAML) |
 | 前端框架 | [Vue 3](https://vuejs.org/) + TypeScript + Vite |
-| UI 组件库 | [Element Plus](https://element-plus.org/) |
+| UI 组件库（前端） | [Element Plus](https://element-plus.org/) |
+| UI 组件库（后台） | [Naive UI](https://www.naiveui.com/) |
 | CSS 框架 | [Tailwind CSS v4](https://tailwindcss.com/) |
 | 状态管理 | [Pinia](https://pinia.vuejs.org/) |
 | HTTP 客户端 | Axios |
+| 图表 | ECharts |
 
 ### 功能模块
+
+#### 官网前端 (frontend)
 
 - **首页 (Dashboard)**：英雄区、关于我们、业务介绍、产品预览、合作伙伴等
 - **产品 (Product)**：产品系列与产品列表、产品详情
@@ -35,10 +45,16 @@ Xenova 是一个前后端分离的全栈 Web 应用，面向企业官网场景�
 - **联系我们 (Contact)**：联系信息展示
 - **用户认证**：注册、登录、JWT 令牌刷新
 
+#### 后台管理系统 (admin)
+
+- **数据看板**：业务数据概览与图表展示
+- **内容管理**：产品、新闻、软件、荣誉等内容的增删改查
+- **系统管理**：用户管理与权限控制
+
 ### 环境要求
 
 - Go 1.25+
-- Node.js 18+ / pnpm 8+
+- Node.js 20.19.0+ 或 22.12.0+
 - MySQL 8
 - Redis 6+
 
@@ -94,15 +110,25 @@ go run main.go
 
 后端默认监听 `http://localhost:8099`
 
-#### 4. 启动前端
+#### 4. 启动官网前端
 
 ```bash
 cd frontend
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
-前端默认运行在 `http://localhost:5173`，API 请求通过 `/api` 前缀代理到后端。
+官网前端默认运行在 `http://localhost:5173`，API 请求通过 `/api` 前缀代理到后端。
+
+#### 5. 启动后台管理系统
+
+```bash
+cd admin
+npm install
+npm run dev
+```
+
+后台管理系统默认运行在 `http://localhost:5799`，API 请求通过 `/api` 前缀代理到后端。
 
 ### API 路由概览
 
@@ -146,7 +172,7 @@ pnpm dev
 
 ```
 xenova/
-├── backend/                # Go 后端
+├── backend/                # Go 后端 API 服务
 │   ├── config/             # 配置文件 (system.yaml)
 │   ├── initialize/         # 初始化 (Viper, GORM, Redis, Router)
 │   ├── internal/
@@ -160,7 +186,7 @@ xenova/
 │   ├── Dockerfile
 │   ├── go.mod
 │   └── main.go
-├── frontend/               # Vue 3 前端
+├── frontend/               # Vue 3 官网前端 (端口 5173)
 │   ├── src/
 │   │   ├── api/            # Axios 请求封装
 │   │   ├── components/     # 公共组件
@@ -172,6 +198,21 @@ xenova/
 │   │   ├── types/          # TypeScript 类型
 │   │   └── utils/          # 工具函数
 │   ├── Dockerfile
+│   └── package.json
+├── admin/                  # Vue 3 后台管理系统 (端口 5799)
+│   ├── src/
+│   │   ├── api/            # Axios 请求封装
+│   │   ├── components/     # 公共组件
+│   │   ├── composables/    # 组合式函数
+│   │   ├── layout/         # 页面布局
+│   │   ├── router/         # 路由配置
+│   │   ├── stores/         # Pinia 状态
+│   │   ├── theme/          # 主题配置
+│   │   ├── types/          # TypeScript 类型
+│   │   ├── utils/          # 工具函数
+│   │   └── views/          # 页面视图
+│   ├── Dockerfile
+│   ├── nginx.conf
 │   └── package.json
 ├── DOCKER.md               # Docker 部署指南
 └── README.md
@@ -187,7 +228,13 @@ xenova/
 
 ### Overview
 
-Xenova is a full-stack web application for enterprise websites. It provides modules for product showcase, news, software downloads, company honors, contact information, and user authentication.
+Xenova is a full-stack web application for enterprise websites. The project includes three submodules:
+
+- **backend**: RESTful API service written in Go
+- **frontend**: User-facing Vue 3 website frontend
+- **admin**: Vue 3 admin panel for content management
+
+It provides modules for product showcase, news, software downloads, company honors, contact information, and user authentication.
 
 ### Tech Stack
 
@@ -199,12 +246,16 @@ Xenova is a full-stack web application for enterprise websites. It provides modu
 | Authentication | JWT (golang-jwt/jwt v5) |
 | Configuration | Viper (YAML) |
 | Frontend Framework | [Vue 3](https://vuejs.org/) + TypeScript + Vite |
-| UI Components | [Element Plus](https://element-plus.org/) |
+| UI Components (frontend) | [Element Plus](https://element-plus.org/) |
+| UI Components (admin) | [Naive UI](https://www.naiveui.com/) |
 | CSS Framework | [Tailwind CSS v4](https://tailwindcss.com/) |
 | State Management | [Pinia](https://pinia.vuejs.org/) |
 | HTTP Client | Axios |
+| Charts | ECharts |
 
 ### Features
+
+#### Website Frontend (frontend)
 
 - **Dashboard**: Hero section, About Us, Business overview, Product preview, Partners
 - **Products**: Product series & list, product details
@@ -214,10 +265,16 @@ Xenova is a full-stack web application for enterprise websites. It provides modu
 - **Contact**: Contact information
 - **Authentication**: Register, login, JWT token refresh
 
+#### Admin Panel (admin)
+
+- **Dashboard**: Business data overview and charts
+- **Content Management**: CRUD for products, news, software, honors, etc.
+- **System Management**: User management and access control
+
 ### Prerequisites
 
 - Go 1.25+
-- Node.js 18+ / pnpm 8+
+- Node.js 20.19.0+ or 22.12.0+
 - MySQL 8
 - Redis 6+
 
@@ -273,21 +330,31 @@ go run main.go
 
 The backend listens on `http://localhost:8099` by default.
 
-#### 4. Start the frontend
+#### 4. Start the website frontend
 
 ```bash
 cd frontend
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 The frontend runs on `http://localhost:5173` by default. API requests with the `/api` prefix are proxied to the backend.
+
+#### 5. Start the admin panel
+
+```bash
+cd admin
+npm install
+npm run dev
+```
+
+The admin panel runs on `http://localhost:5799` by default. API requests with the `/api` prefix are proxied to the backend.
 
 ### Project Structure
 
 ```
 xenova/
-├── backend/                # Go backend
+├── backend/                # Go backend API service
 │   ├── config/             # Configuration (system.yaml)
 │   ├── initialize/         # App bootstrap (Viper, GORM, Redis, Router)
 │   ├── internal/
@@ -301,7 +368,7 @@ xenova/
 │   ├── Dockerfile
 │   ├── go.mod
 │   └── main.go
-├── frontend/               # Vue 3 frontend
+├── frontend/               # Vue 3 website frontend (port 5173)
 │   ├── src/
 │   │   ├── api/            # Axios request wrappers
 │   │   ├── components/     # Shared components
@@ -313,6 +380,21 @@ xenova/
 │   │   ├── types/          # TypeScript types
 │   │   └── utils/          # Utility functions
 │   ├── Dockerfile
+│   └── package.json
+├── admin/                  # Vue 3 admin panel (port 5799)
+│   ├── src/
+│   │   ├── api/            # Axios request wrappers
+│   │   ├── components/     # Shared components
+│   │   ├── composables/    # Composable functions
+│   │   ├── layout/         # Page layout
+│   │   ├── router/         # Vue Router config
+│   │   ├── stores/         # Pinia stores
+│   │   ├── theme/          # Theme configuration
+│   │   ├── types/          # TypeScript types
+│   │   ├── utils/          # Utility functions
+│   │   └── views/          # Page views
+│   ├── Dockerfile
+│   ├── nginx.conf
 │   └── package.json
 ├── DOCKER.md               # Docker deployment guide
 └── README.md
