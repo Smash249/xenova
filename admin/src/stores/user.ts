@@ -225,6 +225,30 @@ export const useUserStore = defineStore('userStore', () => {
           },
           component: 'system/user/index',
         },
+        {
+          path: 'message',
+          name: 'systemMessage',
+          icon: 'icon-[lucide--message-square]',
+          label: '留言管理',
+          meta: {
+            componentName: 'Message',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'system/message/index',
+        },
+        {
+          path: 'jobPosition',
+          name: 'systemJobPosition',
+          icon: 'icon-[lucide--briefcase]',
+          label: '招聘管理',
+          meta: {
+            componentName: 'JobPosition',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'system/jobPosition/index',
+        },
       ],
     },
   ])

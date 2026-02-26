@@ -22,7 +22,7 @@ func initGorm() {
 	if err != nil {
 		log.Fatal("数据库连接失败", err)
 	}
-	if err := db.AutoMigrate(models.User{}, models.ProductSeries{}, models.Product{}, models.JournalismSeries{}, models.Journalism{}, models.JournalismSeries{}, models.Journalism{}, models.SoftwareSeries{}, models.Software{}, models.CompanyHonor{}, models.CompanyPatent{}, models.LoveActivity{}); err != nil {
+	if err := db.AutoMigrate(models.User{}, models.ProductSeries{}, models.Product{}, models.JournalismSeries{}, models.Journalism{}, models.JournalismSeries{}, models.Journalism{}, models.SoftwareSeries{}, models.Software{}, models.CompanyHonor{}, models.CompanyPatent{}, models.LoveActivity{}, models.Message{}, models.JobPosition{}); err != nil {
 		log.Fatal("数据库模型迁移失败", err)
 	}
 	global.DB = db
