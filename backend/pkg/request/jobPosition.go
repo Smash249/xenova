@@ -10,7 +10,7 @@ type GetSystemJobPositionListReq struct {
 }
 
 type CreateSystemJobPositionReq struct {
-	Title            string `json:"title" validate:"required,min=2,max=100"`
+	Title            string `json:"title" validate:"required"`
 	Department       string `json:"department" validate:"required"`
 	Location         string `json:"location" validate:"required"`
 	Headcount        string `json:"headcount" validate:"required"`

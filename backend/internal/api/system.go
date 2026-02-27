@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -112,7 +111,6 @@ func (systemApi) GetSystemJobPositionList(ctx *echo.Context) error {
 
 func (systemApi) CreateSystemJobPosition(ctx *echo.Context) error {
 	createSystemJobPositionReq, err := utils.BindAndValidate[request.CreateSystemJobPositionReq](ctx)
-	fmt.Print(createSystemJobPositionReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}

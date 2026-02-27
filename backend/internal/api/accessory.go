@@ -10,80 +10,80 @@ import (
 	"gorm.io/gorm"
 )
 
-var ProductApi = new(productApi)
+var AccessoryApi = new(accessoryApi)
 
-type productApi struct{}
+type accessoryApi struct{}
 
-func (p *productApi) GetProductSeries(ctx *echo.Context) error {
-	getProductSeriesReq, err := utils.BindAndValidate[request.GetProductSeriesReq](ctx)
+func (p *accessoryApi) GetAccessorySeries(ctx *echo.Context) error {
+	getAccessorySeriesReq, err := utils.BindAndValidate[request.GetAccessorySeriesReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	result, err := productServiceApp.GetProductSeriesList(getProductSeriesReq)
+	result, err := accessoryServiceApp.GetAccessorySeriesList(getAccessorySeriesReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
 }
 
-func (p *productApi) CreateProductSeries(ctx *echo.Context) error {
-	createSeriesReq, err := utils.BindAndValidate[request.CreateProductSeriesReq](ctx)
+func (p *accessoryApi) CreateAccessorySeries(ctx *echo.Context) error {
+	createSeriesReq, err := utils.BindAndValidate[request.CreateAccessorySeriesReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	err = productServiceApp.CreateProductSeries(createSeriesReq)
+	err = accessoryServiceApp.CreateAccessorySeries(createSeriesReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, "创建成功", http.StatusOK)
 }
 
-func (p *productApi) UpdateProductSeries(ctx *echo.Context) error {
-	updateSeriesReq, err := utils.BindAndValidate[request.UpdateProductSeriesReq](ctx)
+func (p *accessoryApi) UpdateAccessorySeries(ctx *echo.Context) error {
+	updateSeriesReq, err := utils.BindAndValidate[request.UpdateAccessorySeriesReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	err = productServiceApp.UpdateProductSeries(updateSeriesReq)
+	err = accessoryServiceApp.UpdateAccessorySeries(updateSeriesReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, "更新成功", http.StatusOK)
 }
 
-func (p *productApi) DeleteProductSeries(ctx *echo.Context) error {
-	deleteSeriesReq, err := utils.BindAndValidate[request.DeleteProductSeriesReq](ctx)
+func (p *accessoryApi) DeleteAccessorySeries(ctx *echo.Context) error {
+	deleteSeriesReq, err := utils.BindAndValidate[request.DeleteAccessorySeriesReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	err = productServiceApp.DeleteProductSeries(deleteSeriesReq)
+	err = accessoryServiceApp.DeleteAccessorySeries(deleteSeriesReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, "删除成功", http.StatusOK)
 }
 
-func (p *productApi) GetProductList(ctx *echo.Context) error {
-	getProductListReq, err := utils.BindAndValidate[request.GetProductReq](ctx)
+func (p *accessoryApi) GetAccessoryList(ctx *echo.Context) error {
+	getAccessoryListReq, err := utils.BindAndValidate[request.GetAccessoryReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	result, err := productServiceApp.GetProductList(getProductListReq)
+	result, err := accessoryServiceApp.GetAccessoryList(getAccessoryListReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
 }
 
-func (p *productApi) GetProductDetail(ctx *echo.Context) error {
-	accessoryId := ctx.Param("accessory_id")
-	if accessoryId == "" {
+func (p *accessoryApi) GetAccessoryDetail(ctx *echo.Context) error {
+	AccessoryId := ctx.Param("Accessory_id")
+	if AccessoryId == "" {
 		return utils.ErrorApiResponse(ctx, "产品ID不能为空", http.StatusBadRequest)
 	}
-	accessoryIdUint, err := utils.ParseStringToUint(accessoryId)
+	AccessoryIdUint, err := utils.ParseStringToUint(AccessoryId)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, "无效的产品ID", http.StatusBadRequest)
 	}
-	result, err := productServiceApp.GetProductDetail(accessoryIdUint)
+	result, err := accessoryServiceApp.GetAccessoryDetail(AccessoryIdUint)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return utils.ErrorApiResponse(ctx, "产品不存在", 404)
@@ -93,37 +93,37 @@ func (p *productApi) GetProductDetail(ctx *echo.Context) error {
 	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
 }
 
-func (p *productApi) CreateProduct(ctx *echo.Context) error {
-	createProductReq, err := utils.BindAndValidate[request.CreateProductReq](ctx)
+func (p *accessoryApi) CreateAccessory(ctx *echo.Context) error {
+	createAccessoryReq, err := utils.BindAndValidate[request.CreateAccessoryReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	err = productServiceApp.CreateProduct(createProductReq)
+	err = accessoryServiceApp.CreateAccessory(createAccessoryReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, "创建成功", http.StatusOK)
 }
 
-func (p *productApi) UpdateProduct(ctx *echo.Context) error {
-	updateProductReq, err := utils.BindAndValidate[request.UpdateProductReq](ctx)
+func (p *accessoryApi) UpdateAccessory(ctx *echo.Context) error {
+	updateAccessoryReq, err := utils.BindAndValidate[request.UpdateAccessoryReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
-	err = productServiceApp.UpdateProduct(updateProductReq)
+	err = accessoryServiceApp.UpdateAccessory(updateAccessoryReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 	return utils.SuccessApiResponse(ctx, "更新成功", http.StatusOK)
 }
 
-func (p *productApi) DeleteProduct(ctx *echo.Context) error {
-	deleteProductReq, err := utils.BindAndValidate[request.DeleteProductReq](ctx)
+func (p *accessoryApi) DeleteAccessory(ctx *echo.Context) error {
+	deleteAccessoryReq, err := utils.BindAndValidate[request.DeleteAccessoryReq](ctx)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
 
-	err = productServiceApp.DeleteProduct(deleteProductReq)
+	err = accessoryServiceApp.DeleteAccessory(deleteAccessoryReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}

@@ -97,7 +97,6 @@ func (p *ProductService) CreateProduct(params request.CreateProductReq) error {
 		Description: params.Description,
 		Cover:       params.Cover,
 		Previews:    params.Previews,
-		Price:       params.Price,
 		SeriesID:    params.SeriesID,
 	}).Error
 }
@@ -109,7 +108,6 @@ func (p *ProductService) UpdateProduct(params request.UpdateProductReq) error {
 		Description: params.Description,
 		Cover:       params.Cover,
 		Previews:    params.Previews,
-		Price:       params.Price,
 		SeriesID:    params.SeriesID,
 	}).Error
 }

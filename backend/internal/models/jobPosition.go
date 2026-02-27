@@ -2,7 +2,6 @@ package models
 
 import "github.com/Smash249/xenova/backend/internal/global"
 
-// JobPosition 招聘职位模型
 type JobPosition struct {
 	global.BaseModel
 	Title            string `gorm:"type:varchar(100);not null;comment:职位名称" json:"title"`
@@ -14,7 +13,7 @@ type JobPosition struct {
 	SalaryRange      string `gorm:"type:varchar(50);default:'面议';comment:薪资范围(如: 10k-15k)" json:"salaryRange"`
 	Responsibilities string `gorm:"type:text;not null;comment:岗位职责(支持富文本或换行符)" json:"responsibilities"`
 	Requirements     string `gorm:"type:text;not null;comment:任职要求(支持富文本或换行符)" json:"requirements"`
-	Status           int    `gorm:"type:tinyint(1);default:1;comment:状态(1:招聘中, 0:已停止/下线)" json:"status"`
+	Status           int    `gorm:"type:int;default:1;comment:状态(1:招聘中, 0:已停止/下线)" json:"status"`
 	Sort             int    `gorm:"type:int;default:0;comment:排序字段(数值越小越靠前)" json:"sort"`
 }
 

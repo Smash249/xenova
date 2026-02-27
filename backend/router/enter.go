@@ -13,6 +13,7 @@ type routerHub struct {
 func (r *routerHub) InitRouterHub(public, private, admin *echo.Group) {
 	initUserRouter()
 	initProductRouter()
+	initAccessoryRouter()
 	initJournalism()
 	initSoftwareRouter()
 	initHonorRouter()
