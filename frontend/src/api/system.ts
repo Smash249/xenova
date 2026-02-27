@@ -8,7 +8,7 @@ export async function GetSystemJobPositionList(page: number, pageSize: number) {
     if (page) searchParams.append("page", String(page))
     if (pageSize) searchParams.append("page_size", String(pageSize))
     const result = await request.get(
-      `/public/job_postions?${searchParams.toString()}`
+      `/public/job_positions?${searchParams.toString()}`
     )
     if (!result || !result.success) throw new Error("请求出错")
     return result.data
@@ -19,7 +19,7 @@ export async function GetSystemJobPositionList(page: number, pageSize: number) {
 
 export async function CreateSystemMessage(params: CreateSystemMessageReq) {
   try {
-    const result = await request.post(`/public/messages`, params)
+    const result = await request.post(`/private/messages`, params)
     if (!result || !result.success) throw new Error("请求出错")
     return result.data
   } catch (error) {

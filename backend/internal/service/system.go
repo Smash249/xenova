@@ -11,12 +11,15 @@ type SystemService struct {
 }
 
 func (SystemService) GetSystemUserList(params request.GetSystemUserListReq) (*global.PaginatorResp[models.User], error) {
-	query := global.DB.Model(&models.User{}).Where("role = ?", "user")
+	query := global.DB.Model(&models.User{})
 	if params.Email != "" {
 		query = query.Where("email LIKE ?", "%"+params.Email+"%")
 	}
 	if params.UserName != "" {
 		query = query.Where("user_name LIKE ?", "%"+params.UserName+"%")
+	}
+	if params.Role != "" {
+		query = query.Where("role = ?", params.Role)
 	}
 	result, err := utils.Paginator[models.User](query, params.PaginateReq)
 	if err != nil {
@@ -27,6 +30,20 @@ func (SystemService) GetSystemUserList(params request.GetSystemUserListReq) (*gl
 
 func (SystemService) BanedUserById(userId uint) error {
 	return global.DB.Model(&models.User{}).Where("id = ?", userId).Update("is_banned", true).Error
+}
+
+func (SystemService) ChangeUserRole(userId uint) error {
+	var user models.User
+	if err := global.DB.First(&user, userId).Error; err != nil {
+		return err
+	}
+	newRole := "user"
+	if user.Role == "user" {
+		newRole = "admin"
+	} else if user.Role == "admin" {
+		newRole = "user"
+	}
+	return global.DB.Model(&models.User{}).Where("id = ?", userId).Update("role", newRole).Error
 }
 
 func (SystemService) GetSystemMessageList(params request.GetSystemMessageListReq) (*global.PaginatorResp[models.Message], error) {
@@ -45,14 +62,14 @@ func (SystemService) GetSystemMessageList(params request.GetSystemMessageListReq
 }
 
 func (SystemService) CreateSystemMessage(userId uint, params request.CreateSystemMessageReq) error {
-	global.DB.Create(models.Message{
+	return global.DB.Create(&models.Message{
 		UserID:  userId,
 		Content: params.Content,
 		Company: params.Company,
 		Email:   params.Email,
 		Phone:   params.Phone,
-	})
-	return nil
+	}).Error
+
 }
 
 func (SystemService) UpdateSystemMessage(params request.UpdateSystemMessageReq) error {
@@ -87,7 +104,7 @@ func (SystemService) GetSystemJobPositionList(params request.GetSystemJobPositio
 }
 
 func (SystemService) CreateSystemJobPosition(params request.CreateSystemJobPositionReq) error {
-	return global.DB.Model(&models.JobPosition{}).Create(models.JobPosition{
+	return global.DB.Create(&models.JobPosition{
 		Title:            params.Title,
 		Department:       params.Department,
 		Location:         params.Location,
@@ -98,22 +115,26 @@ func (SystemService) CreateSystemJobPosition(params request.CreateSystemJobPosit
 		Responsibilities: params.Responsibilities,
 		Requirements:     params.Requirements,
 	}).Error
+
 }
 
 func (SystemService) UpdateSystemJobPosition(params request.UpdateSystemJobPositionReq) error {
-	return global.DB.Model(&models.JobPosition{}).Where("id = ?", params.ID).Updates(models.JobPosition{
-		Title:            params.Title,
-		Department:       params.Department,
-		Location:         params.Location,
-		Headcount:        params.Headcount,
-		Experience:       params.Experience,
-		Education:        params.Education,
-		SalaryRange:      params.SalaryRange,
-		Responsibilities: params.Responsibilities,
-		Requirements:     params.Requirements,
-		Status:           params.Status,
-		Sort:             params.Sort,
-	}).Error
+	return global.DB.Model(&models.JobPosition{}).
+		Where("id = ?", params.ID).
+		Updates(map[string]interface{}{
+			"title":            params.Title,
+			"department":       params.Department,
+			"location":         params.Location,
+			"headcount":        params.Headcount,
+			"experience":       params.Experience,
+			"education":        params.Education,
+			"salary_range":     params.SalaryRange,
+			"responsibilities": params.Responsibilities,
+			"requirements":     params.Requirements,
+			"status":           *params.Status,
+			"sort":             *params.Sort,
+		}).Error
+
 }
 
 func (SystemService) DeleteSystemJobPosition(params request.DeleteSystemJobPositionReq) error {

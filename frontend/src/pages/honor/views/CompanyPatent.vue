@@ -115,6 +115,7 @@
 
 <script setup lang="ts">
 import { GetCompanyPatentApi } from "@/api/honor"
+import { Sleep } from "@/utils/common"
 import { ElMessage } from "element-plus"
 import { Calendar, FileCheck, ZoomIn } from "lucide-vue-next"
 import { computed, onMounted, ref } from "vue"
@@ -126,7 +127,7 @@ import CompanyPatentModal from "../components/CompanyPatentModal.vue"
 
 const BaseUrl = import.meta.env.VITE_BASE_URL
 
-const loading = ref(false)
+const loading = ref(true)
 const isModalOpen = ref(false)
 const patents = ref<CompanyPatent[]>([])
 const selectedPatent = ref<CompanyPatent | null>(null)
@@ -174,7 +175,10 @@ function HandlePageChange(page: number) {
 async function GetCompanyPatent() {
   loading.value = true
   try {
-    const result = await GetCompanyPatentApi(currentPage.value)
+    const [result] = await Promise.all([
+      GetCompanyPatentApi(currentPage.value),
+      Sleep(500),
+    ])
     patents.value = result.data
     if (result.paginate) paginate.value = result.paginate
   } catch (error) {

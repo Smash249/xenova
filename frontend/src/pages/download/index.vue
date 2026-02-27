@@ -1,24 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 font-sans text-slate-800">
-    <div
-      class="relative flex h-[40vh] items-center justify-center overflow-hidden bg-slate-900"
-    >
-      <div
-        class="absolute inset-0 z-10 bg-linear-to-r from-blue-900/80 to-slate-900/80"
-      ></div>
-
-      <div
-        class="animate-pulse-slow absolute inset-0 bg-[url('./banner/download.webp')] bg-cover bg-center"
-      ></div>
-
-      <div class="relative z-20 px-4 text-center">
-        <h1
-          class="mb-4 text-4xl font-bold tracking-wider text-white drop-shadow-md md:text-5xl"
-        >
-          软件中心
-        </h1>
-      </div>
-    </div>
+    <CustomBanner title="软件中心" />
 
     <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
       <nav class="mb-8 flex items-center text-sm text-slate-500">
@@ -198,6 +180,7 @@
 
 <script setup lang="ts">
 import { GetSoftWareListApi, GetSoftWareSeriesApi } from "@/api/software"
+import { Sleep } from "@/utils/common"
 import {
   ArrowRight,
   Download,
@@ -212,6 +195,7 @@ import { computed, onMounted, ref, watch } from "vue"
 
 import type { Paginate } from "@/types/common"
 import type { SoftWare, SoftWareSeries } from "@/types/software"
+import CustomBanner from "@/components/customBanner/index.vue"
 
 interface TabItem {
   id: number
@@ -219,7 +203,7 @@ interface TabItem {
   description: string
 }
 
-const loading = ref(false)
+const loading = ref(true)
 const activeTab = ref<number>(0)
 const searchKeyword = ref("")
 const currentPage = ref(1)
@@ -284,21 +268,27 @@ async function GetSoftWareSeries() {
     seriesList.value = result.data
     if (result.data.length > 0) {
       activeTab.value = result.data[0].id
+    } else {
+      loading.value = false
     }
   } catch (error) {
     console.error(error)
     ElMessage.error("获取下载软件系列失败")
+    loading.value = false
   }
 }
 
 async function GetSoftWareList() {
   loading.value = true
   try {
-    const result = await GetSoftWareListApi(
-      currentPage.value,
-      searchKeyword.value,
-      activeTab.value
-    )
+    const [result] = await Promise.all([
+      GetSoftWareListApi(
+        currentPage.value,
+        searchKeyword.value,
+        activeTab.value
+      ),
+      Sleep(500),
+    ])
     downloads.value = result.data
     if (result.paginate) paginate.value = result.paginate
   } catch (error) {

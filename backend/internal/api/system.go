@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -45,6 +47,22 @@ func (systemApi) BanedUserById(ctx *echo.Context) error {
 	return utils.SuccessApiResponse(ctx, "用户已封禁", http.StatusOK)
 }
 
+func (systemApi) ChangeUserRole(ctx *echo.Context) error {
+	userId := ctx.Param("id")
+	if userId == "" {
+		return utils.ErrorApiResponse(ctx, "用户ID不能为空", http.StatusBadRequest)
+	}
+	parsedId, err := strconv.ParseUint(userId, 10, 32)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, "无效的用户ID", http.StatusBadRequest)
+	}
+	err = systemServiceApp.ChangeUserRole(uint(parsedId))
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusInternalServerError)
+	}
+	return utils.SuccessApiResponse(ctx, "用户角色已切换", http.StatusOK)
+}
+
 func (systemApi) GetSystemMessageList(ctx *echo.Context) error {
 	getSystemMessageListReq, err := utils.BindAndValidate[request.GetSystemMessageListReq](ctx)
 	if err != nil {
@@ -66,6 +84,7 @@ func (systemApi) CreateSystemMessage(ctx *echo.Context) error {
 	if !ok {
 		return utils.ErrorApiResponse(ctx, "用户未登录", http.StatusUnauthorized)
 	}
+	fmt.Println(userId, createSystemMessageReq)
 	err = systemServiceApp.CreateSystemMessage(userId, createSystemMessageReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusInternalServerError)
@@ -114,6 +133,7 @@ func (systemApi) CreateSystemJobPosition(ctx *echo.Context) error {
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
 	}
+	slog.Info("创建职位", "title", createSystemJobPositionReq.Title, "department", createSystemJobPositionReq.Department)
 	err = systemServiceApp.CreateSystemJobPosition(createSystemJobPositionReq)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusInternalServerError)

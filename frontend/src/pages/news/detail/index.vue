@@ -7,10 +7,6 @@
         class="absolute inset-0 z-10 bg-linear-to-r from-blue-900/90 to-slate-900/90"
       ></div>
 
-      <div
-        class="animate-pulse-slow absolute inset-0 bg-[url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80')] bg-cover bg-center mix-blend-overlay"
-      ></div>
-
       <div class="relative z-20 container mx-auto mt-16 px-4 text-center">
         <h1
           class="line-clamp-2 text-3xl font-bold tracking-wider text-white drop-shadow-md md:text-4xl"

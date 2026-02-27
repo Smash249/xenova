@@ -10,33 +10,38 @@ import {
   NPopconfirm,
   useMessage,
   NPagination,
+  NDropdown,
+  NImage,
   NTag,
-  NSelect,
 } from 'naive-ui'
 import { reactive, ref, useTemplateRef, computed, onMounted } from 'vue'
 
-import { GetSystemUserListApi, BanedUserByIdApi, ChangeUserRoleApi } from '@/api/system'
+import { GetAccessoryListApi, DeleteAccessoryApi } from '@/api/accessory'
 import { ScrollContainer } from '@/components'
 
-import type { UserInfo } from '@/types/user'
-import type { DataTableColumns, PaginationProps, FormInst } from 'naive-ui'
+import AccessoryModal from './component/AccessoryModal.vue'
+
+import type { Accessory } from '@/types/accessory'
+import type { DataTableColumns, PaginationProps, DropdownProps, FormInst } from 'naive-ui'
 
 defineOptions({
-  name: 'UserAdmin',
+  name: 'AccessoryAdmin',
 })
 
 const message = useMessage()
 
 const formRef = useTemplateRef<FormInst>('formRef')
+const modalRef = ref<InstanceType<typeof AccessoryModal> | null>(null)
 
-const userData = ref<UserInfo[]>([])
+const showDropdown = ref(false)
+const contextmenuId = ref<number | null>(null)
+
+const acessoryData = ref<Accessory[]>([])
 const checkedRowKeys = ref<Array<number | string>>([])
 const isLoading = ref(false)
 
 const queryForm = reactive({
-  email: '',
-  userName: '',
-  role: 'user',
+  name: '',
 })
 
 const pagination = reactive<PaginationProps>({
@@ -49,18 +54,50 @@ const pagination = reactive<PaginationProps>({
   showQuickJumpDropdown: true,
   onUpdatePage: (page) => {
     pagination.page = page
-    GetUserList()
+    GetAccessorys()
   },
   onUpdatePageSize: (pageSize) => {
     pagination.pageSize = pageSize
     pagination.page = 1
-    GetUserList()
+    GetAccessorys()
+  },
+})
+
+const dropdownOptions = reactive<DropdownProps>({
+  x: 0,
+  y: 0,
+  options: [
+    {
+      label: '编辑',
+      key: 'edit',
+    },
+    {
+      label: () => <span class='text-rose-500'>删除</span>,
+      key: 'delete',
+    },
+  ],
+  onClickoutside: () => {
+    showDropdown.value = false
+  },
+  onSelect: (v) => {
+    if (contextmenuId.value !== null) {
+      const row = acessoryData.value.find((item) => item.id === contextmenuId.value)
+      switch (v) {
+        case 'edit':
+          if (row) modalRef.value?.Open('update', row)
+          break
+        case 'delete':
+          MutateDeleteData(contextmenuId.value)
+          break
+      }
+    }
+    showDropdown.value = false
   },
 })
 
 const hasChecked = computed(() => checkedRowKeys.value.length > 0)
 
-const columns = computed<DataTableColumns<UserInfo>>(() => {
+const columns = computed<DataTableColumns<Accessory>>(() => {
   return [
     {
       type: 'selection',
@@ -74,41 +111,61 @@ const columns = computed<DataTableColumns<UserInfo>>(() => {
       width: 80,
     },
     {
-      key: 'userName',
-      title: '用户名',
+      key: 'name',
+      title: '配件名称',
       width: 150,
-      ellipsis: {
-        tooltip: true,
-      },
     },
     {
-      key: 'email',
-      title: '邮箱',
+      key: 'cover',
+      title: '封面',
+      width: 100,
+      align: 'center',
+      render: (row) =>
+        row.cover ? (
+          <NImage
+            src={import.meta.env.VITE_SITE_BASE_API + row.cover}
+            width={60}
+            height={60}
+            object-fit='cover'
+            class='rounded'
+            lazy
+          />
+        ) : (
+          <span class='text-gray-400'>暂无</span>
+        ),
+    },
+    {
+      key: 'price',
+      title: '价格',
+      width: 120,
+      align: 'right',
+      render: (row) => (
+        <NTag
+          type='warning'
+          size='small'
+        >
+          ¥{row.price.toFixed(2)}
+        </NTag>
+      ),
+    },
+    {
+      key: 'previews',
+      title: '预览图',
+      width: 120,
+      align: 'center',
+      render: (row) =>
+        row.previews && row.previews.length > 0 ? (
+          <span class='text-blue-500'>{row.previews.length} 张</span>
+        ) : (
+          <span class='text-gray-400'>暂无</span>
+        ),
+    },
+    {
+      key: 'description',
+      title: '描述',
       width: 200,
       ellipsis: {
         tooltip: true,
-      },
-    },
-    {
-      key: 'role',
-      title: '角色',
-      width: 120,
-      align: 'center',
-      render: (row) => {
-        const roleMap: Record<string, { label: string; type: 'success' | 'info' | 'warning' }> = {
-          admin: { label: '管理员', type: 'success' },
-          user: { label: '普通用户', type: 'info' },
-        }
-        const role = roleMap[row.role] || { label: row.role, type: 'warning' as const }
-        return (
-          <NTag
-            type={role.type}
-            size='small'
-            round
-          >
-            {role.label}
-          </NTag>
-        )
       },
     },
     {
@@ -126,7 +183,7 @@ const columns = computed<DataTableColumns<UserInfo>>(() => {
     {
       key: 'actions',
       title: '操作',
-      width: 220,
+      width: 160,
       align: 'center',
       fixed: 'right',
       render: (row) => CellActions(row),
@@ -134,55 +191,31 @@ const columns = computed<DataTableColumns<UserInfo>>(() => {
   ]
 })
 
-function CellActions(row: UserInfo) {
-  const isBanned = row.isBanned
-  const banActionText = isBanned ? '解禁' : '封禁'
-  const banConfirmText = isBanned
-    ? `确认解禁用户「${row.userName}」吗？`
-    : `确认封禁用户「${row.userName}」吗？`
-  const banButtonType = isBanned ? 'success' : 'error'
-
-  const isAdmin = row.role === 'admin'
-  const roleActionText = isAdmin ? '设为普通用户' : '设为管理员'
-  const roleConfirmText = isAdmin
-    ? `确认将「${row.userName}」设为普通用户吗？`
-    : `确认将「${row.userName}」设为管理员吗？`
-
+function CellActions(row: Accessory) {
   return (
     <div class='flex justify-center gap-2'>
+      <NButton
+        secondary
+        type='primary'
+        size='small'
+        onClick={() => modalRef.value?.Open('update', row)}
+      >
+        编辑
+      </NButton>
       <NPopconfirm
         positiveText='确定'
         negativeText='取消'
-        onPositiveClick={() => MutateBanUser(row.id, isBanned)}
+        onPositiveClick={() => MutateDeleteData(row.id)}
       >
         {{
-          default: () => banConfirmText,
+          default: () => '确认删除该配件吗？',
           trigger: () => (
             <NButton
               secondary
-              type={banButtonType}
+              type='error'
               size='small'
             >
-              {banActionText}
-            </NButton>
-          ),
-        }}
-      </NPopconfirm>
-
-      <NPopconfirm
-        positiveText='确定'
-        negativeText='取消'
-        onPositiveClick={() => MutateChangeUserRole(row.id)}
-      >
-        {{
-          default: () => roleConfirmText,
-          trigger: () => (
-            <NButton
-              secondary
-              type='warning'
-              size='small'
-            >
-              {roleActionText}
+              删除
             </NButton>
           ),
         }}
@@ -208,77 +241,61 @@ function HandleQueryClick() {
   formRef.value?.validate((errors) => {
     if (!errors) {
       pagination.page = 1
-      GetUserList()
+      GetAccessorys()
     }
   })
 }
 
 function ResetForm() {
-  queryForm.email = ''
-  queryForm.userName = ''
+  queryForm.name = ''
   pagination.page = 1
-  GetUserList()
+  GetAccessorys()
 }
 
-async function MutateBanUser(id: number, isBanned: boolean) {
+async function MutateDeleteData(id: number) {
   isLoading.value = true
   try {
-    await BanedUserByIdApi(id)
-    message.success(isBanned ? '解禁成功' : '封禁成功')
-    GetUserList()
+    await DeleteAccessoryApi([id])
+    message.success('删除成功')
+    checkedRowKeys.value = checkedRowKeys.value.filter((key) => key !== id)
+    GetAccessorys()
   } catch (error) {
-    message.error(isBanned ? '解禁失败' : '封禁失败')
+    message.error('删除失败')
     console.error(error)
   } finally {
     isLoading.value = false
   }
 }
 
-async function MutateChangeUserRole(id: number) {
-  isLoading.value = true
-  try {
-    await ChangeUserRoleApi(id)
-    message.success('角色修改成功')
-    GetUserList()
-  } catch (error) {
-    message.error('角色修改失败')
-    console.error(error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-async function MutateBatchBanUsers() {
+async function MutateBatchDeleteData() {
   if (!hasChecked.value) return
   isLoading.value = true
   try {
-    const promises = (checkedRowKeys.value as number[]).map((id) => BanedUserByIdApi(id))
-    await Promise.all(promises)
-    message.success(`成功操作 ${checkedRowKeys.value.length} 个用户状态`)
+    await DeleteAccessoryApi(checkedRowKeys.value as number[])
+    message.success(`成功删除 ${checkedRowKeys.value.length} 条记录`)
     checkedRowKeys.value = []
-    GetUserList()
+    GetAccessorys()
   } catch (error) {
-    message.error('批量操作失败')
+    message.error('批量删除失败')
     console.error(error)
   } finally {
     isLoading.value = false
   }
 }
 
-async function GetUserList() {
+async function GetAccessorys() {
   isLoading.value = true
   try {
-    const result = await GetSystemUserListApi(
+    const result = await GetAccessoryListApi(
       pagination.page || 1,
       pagination.pageSize || 10,
-      queryForm.email,
-      queryForm.role,
+      queryForm.name,
     )
-    console.log('GetSystemUserListApi result:', result.data)
-    userData.value = result.data
+    console.log('GetAccessoryListApi result:', result.data)
+    acessoryData.value = result.data
     if (result.paginate) pagination.itemCount = result.paginate.total_count
   } catch (error) {
-    message.error('获取用户列表失败')
+    message.error('获取列表失败')
     console.error(error)
   } finally {
     isLoading.value = false
@@ -286,7 +303,7 @@ async function GetUserList() {
 }
 
 onMounted(() => {
-  GetUserList()
+  GetAccessorys()
 })
 </script>
 
@@ -307,57 +324,40 @@ onMounted(() => {
         class="max-lg:w-full max-lg:flex-col"
       >
         <NFormItem
-          label="邮箱"
-          path="email"
+          label="配件名称"
+          path="name"
         >
           <NInput
-            v-model:value="queryForm.email"
+            v-model:value="queryForm.name"
             clearable
-            placeholder="请输入用户邮箱"
-          />
-        </NFormItem>
-        <NFormItem
-          label="用户名"
-          path="userName"
-        >
-          <NInput
-            v-model:value="queryForm.userName"
-            clearable
-            placeholder="请输入用户名"
-          />
-        </NFormItem>
-        <NFormItem
-          label="角色"
-          path="role"
-        >
-          <NSelect
-            v-model:value="queryForm.role"
-            clearable
-            placeholder="请选择用户角色"
-            :options="[
-              { label: '管理员', value: 'admin' },
-              { label: '普通用户', value: 'user' },
-            ]"
+            placeholder="请输入配件名称"
           />
         </NFormItem>
         <div class="flex gap-2">
+          <NButton
+            type="success"
+            @click="modalRef?.Open('create')"
+          >
+            <template #icon>
+              <span class="iconify ph--plus-circle" />
+            </template>
+            新增配件
+          </NButton>
           <NPopconfirm
             positive-text="确定"
             negative-text="取消"
-            @positive-click="MutateBatchBanUsers"
+            @positive-click="MutateBatchDeleteData"
           >
-            <template #default>
-              确认反转选中的 {{ checkedRowKeys.length }} 个用户封禁状态吗？
-            </template>
+            <template #default> 确认删除选中的 {{ checkedRowKeys.length }} 条记录吗？ </template>
             <template #trigger>
               <NButton
                 type="error"
                 :disabled="!hasChecked"
               >
                 <template #icon>
-                  <span class="iconify ph--prohibit" />
+                  <span class="iconify ph--trash" />
                 </template>
-                批量封禁/解禁 ({{ checkedRowKeys.length }})
+                批量删除 ({{ checkedRowKeys.length }})
               </NButton>
             </template>
           </NPopconfirm>
@@ -391,9 +391,10 @@ onMounted(() => {
           v-model:checked-row-keys="checkedRowKeys"
           :remote="true"
           :columns="columns"
-          :data="userData"
+          :data="acessoryData"
           :row-key="(row) => row.id"
           :loading="isLoading"
+          scroll-x="1800"
         />
 
         <div class="mt-3 flex items-end justify-end max-xl:flex-col max-xl:gap-y-2">
@@ -405,6 +406,18 @@ onMounted(() => {
         </div>
       </div>
     </NCard>
+
+    <NDropdown
+      placement="bottom-start"
+      trigger="manual"
+      v-bind="dropdownOptions"
+      :show="showDropdown"
+    />
+
+    <AccessoryModal
+      ref="modalRef"
+      @success="GetAccessorys"
+    />
   </ScrollContainer>
 </template>
 

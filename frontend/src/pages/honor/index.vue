@@ -1,24 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 font-sans text-slate-800">
-    <div
-      class="relative flex h-[40vh] items-center justify-center overflow-hidden bg-slate-900"
-    >
-      <div
-        class="absolute inset-0 z-10 bg-linear-to-r from-blue-900/80 to-slate-900/80"
-      ></div>
-
-      <div
-        class="animate-pulse-slow absolute inset-0 bg-[url('./banner/about.webp')] bg-cover bg-center"
-      ></div>
-
-      <div class="relative z-20 px-4 text-center">
-        <h1
-          class="mb-4 text-4xl font-bold tracking-wider text-white drop-shadow-md md:text-5xl"
-        >
-          荣誉与文化
-        </h1>
-      </div>
-    </div>
+    <CustomBanner title="荣誉与文化" />
 
     <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
       <nav class="mb-10 flex items-center text-sm text-slate-500">
@@ -113,6 +95,7 @@ import { Award, ChevronRight, FileCheck, Heart, Users } from "lucide-vue-next"
 import { computed, defineAsyncComponent, markRaw, ref } from "vue"
 
 import ContactUs from "@/components/contactUs/index.vue"
+import CustomBanner from "@/components/customBanner/index.vue"
 
 const CompanyHonor = defineAsyncComponent(
   () => import("./views/CompanyHonor.vue")

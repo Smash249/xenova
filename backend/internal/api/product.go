@@ -75,15 +75,15 @@ func (p *productApi) GetProductList(ctx *echo.Context) error {
 }
 
 func (p *productApi) GetProductDetail(ctx *echo.Context) error {
-	accessoryId := ctx.Param("accessory_id")
-	if accessoryId == "" {
+	productId := ctx.Param("product_id")
+	if productId == "" {
 		return utils.ErrorApiResponse(ctx, "产品ID不能为空", http.StatusBadRequest)
 	}
-	accessoryIdUint, err := utils.ParseStringToUint(accessoryId)
+	productIdUint, err := utils.ParseStringToUint(productId)
 	if err != nil {
 		return utils.ErrorApiResponse(ctx, "无效的产品ID", http.StatusBadRequest)
 	}
-	result, err := productServiceApp.GetProductDetail(accessoryIdUint)
+	result, err := productServiceApp.GetProductDetail(productIdUint)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return utils.ErrorApiResponse(ctx, "产品不存在", 404)

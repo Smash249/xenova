@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen bg-gray-50 font-sans text-slate-800">
-    <CustomBanner title="企业动态" />
+    <CustomBanner title="配件商城" />
     <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
       <nav class="mb-10 flex items-center text-sm text-slate-500">
-        <a class="transition-colors hover:text-blue-600" href="/">首页</a>
+        <a href="/" class="transition-colors hover:text-blue-600">首页</a>
         <ChevronRight class="mx-2 h-4 w-4" />
-        <span class="font-medium text-slate-800">企业动态</span>
+        <span class="font-medium text-slate-800">配件商城</span>
       </nav>
 
       <div class="grid grid-cols-1 gap-10 lg:grid-cols-4">
@@ -15,9 +15,9 @@
           >
             <Search class="mr-3 h-5 w-5 text-slate-400" />
             <input
-              v-model="title"
+              v-model="accessoryName"
               type="text"
-              placeholder="搜索新闻标题..."
+              placeholder="搜索配件型号..."
               class="w-full border-none bg-transparent text-sm text-slate-700 placeholder-slate-400 focus:ring-0"
             />
           </div>
@@ -30,16 +30,16 @@
             >
               <h2 class="flex items-center font-bold text-slate-900">
                 <Filter class="mr-2 h-4 w-4 text-blue-600" />
-                新闻分类
+                配件系列
               </h2>
             </div>
             <ul class="cursor-pointer space-y-1 p-3">
               <li v-for="cat in categories" :key="cat.id">
                 <button
-                  @click="SelectProductSeries(cat.id)"
+                  @click="SelectAccessorySeries(cat.id)"
                   class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-all duration-200"
                   :class="[
-                    activeProductSeriesId === cat.id
+                    activeAccessorySeriesId === cat.id
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
                       : 'text-slate-600 hover:bg-gray-50 hover:text-blue-600',
                   ]"
@@ -49,7 +49,6 @@
               </li>
             </ul>
           </div>
-
           <ContactUs />
         </aside>
 
@@ -58,9 +57,9 @@
             class="mb-8 flex flex-col items-center justify-between border-b border-gray-200 pb-4 sm:flex-row"
           >
             <h2 class="mb-4 text-2xl font-bold text-slate-800 sm:mb-0">
-              全部动态
+              全部配件
               <span class="ml-2 text-base font-normal text-slate-400">
-                共 {{ paginate?.total_count ?? 0 }} 篇文章
+                共 {{ paginate?.total_count ?? 0 }} 款设备
               </span>
             </h2>
             <div class="flex items-center space-x-2">
@@ -74,14 +73,18 @@
             </div>
           </div>
 
-          <div v-if="loading" class="space-y-6">
+          <div
+            v-if="loading"
+            class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+          >
             <div
-              v-for="n in 4"
+              v-for="n in 6"
               :key="n"
               class="overflow-hidden rounded-2xl border border-gray-100 bg-white"
             >
               <el-skeleton animated>
                 <template #template>
+                  <el-skeleton-item variant="image" class="h-56 w-full" />
                   <div class="p-6">
                     <el-skeleton-item variant="h3" class="mb-3 w-3/4" />
                     <el-skeleton-item variant="text" class="mb-2 w-full" />
@@ -96,11 +99,11 @@
             v-else-if="isEmpty"
             class="flex h-full items-center justify-center"
           >
-            <el-empty description="暂无相关动态" :image-size="160">
+            <el-empty description="暂无相关配件" :image-size="160">
               <template #description>
-                <span class="text-sm text-slate-400">
-                  暂无相关动态，请尝试其他搜索条件
-                </span>
+                <span class="text-sm text-slate-400"
+                  >暂无相关配件，请尝试其他搜索条件</span
+                >
               </template>
             </el-empty>
           </div>
@@ -110,63 +113,54 @@
             appear
             name="list"
             tag="div"
-            class="flex-1 space-y-6"
+            class="grid flex-1 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
           >
-            <article
-              v-for="(news, index) in newsData"
-              :key="news.id"
-              class="group cursor-pointer rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5 md:p-8"
+            <div
+              v-for="(accessory, index) in accessorys"
+              :key="accessory.id"
+              class="group flex h-full max-h-100 transform cursor-pointer flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-500 hover:shadow-2xl hover:shadow-blue-900/10"
               :style="{ animationDelay: `${index * 50}ms` }"
-              @click="HandelGotoNewsDetail(news)"
+              @click="HandleGotoDetail(accessory)"
             >
-              <div
-                class="mb-4 flex flex-col justify-between gap-4 md:flex-row md:items-start"
-              >
-                <div class="flex-1">
-                  <div class="mb-3 flex items-center gap-3">
-                    <span
-                      class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600"
-                    >
-                      {{ GetCategoryName(news.series_id) }}
-                    </span>
-                    <div class="flex items-center text-xs text-slate-400">
-                      <Calendar class="mr-1 h-3.5 w-3.5" />
-                      {{ FormatDate(news.created_at) }}
-                    </div>
-                  </div>
-                  <h3
-                    class="mb-3 line-clamp-2 text-xl font-bold text-slate-800 transition-colors group-hover:text-blue-700 md:text-2xl"
-                  >
-                    <a :href="`/news/detail/${news.id}`">{{ news.title }}</a>
-                  </h3>
-                </div>
-              </div>
-
-              <p class="mb-6 line-clamp-3 leading-relaxed text-slate-600">
-                {{ news.content }}
-              </p>
-
-              <div
-                class="flex items-center justify-between border-t border-gray-50 pt-6"
-              >
-                <div class="flex items-center text-sm text-slate-400">
-                  <Eye class="mr-2 h-4 w-4" />
-                  <span>{{ news.view_count }} 次浏览</span>
-                </div>
+              <div class="relative h-56 overflow-hidden bg-gray-100">
+                <img
+                  :src="BASE_URL + accessory.cover"
+                  :alt="accessory.name"
+                  class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
 
                 <div
-                  class="group/btn inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  class="absolute inset-0 bg-blue-900/0 transition-colors duration-300 group-hover:bg-blue-900/10"
+                ></div>
+              </div>
+
+              <div class="flex flex-1 flex-col p-6">
+                <h3
+                  class="mb-2 text-lg font-bold text-slate-800 transition-colors group-hover:text-blue-600"
                 >
-                  阅读更多
-                  <ChevronRight
-                    class="ml-1 h-4 w-4 transition-transform group-hover/btn:translate-x-1"
-                  />
+                  {{ accessory.name }}
+                </h3>
+                <p class="mb-6 line-clamp-2 flex-1 text-sm text-slate-500">
+                  {{ accessory.description }}
+                </p>
+
+                <div class="mt-auto flex items-center justify-between">
+                  <span
+                    class="text-xs font-semibold text-slate-400 transition-colors group-hover:text-blue-500"
+                  >
+                    查看详情
+                  </span>
+                  <div
+                    class="flex h-8 w-8 transform items-center justify-center rounded-full bg-gray-50 text-slate-400 transition-all duration-300 group-hover:-rotate-45 group-hover:bg-blue-600 group-hover:text-white"
+                  >
+                    <ArrowRight class="h-4 w-4" />
+                  </div>
                 </div>
               </div>
-            </article>
+            </div>
           </TransitionGroup>
 
-          <div v-if="canShowPaginate" class="mt-12 flex justify-center">
+          <div v-if="canShowPaginate" class="mt-8 flex justify-center">
             <el-pagination
               v-model:current-page="currentPage"
               :page-size="paginate?.page_size ?? 0"
@@ -182,118 +176,105 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { GetNewsListApi, GetNewsSeriesApi } from "@/api/news"
+<script setup lang="ts">
+import { GetAccessoryListApi, GetAccessorySeriesApi } from "@/api/accessorys"
 import router from "@/router"
 import { Sleep } from "@/utils/common"
-import dayjs from "dayjs"
 import { ElMessage } from "element-plus"
-import { Calendar, ChevronRight, Eye, Filter, Search } from "lucide-vue-next"
+import { ArrowRight, ChevronRight, Filter, Search } from "lucide-vue-next"
 import { computed, onMounted, ref, watch } from "vue"
 
+import type { Accessory, AccessorySeries } from "@/types/accessorys"
 import type { Paginate } from "@/types/common"
-import type { News, NewsSeries } from "@/types/new"
 import ContactUs from "@/components/contactUs/index.vue"
 import CustomBanner from "@/components/customBanner/index.vue"
 
+const BASE_URL = import.meta.env.VITE_BASE_URL
+
 const loading = ref(true)
-const title = ref("")
-const categories = ref<NewsSeries[]>([])
-const activeProductSeriesId = ref<null | number>(null)
-const newsData = ref<News[]>([])
+
+const accessoryName = ref("")
+const categories = ref<AccessorySeries[]>([])
+const activeAccessorySeriesId = ref<null | number>(null)
+const accessorys = ref<Accessory[]>([])
 const paginate = ref<Paginate | null>(null)
 const currentPage = ref(1)
 
 const isEmpty = computed(() => {
-  return !loading.value && newsData.value.length === 0
+  return !loading.value && accessorys.value.length === 0
 })
 
 const canShowPaginate = computed(() => {
-  return (
-    !loading.value && newsData.value.length !== 0 && paginate.value !== null
-  )
+  return !loading.value && accessorys.value.length > 0 && !!paginate.value
 })
 
-function FormatDate(dateStr: string) {
-  if (!dateStr) return ""
-  return dayjs(dateStr).format("YYYY-MM-DD")
-}
-
-function GetCategoryName(seriesId: number): string {
-  const category = categories.value.find((c) => c.id === seriesId)
-  return category ? category.name : "未分类"
-}
-
-function SelectProductSeries(id: number) {
-  activeProductSeriesId.value = id
+function SelectAccessorySeries(id: number) {
+  activeAccessorySeriesId.value = id
   currentPage.value = 1
 }
 
 function HandlePageChange(page: number) {
   currentPage.value = page
-  GetNewsList()
+  GetAccessoryList()
 }
 
-function HandelGotoNewsDetail(news: News) {
+function HandleGotoDetail(accessory: Accessory) {
   router.push({
-    name: "newsDetail",
-    params: {
-      newsId: news.id,
-    },
+    name: "accessoryDetail",
+    params: { accessory_id: accessory.id },
   })
 }
 
-async function GetNewsSeries() {
+async function GetAccessorySeries() {
   try {
-    const result = await GetNewsSeriesApi()
+    const result = await GetAccessorySeriesApi()
     categories.value = result.data
     if (result.data.length > 0) {
-      activeProductSeriesId.value = result.data[0].id
+      activeAccessorySeriesId.value = result.data[0].id
     } else {
       loading.value = false
     }
   } catch (error) {
     console.log(error)
-    ElMessage.error("获取新闻系列失败")
+    ElMessage.error("获取配件系列失败")
     loading.value = false
   }
 }
 
-async function GetNewsList() {
+async function GetAccessoryList() {
   loading.value = true
   try {
     const [result] = await Promise.all([
-      GetNewsListApi(
+      GetAccessoryListApi(
         currentPage.value,
-        title.value,
-        activeProductSeriesId.value
+        accessoryName.value,
+        activeAccessorySeriesId.value
       ),
       Sleep(500),
     ])
-
-    newsData.value = result.data
+    accessorys.value = result.data
     if (result.paginate) paginate.value = result.paginate
   } catch (error) {
     console.log(error)
-    ElMessage.error("获取新闻列表失败")
+    ElMessage.error("获取配件列表失败")
   } finally {
     loading.value = false
   }
 }
 
-watch(title, (newVal) => {
+watch(accessoryName, (newVal) => {
   if (!newVal.trim()) return
   currentPage.value = 1
-  GetNewsList()
+  GetAccessoryList()
 })
 
-watch(activeProductSeriesId, () => {
-  if (!activeProductSeriesId.value) return
-  GetNewsList()
+watch(activeAccessorySeriesId, () => {
+  if (!activeAccessorySeriesId.value) return
+  GetAccessoryList()
 })
 
 onMounted(() => {
-  GetNewsSeries()
+  GetAccessorySeries()
 })
 </script>
 

@@ -14,22 +14,22 @@
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-12">
       <div class="flex flex-col gap-6 lg:col-span-2">
         <div
-          class="overflow-hidden rounded-2xl bg-linear-to-br from-blue-600 to-indigo-700 p-8 text-white shadow-lg shadow-blue-500/20"
+          class="overflow-hidden rounded-2xl border border-blue-50 bg-[#F4F8FB] p-8 shadow-sm"
         >
-          <h4 class="mb-6 text-xl font-bold tracking-wider">
+          <h4 class="mb-6 text-xl font-bold tracking-wider text-slate-800">
             高效响应，专业服务
           </h4>
 
           <div class="space-y-6">
             <div class="flex items-start gap-4">
               <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 backdrop-blur-xs"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100"
               >
-                <ZapIcon class="h-5 w-5 text-blue-200" />
+                <ZapIcon class="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <h5 class="mb-1 font-bold text-blue-50">极速响应</h5>
-                <p class="text-xs leading-relaxed text-blue-200">
+                <h5 class="mb-1 font-bold text-slate-800">极速响应</h5>
+                <p class="text-xs leading-relaxed text-slate-500">
                   收到留言后，我们会在24小时内安排专属工程师与您初步对接需求。
                 </p>
               </div>
@@ -37,13 +37,13 @@
 
             <div class="flex items-start gap-4">
               <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 backdrop-blur-xs"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100"
               >
-                <ShieldCheckIcon class="h-5 w-5 text-blue-200" />
+                <ShieldCheckIcon class="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <h5 class="mb-1 font-bold text-blue-50">隐私保护</h5>
-                <p class="text-xs leading-relaxed text-blue-200">
+                <h5 class="mb-1 font-bold text-slate-800">隐私保护</h5>
+                <p class="text-xs leading-relaxed text-slate-500">
                   您提交的所有商业信息和联系方式都将受到严格保密，绝不外泄。
                 </p>
               </div>
@@ -51,13 +51,13 @@
 
             <div class="flex items-start gap-4">
               <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 backdrop-blur-xs"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100"
               >
-                <HeadphonesIcon class="h-5 w-5 text-blue-200" />
+                <HeadphonesIcon class="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <h5 class="mb-1 font-bold text-blue-50">全程跟踪</h5>
-                <p class="text-xs leading-relaxed text-blue-200">
+                <h5 class="mb-1 font-bold text-slate-800">全程跟踪</h5>
+                <p class="text-xs leading-relaxed text-slate-500">
                   从需求沟通、方案定制到设备交付，提供一站式全周期技术支持。
                 </p>
               </div>
@@ -224,13 +224,7 @@ import {
 } from "lucide-vue-next"
 import { reactive, ref } from "vue"
 
-interface CreateSystemMessageReq {
-  name: string
-  phone: string
-  company: string
-  email: string
-  content: string
-}
+import type { CreateSystemMessageReq } from "@/types/system"
 
 const formRef = ref<FormInstance>()
 const isSubmitting = ref(false)

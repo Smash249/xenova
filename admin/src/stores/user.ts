@@ -78,6 +78,43 @@ export const useUserStore = defineStore('userStore', () => {
       ],
     },
     {
+      path: 'accessory',
+      name: 'accessory',
+      icon: 'icon-[lucide--component]',
+      label: '配件管理',
+      meta: {
+        componentName: 'Product',
+        pinned: true,
+        showTab: true,
+      },
+      children: [
+        {
+          path: 'series',
+          name: 'accessorySeries',
+          icon: 'icon-[lucide--shapes]',
+          label: '配件系列',
+          meta: {
+            componentName: 'AccessorySeries',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'accessory/series/index',
+        },
+        {
+          path: 'list',
+          name: 'accessoryList',
+          icon: 'icon-[lucide--list]',
+          label: '配件列表',
+          meta: {
+            componentName: 'AccessoryList',
+            pinned: true,
+            showTab: true,
+          },
+          component: 'accessory/list/index',
+        },
+      ],
+    },
+    {
       path: 'news',
       name: 'news',
       icon: 'icon-[lucide--newspaper]',

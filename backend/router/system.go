@@ -11,6 +11,7 @@ func initSystemRouter() {
 			public.GET("/health", api.SystemApi.Health)
 			admin.GET("/users", api.SystemApi.GetSystemUserList)
 			admin.GET("/users/:id", api.SystemApi.BanedUserById)
+			admin.POST("/users/:id", api.SystemApi.ChangeUserRole)
 
 			admin.GET("/messages", api.SystemApi.GetSystemMessageList)
 			private.POST("/messages", api.SystemApi.CreateSystemMessage)

@@ -10,6 +10,7 @@ export async function GetSystemUserListApi(
   page: number = 1,
   page_size: number = 10,
   email: string = '',
+  role: string = 'user',
 ) {
   try {
     const searchParams = new URLSearchParams({
@@ -17,6 +18,7 @@ export async function GetSystemUserListApi(
       page_size: page_size.toString(),
     })
     if (email) searchParams.append('email', email)
+    if (role) searchParams.append('role', role)
     const result = await request.get('/admin/users' + '?' + searchParams.toString())
     if (!result.success) throw new Error('登录失败')
     return result.data
@@ -27,11 +29,21 @@ export async function GetSystemUserListApi(
 
 export async function BanedUserByIdApi(userId: number) {
   try {
-    const result = await request.post(`/admin/users/${userId}`)
+    const result = await request.get(`/admin/users/${userId}`)
     if (!result.success) throw new Error('封禁用户失败')
     return result.data
   } catch (error) {
     throw error instanceof Error ? error : new Error('封禁用户请求失败')
+  }
+}
+
+export async function ChangeUserRoleApi(userId: number) {
+  try {
+    const result = await request.post(`/admin/users/${userId}`)
+    if (!result.success) throw new Error('切换用户角色失败')
+    return result.data
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('切换用户角色请求失败')
   }
 }
 
@@ -121,7 +133,7 @@ export async function UpdateSystemJobPositionApi(params: UpdateJobPositionReq) {
 
 export async function DeleteSystemJobPositionApi(id_list: number[]) {
   try {
-    const result = await request.delete('/admin/job_positions/', {
+    const result = await request.delete('/admin/job_positions', {
       data: { id_list },
     })
     if (!result.success) throw new Error('删除职位失败')

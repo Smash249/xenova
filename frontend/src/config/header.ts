@@ -33,6 +33,7 @@ export const systemConfig: SystemConfig = {
       path: "/product",
       isNav: true,
     },
+    { title: "配件商城", path: "/accessory", isNav: true },
     {
       title: "企业动态",
       path: "/news",

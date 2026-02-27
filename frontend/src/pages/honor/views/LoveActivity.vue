@@ -119,6 +119,7 @@
 
 <script setup lang="ts">
 import { GetLoveActivityListApi } from "@/api/honor"
+import { Sleep } from "@/utils/common"
 import { ElMessage } from "element-plus"
 import { Heart, MapPin, Users } from "lucide-vue-next"
 import { computed, onMounted, ref } from "vue"
@@ -130,7 +131,7 @@ import LoveActivityModal from "../components/LoveActivityModal.vue"
 
 const BaseUrl = import.meta.env.VITE_BASE_URL
 
-const loading = ref(false)
+const loading = ref(true)
 const isModalOpen = ref(false)
 const activities = ref<LoveActivity[]>([])
 const selectedActivity = ref<LoveActivity | null>(null)
@@ -179,7 +180,10 @@ function HandlePageChange(page: number) {
 async function GetLoveActivity() {
   loading.value = true
   try {
-    const result = await GetLoveActivityListApi(currentPage.value)
+    const [result] = await Promise.all([
+      GetLoveActivityListApi(currentPage.value),
+      Sleep(500),
+    ])
     activities.value = result.data
     if (result.paginate) paginate.value = result.paginate
   } catch (error) {

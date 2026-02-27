@@ -1,17 +1,17 @@
 <template>
   <div class="min-h-screen bg-gray-50 font-sans text-slate-800">
-    <CustomBanner title="产品详情" />
+    <CustomBanner title="配件详情" />
 
     <div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <nav class="mb-8 flex items-center text-sm text-slate-500">
         <a href="/" class="transition-colors hover:text-blue-600">首页</a>
         <ChevronRight class="mx-2 h-4 w-4" />
-        <a href="/product" class="transition-colors hover:text-blue-600"
-          >产品中心</a
+        <a href="/accessory" class="transition-colors hover:text-blue-600"
+          >配件商场</a
         >
         <ChevronRight class="mx-2 h-4 w-4" />
         <span class="max-w-50 truncate font-medium text-slate-800">{{
-          productDetail?.name ?? "加载中..."
+          accessoryDetail?.name ?? "加载中..."
         }}</span>
       </nav>
 
@@ -43,7 +43,7 @@
         </el-skeleton>
       </div>
 
-      <div v-else-if="productDetail" class="animate-fade-in space-y-12">
+      <div v-else-if="accessoryDetail" class="animate-fade-in space-y-12">
         <div
           class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm lg:p-10"
         >
@@ -59,8 +59,8 @@
                 </span>
               </div>
               <el-image
-                :src="Baseurl + (productDetail.cover ?? '')"
-                :alt="productDetail.name ?? ''"
+                :src="Baseurl + (accessoryDetail.cover ?? '')"
+                :alt="accessoryDetail.name ?? ''"
                 fit="contain"
                 class="h-full w-full rounded-lg transition-transform duration-500 group-hover:scale-105"
               >
@@ -77,20 +77,31 @@
 
             <div class="flex flex-col justify-between space-y-6">
               <div>
-                <div
-                  class="mb-6 grid grid-cols-2 gap-4 border-b border-gray-100 pb-6 text-sm"
-                >
-                  <div class="space-y-1">
-                    <span class="block text-slate-400">产品名称</span>
-                    <span class="block font-medium text-slate-800">{{
-                      productDetail.name
-                    }}</span>
+                <div class="mb-6 border-b border-gray-100 pb-6">
+                  <div class="mb-5 grid grid-cols-2 gap-4 text-sm">
+                    <div class="space-y-1">
+                      <span class="block text-slate-400">配件名称</span>
+                      <span class="block font-medium text-slate-800">{{
+                        accessoryDetail.name
+                      }}</span>
+                    </div>
+                    <div class="space-y-1">
+                      <span class="block text-slate-400">配件分类</span>
+                      <span class="block font-medium text-blue-600">
+                        {{ accessoryDetail.series_name ?? "默认分类" }}
+                      </span>
+                    </div>
                   </div>
-                  <div class="space-y-1">
-                    <span class="block text-slate-400">产品分类</span>
-                    <span class="block font-medium text-blue-600">
-                      {{ productDetail.series_name ?? "默认分类" }}
-                    </span>
+
+                  <div
+                    class="flex items-baseline gap-2 rounded-xl bg-red-50 p-4"
+                  >
+                    <span class="text-sm text-slate-500">参考价</span>
+                    <span class="text-xl font-bold text-red-600">¥</span>
+                    <span
+                      class="text-3xl font-bold tracking-tight text-red-600"
+                      >{{ accessoryDetail.price ?? "面议" }}</span
+                    >
                   </div>
                 </div>
 
@@ -98,7 +109,7 @@
                   class="space-y-4 rounded-xl border border-gray-100 bg-gray-50 p-6 text-slate-600"
                 >
                   <p class="text-justify text-sm leading-relaxed">
-                    {{ productDetail.description ?? "暂无产品描述" }}
+                    {{ accessoryDetail.description ?? "暂无配件描述" }}
                   </p>
 
                   <div class="mt-4 rounded-lg bg-blue-50/50 p-4">
@@ -135,9 +146,33 @@
                       class="flex items-center rounded bg-blue-50 px-2 py-1 text-blue-600"
                     >
                       <ShieldCheck class="mr-1 h-3 w-3" />
-                      <span>产品质保</span>
+                      <span>配件质保</span>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              <div class="border-t border-gray-100 pt-6">
+                <div class="mb-6 flex items-baseline gap-2">
+                  <span class="text-sm text-slate-400">订购数量</span>
+                </div>
+                <div class="flex flex-col gap-4 sm:flex-row">
+                  <el-input-number
+                    v-model="quantity"
+                    :min="1"
+                    controls-position="right"
+                    class="w-36!"
+                    size="large"
+                  />
+                  <el-button
+                    :disabled="true"
+                    type="primary"
+                    size="large"
+                    class="flex! h-auto! flex-1! items-center justify-center rounded-xl! px-8! py-3! text-base! font-bold! shadow-lg! shadow-blue-200! hover:shadow-blue-300! sm:w-64! sm:flex-initial!"
+                  >
+                    <ShoppingCart class="mr-2 h-5 w-5" />
+                    立即下单
+                  </el-button>
                 </div>
               </div>
             </div>
@@ -149,15 +184,17 @@
             class="flex items-center space-x-4 border-b border-gray-200 pb-4"
           >
             <div class="h-8 w-1 rounded-r bg-blue-600"></div>
-            <h2 class="text-2xl font-bold text-slate-800">产品详情展示</h2>
+            <h2 class="text-2xl font-bold text-slate-800">配件详情展示</h2>
           </div>
 
           <div class="space-y-4">
             <template
-              v-if="productDetail.previews && productDetail.previews.length > 0"
+              v-if="
+                accessoryDetail.previews && accessoryDetail.previews.length > 0
+              "
             >
               <div
-                v-for="(img, idx) in productDetail.previews"
+                v-for="(img, idx) in accessoryDetail.previews"
                 :key="idx"
                 class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100"
               >
@@ -187,21 +224,20 @@
             </template>
 
             <div v-else class="flex justify-center py-12">
-              <el-empty description="暂无产品详情图" :image-size="160" />
+              <el-empty description="暂无配件详情图" :image-size="160" />
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 404 状态 -->
       <div
         v-else
         class="flex h-[50vh] flex-col items-center justify-center text-slate-500"
       >
-        <el-empty description="未找到该产品信息" :image-size="160">
+        <el-empty description="未找到该配件信息" :image-size="160">
           <template #extra>
             <el-button type="primary" plain @click="router.back()"
-              >返回产品列表</el-button
+              >返回配件列表</el-button
             >
           </template>
         </el-empty>
@@ -211,7 +247,7 @@
 </template>
 
 <script setup lang="ts">
-import { GetProductDetailApi } from "@/api/product"
+import { GetAccessoryDetailApi } from "@/api/accessorys"
 import { ElMessage } from "element-plus"
 import {
   CheckCircle,
@@ -220,11 +256,12 @@ import {
   Mail,
   Phone,
   ShieldCheck,
+  ShoppingCart,
 } from "lucide-vue-next"
 import { onMounted, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
-import type { ProductDetail } from "@/types/product"
+import type { AccessoryDetail } from "@/types/accessorys"
 import CustomBanner from "@/components/customBanner/index.vue"
 
 const Baseurl = import.meta.env.VITE_BASE_URL
@@ -233,24 +270,27 @@ const route = useRoute()
 const router = useRouter()
 
 const loading = ref(true)
-const productDetail = ref<ProductDetail | null>(null)
+const accessoryDetail = ref<AccessoryDetail | null>(null)
+const quantity = ref(1)
 
-async function GetProductDetail() {
-  if (!route.params.product_id) return
+async function GetAccessoryDetail() {
+  if (!route.params.accessory_id) return
   try {
     loading.value = true
-    const result = await GetProductDetailApi(Number(route.params.product_id))
-    productDetail.value = result.data ?? result
+    const result = await GetAccessoryDetailApi(
+      Number(route.params.accessory_id)
+    )
+    accessoryDetail.value = result.data ?? result
   } catch (error) {
     console.error(error)
-    ElMessage.error("获取产品详情失败")
+    ElMessage.error("获取配件详情失败")
   } finally {
     loading.value = false
   }
 }
 
 onMounted(() => {
-  GetProductDetail()
+  GetAccessoryDetail()
 })
 </script>
 

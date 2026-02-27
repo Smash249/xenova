@@ -6,4 +6,5 @@ type GetSystemUserListReq struct {
 	global.PaginateReq
 	Email    string `query:"email"`
 	UserName string `query:"userName"`
+	Role     string `query:"role"`
 }

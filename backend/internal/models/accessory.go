@@ -11,3 +11,7 @@ type Accessory struct {
 	Price       float64    `gorm:"type:decimal(10,2);not null;comment:产品价格" json:"price"`
 	SeriesID    uint       `gorm:"comment:产品系列Id" json:"series_id"`
 }
+
+func (Accessory) TableName() string {
+	return "accessory"
+}

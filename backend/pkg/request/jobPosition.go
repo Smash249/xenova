@@ -23,7 +23,7 @@ type CreateSystemJobPositionReq struct {
 
 type UpdateSystemJobPositionReq struct {
 	ID               uint   `json:"id" validate:"required"`
-	Title            string `json:"title" validate:"required,min=2,max=100"`
+	Title            string `json:"title" validate:"required"`
 	Department       string `json:"department" validate:"required"`
 	Location         string `json:"location" validate:"required"`
 	Headcount        string `json:"headcount" validate:"required"`
@@ -32,8 +32,8 @@ type UpdateSystemJobPositionReq struct {
 	SalaryRange      string `json:"salaryRange" validate:"required"`
 	Responsibilities string `json:"responsibilities" validate:"required"`
 	Requirements     string `json:"requirements" validate:"required"`
-	Status           int    `json:"status" validate:"required"`
-	Sort             int    `json:"sort" validate:"required"`
+	Status           *int   `json:"status" validate:"required"`
+	Sort             *int   `json:"sort" validate:"required"`
 }
 
 type DeleteSystemJobPositionReq struct {

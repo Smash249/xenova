@@ -2,37 +2,15 @@
   <div
     class="relative flex min-h-screen w-full flex-col bg-slate-50 font-sans text-slate-600"
   >
-    <div
-      class="relative flex h-[30vh] items-center justify-center overflow-hidden bg-slate-900 md:h-[40vh]"
-    >
-      <div
-        class="absolute inset-0 z-10 bg-linear-to-r from-blue-900/90 to-slate-900/90"
-      ></div>
-      <div
-        class="animate-pulse-slow absolute inset-0 bg-[url('./banner/contact.webp')] bg-cover bg-center opacity-50"
-      ></div>
-      <div class="relative z-20 px-4 text-center">
-        <h1
-          class="mb-4 text-3xl font-bold tracking-wider text-white drop-shadow-lg md:text-4xl lg:text-5xl"
-        >
-          联系我们
-        </h1>
-      </div>
-    </div>
+    <CustomBanner title="联系我们" />
     <div
       class="mx-auto w-full space-y-4 px-4 py-6 sm:px-6 md:w-4/5 md:py-8 lg:px-8"
     >
       <div
-        class="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500 sm:text-sm"
+        class="flex flex-wrap items-center text-xs font-medium text-slate-500 sm:text-sm"
       >
-        <div
-          class="flex h-2 w-2 items-center justify-center rounded-full bg-blue-100"
-        >
-          <div class="h-1 w-1 rounded-full bg-blue-600"></div>
-        </div>
-        <span>当前位置：</span>
-        <a href="#" class="transition-colors hover:text-blue-600">首页</a>
-        <span class="text-slate-300">/</span>
+        <a class="transition-colors hover:text-blue-600" href="/">首页</a>
+        <ChevronRight class="mx-2 h-4 w-4" />
         <span class="font-bold text-blue-600">{{ tabs[activeTab] }}</span>
       </div>
 
@@ -69,7 +47,10 @@
 </template>
 
 <script setup lang="ts">
+import { ChevronRight } from "lucide-vue-next"
 import { computed, ref } from "vue"
+
+import CustomBanner from "@/components/customBanner/index.vue"
 
 import ContactInfo from "./components/ContactInfo.vue"
 import CopyrightInfo from "./components/CopyrightInfo.vue"

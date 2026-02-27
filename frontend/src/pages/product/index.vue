@@ -1,24 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 font-sans text-slate-800">
-    <div
-      class="relative flex h-[40vh] items-center justify-center overflow-hidden bg-slate-900"
-    >
-      <div
-        class="absolute inset-0 z-10 bg-linear-to-r from-blue-900/80 to-slate-900/80"
-      ></div>
-      <div
-        class="animate-pulse-slow absolute inset-0 bg-[url('./banner/product.webp')] bg-cover bg-center"
-      ></div>
-
-      <div class="relative z-20 px-4 text-center">
-        <h1
-          class="mb-4 text-4xl font-bold tracking-wider text-white drop-shadow-md md:text-5xl"
-        >
-          产品中心
-        </h1>
-      </div>
-    </div>
-
+    <CustomBanner title="产品中心" />
     <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
       <nav class="mb-10 flex items-center text-sm text-slate-500">
         <a href="/" class="transition-colors hover:text-blue-600">首页</a>
@@ -197,6 +179,7 @@
 <script setup lang="ts">
 import { GetProductListApi, GetProductSeriesApi } from "@/api/product"
 import router from "@/router"
+import { Sleep } from "@/utils/common"
 import { ElMessage } from "element-plus"
 import { ArrowRight, ChevronRight, Filter, Search } from "lucide-vue-next"
 import { computed, onMounted, ref, watch } from "vue"
@@ -204,10 +187,11 @@ import { computed, onMounted, ref, watch } from "vue"
 import type { Paginate } from "@/types/common"
 import type { Product, ProductSeries } from "@/types/product"
 import ContactUs from "@/components/contactUs/index.vue"
+import CustomBanner from "@/components/customBanner/index.vue"
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
-const loading = ref(false)
+const loading = ref(true)
 
 const productName = ref("")
 const categories = ref<ProductSeries[]>([])
@@ -242,21 +226,29 @@ async function GetProductSeries() {
   try {
     const result = await GetProductSeriesApi()
     categories.value = result.data
-    if (result.data.length > 0) activeProductSeriesId.value = result.data[0].id
+    if (result.data.length > 0) {
+      activeProductSeriesId.value = result.data[0].id
+    } else {
+      loading.value = false
+    }
   } catch (error) {
     console.log(error)
     ElMessage.error("获取产品系列失败")
+    loading.value = false
   }
 }
 
 async function GetProductList() {
   loading.value = true
   try {
-    const result = await GetProductListApi(
-      currentPage.value,
-      productName.value,
-      activeProductSeriesId.value
-    )
+    const [result] = await Promise.all([
+      GetProductListApi(
+        currentPage.value,
+        productName.value,
+        activeProductSeriesId.value
+      ),
+      Sleep(500),
+    ])
     products.value = result.data
     if (result.paginate) paginate.value = result.paginate
   } catch (error) {

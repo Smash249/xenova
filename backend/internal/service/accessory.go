@@ -109,6 +109,7 @@ func (p *AccessoryService) UpdateAccessory(params request.UpdateAccessoryReq) er
 		Cover:       params.Cover,
 		Previews:    params.Previews,
 		SeriesID:    params.SeriesID,
+		Price:       params.Price,
 	}).Error
 }
 

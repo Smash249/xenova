@@ -75,9 +75,9 @@ func (p *accessoryApi) GetAccessoryList(ctx *echo.Context) error {
 }
 
 func (p *accessoryApi) GetAccessoryDetail(ctx *echo.Context) error {
-	AccessoryId := ctx.Param("Accessory_id")
+	AccessoryId := ctx.Param("accessory_id")
 	if AccessoryId == "" {
-		return utils.ErrorApiResponse(ctx, "产品ID不能为空", http.StatusBadRequest)
+		return utils.ErrorApiResponse(ctx, "配件ID不能为空", http.StatusBadRequest)
 	}
 	AccessoryIdUint, err := utils.ParseStringToUint(AccessoryId)
 	if err != nil {

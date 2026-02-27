@@ -10,33 +10,36 @@ import {
   NPopconfirm,
   useMessage,
   NPagination,
-  NTag,
-  NSelect,
+  NDropdown,
 } from 'naive-ui'
 import { reactive, ref, useTemplateRef, computed, onMounted } from 'vue'
 
-import { GetSystemUserListApi, BanedUserByIdApi, ChangeUserRoleApi } from '@/api/system'
+import { GetAccessorySeriesListApi, DeleteAccessorySeriesApi } from '@/api/accessory'
 import { ScrollContainer } from '@/components'
 
-import type { UserInfo } from '@/types/user'
-import type { DataTableColumns, PaginationProps, FormInst } from 'naive-ui'
+import AccessorySeriesModal from './component/AccessorySeriesModal.vue'
+
+import type { AccessorySeries } from '@/types/accessory'
+import type { DataTableColumns, PaginationProps, DropdownProps, FormInst } from 'naive-ui'
 
 defineOptions({
-  name: 'UserAdmin',
+  name: 'AccessorySeriesAdmin',
 })
 
 const message = useMessage()
 
 const formRef = useTemplateRef<FormInst>('formRef')
+const modalRef = ref<InstanceType<typeof AccessorySeriesModal> | null>(null)
 
-const userData = ref<UserInfo[]>([])
+const showDropdown = ref(false)
+const contextmenuId = ref<number | null>(null)
+
+const accessorySeriesData = ref<AccessorySeries[]>([])
 const checkedRowKeys = ref<Array<number | string>>([])
 const isLoading = ref(false)
 
 const queryForm = reactive({
-  email: '',
-  userName: '',
-  role: 'user',
+  name: '',
 })
 
 const pagination = reactive<PaginationProps>({
@@ -49,18 +52,50 @@ const pagination = reactive<PaginationProps>({
   showQuickJumpDropdown: true,
   onUpdatePage: (page) => {
     pagination.page = page
-    GetUserList()
+    GetAccessorySeries()
   },
   onUpdatePageSize: (pageSize) => {
     pagination.pageSize = pageSize
     pagination.page = 1
-    GetUserList()
+    GetAccessorySeries()
+  },
+})
+
+const dropdownOptions = reactive<DropdownProps>({
+  x: 0,
+  y: 0,
+  options: [
+    {
+      label: '编辑',
+      key: 'edit',
+    },
+    {
+      label: () => <span class='text-rose-500'>删除</span>,
+      key: 'delete',
+    },
+  ],
+  onClickoutside: () => {
+    showDropdown.value = false
+  },
+  onSelect: (v) => {
+    if (contextmenuId.value !== null) {
+      const row = accessorySeriesData.value.find((item) => item.id === contextmenuId.value)
+      switch (v) {
+        case 'edit':
+          if (row) modalRef.value?.Open('update', row)
+          break
+        case 'delete':
+          MutateDeleteData(contextmenuId.value)
+          break
+      }
+    }
+    showDropdown.value = false
   },
 })
 
 const hasChecked = computed(() => checkedRowKeys.value.length > 0)
 
-const columns = computed<DataTableColumns<UserInfo>>(() => {
+const columns = computed<DataTableColumns<AccessorySeries>>(() => {
   return [
     {
       type: 'selection',
@@ -74,42 +109,14 @@ const columns = computed<DataTableColumns<UserInfo>>(() => {
       width: 80,
     },
     {
-      key: 'userName',
-      title: '用户名',
-      width: 150,
-      ellipsis: {
-        tooltip: true,
-      },
-    },
-    {
-      key: 'email',
-      title: '邮箱',
+      key: 'name',
+      title: '系列名称',
       width: 200,
-      ellipsis: {
-        tooltip: true,
-      },
     },
     {
-      key: 'role',
-      title: '角色',
-      width: 120,
-      align: 'center',
-      render: (row) => {
-        const roleMap: Record<string, { label: string; type: 'success' | 'info' | 'warning' }> = {
-          admin: { label: '管理员', type: 'success' },
-          user: { label: '普通用户', type: 'info' },
-        }
-        const role = roleMap[row.role] || { label: row.role, type: 'warning' as const }
-        return (
-          <NTag
-            type={role.type}
-            size='small'
-            round
-          >
-            {role.label}
-          </NTag>
-        )
-      },
+      key: 'description',
+      title: '描述',
+      minWidth: 250,
     },
     {
       key: 'created_at',
@@ -126,7 +133,7 @@ const columns = computed<DataTableColumns<UserInfo>>(() => {
     {
       key: 'actions',
       title: '操作',
-      width: 220,
+      width: 160,
       align: 'center',
       fixed: 'right',
       render: (row) => CellActions(row),
@@ -134,55 +141,31 @@ const columns = computed<DataTableColumns<UserInfo>>(() => {
   ]
 })
 
-function CellActions(row: UserInfo) {
-  const isBanned = row.isBanned
-  const banActionText = isBanned ? '解禁' : '封禁'
-  const banConfirmText = isBanned
-    ? `确认解禁用户「${row.userName}」吗？`
-    : `确认封禁用户「${row.userName}」吗？`
-  const banButtonType = isBanned ? 'success' : 'error'
-
-  const isAdmin = row.role === 'admin'
-  const roleActionText = isAdmin ? '设为普通用户' : '设为管理员'
-  const roleConfirmText = isAdmin
-    ? `确认将「${row.userName}」设为普通用户吗？`
-    : `确认将「${row.userName}」设为管理员吗？`
-
+function CellActions(row: AccessorySeries) {
   return (
     <div class='flex justify-center gap-2'>
+      <NButton
+        secondary
+        type='primary'
+        size='small'
+        onClick={() => modalRef.value?.Open('update', row)}
+      >
+        编辑
+      </NButton>
       <NPopconfirm
         positiveText='确定'
         negativeText='取消'
-        onPositiveClick={() => MutateBanUser(row.id, isBanned)}
+        onPositiveClick={() => MutateDeleteData(row.id)}
       >
         {{
-          default: () => banConfirmText,
+          default: () => '确认删除该产品系列吗？',
           trigger: () => (
             <NButton
               secondary
-              type={banButtonType}
+              type='error'
               size='small'
             >
-              {banActionText}
-            </NButton>
-          ),
-        }}
-      </NPopconfirm>
-
-      <NPopconfirm
-        positiveText='确定'
-        negativeText='取消'
-        onPositiveClick={() => MutateChangeUserRole(row.id)}
-      >
-        {{
-          default: () => roleConfirmText,
-          trigger: () => (
-            <NButton
-              secondary
-              type='warning'
-              size='small'
-            >
-              {roleActionText}
+              删除
             </NButton>
           ),
         }}
@@ -208,77 +191,61 @@ function HandleQueryClick() {
   formRef.value?.validate((errors) => {
     if (!errors) {
       pagination.page = 1
-      GetUserList()
+      GetAccessorySeries()
     }
   })
 }
 
 function ResetForm() {
-  queryForm.email = ''
-  queryForm.userName = ''
+  queryForm.name = ''
   pagination.page = 1
-  GetUserList()
+  GetAccessorySeries()
 }
 
-async function MutateBanUser(id: number, isBanned: boolean) {
+async function MutateDeleteData(id: number) {
   isLoading.value = true
   try {
-    await BanedUserByIdApi(id)
-    message.success(isBanned ? '解禁成功' : '封禁成功')
-    GetUserList()
+    await DeleteAccessorySeriesApi([id])
+    message.success('删除成功')
+    checkedRowKeys.value = checkedRowKeys.value.filter((key) => key !== id)
+    GetAccessorySeries()
   } catch (error) {
-    message.error(isBanned ? '解禁失败' : '封禁失败')
+    message.error('删除失败')
     console.error(error)
   } finally {
     isLoading.value = false
   }
 }
 
-async function MutateChangeUserRole(id: number) {
-  isLoading.value = true
-  try {
-    await ChangeUserRoleApi(id)
-    message.success('角色修改成功')
-    GetUserList()
-  } catch (error) {
-    message.error('角色修改失败')
-    console.error(error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-async function MutateBatchBanUsers() {
+async function MutateBatchDeleteData() {
   if (!hasChecked.value) return
   isLoading.value = true
   try {
-    const promises = (checkedRowKeys.value as number[]).map((id) => BanedUserByIdApi(id))
-    await Promise.all(promises)
-    message.success(`成功操作 ${checkedRowKeys.value.length} 个用户状态`)
+    await DeleteAccessorySeriesApi(checkedRowKeys.value as number[])
+    message.success(`成功删除 ${checkedRowKeys.value.length} 条记录`)
     checkedRowKeys.value = []
-    GetUserList()
+    GetAccessorySeries()
   } catch (error) {
-    message.error('批量操作失败')
+    message.error('批量删除失败')
     console.error(error)
   } finally {
     isLoading.value = false
   }
 }
 
-async function GetUserList() {
+async function GetAccessorySeries() {
   isLoading.value = true
   try {
-    const result = await GetSystemUserListApi(
+    const result = await GetAccessorySeriesListApi(
       pagination.page || 1,
       pagination.pageSize || 10,
-      queryForm.email,
-      queryForm.role,
+      queryForm.name,
     )
-    console.log('GetSystemUserListApi result:', result.data)
-    userData.value = result.data
+    console.log('GetAccessorySeriesListApi result:', result.data)
+    accessorySeriesData.value = result.data
     if (result.paginate) pagination.itemCount = result.paginate.total_count
   } catch (error) {
-    message.error('获取用户列表失败')
+    message.error('获取列表失败')
     console.error(error)
   } finally {
     isLoading.value = false
@@ -286,7 +253,7 @@ async function GetUserList() {
 }
 
 onMounted(() => {
-  GetUserList()
+  GetAccessorySeries()
 })
 </script>
 
@@ -307,57 +274,40 @@ onMounted(() => {
         class="max-lg:w-full max-lg:flex-col"
       >
         <NFormItem
-          label="邮箱"
-          path="email"
+          label="系列名称"
+          path="name"
         >
           <NInput
-            v-model:value="queryForm.email"
+            v-model:value="queryForm.name"
             clearable
-            placeholder="请输入用户邮箱"
-          />
-        </NFormItem>
-        <NFormItem
-          label="用户名"
-          path="userName"
-        >
-          <NInput
-            v-model:value="queryForm.userName"
-            clearable
-            placeholder="请输入用户名"
-          />
-        </NFormItem>
-        <NFormItem
-          label="角色"
-          path="role"
-        >
-          <NSelect
-            v-model:value="queryForm.role"
-            clearable
-            placeholder="请选择用户角色"
-            :options="[
-              { label: '管理员', value: 'admin' },
-              { label: '普通用户', value: 'user' },
-            ]"
+            placeholder="请输入系列名称"
           />
         </NFormItem>
         <div class="flex gap-2">
-          <NPopconfirm
-            positive-text="确定"
-            negative-text="取消"
-            @positive-click="MutateBatchBanUsers"
+          <NButton
+            type="success"
+            @click="modalRef?.Open('create')"
           >
-            <template #default>
-              确认反转选中的 {{ checkedRowKeys.length }} 个用户封禁状态吗？
+            <template #icon>
+              <span class="iconify ph--plus-circle" />
             </template>
+            新增系列
+          </NButton>
+          <NPopconfirm
+            :positive-text="'确定'"
+            :negative-text="'取消'"
+            @positive-click="MutateBatchDeleteData"
+          >
+            <template #default> 确认删除选中的 {{ checkedRowKeys.length }} 条记录吗？ </template>
             <template #trigger>
               <NButton
                 type="error"
                 :disabled="!hasChecked"
               >
                 <template #icon>
-                  <span class="iconify ph--prohibit" />
+                  <span class="iconify ph--trash" />
                 </template>
-                批量封禁/解禁 ({{ checkedRowKeys.length }})
+                批量删除 ({{ checkedRowKeys.length }})
               </NButton>
             </template>
           </NPopconfirm>
@@ -391,7 +341,7 @@ onMounted(() => {
           v-model:checked-row-keys="checkedRowKeys"
           :remote="true"
           :columns="columns"
-          :data="userData"
+          :data="accessorySeriesData"
           :row-key="(row) => row.id"
           :loading="isLoading"
         />
@@ -405,6 +355,18 @@ onMounted(() => {
         </div>
       </div>
     </NCard>
+
+    <NDropdown
+      placement="bottom-start"
+      trigger="manual"
+      v-bind="dropdownOptions"
+      :show="showDropdown"
+    />
+
+    <AccessorySeriesModal
+      ref="modalRef"
+      @success="GetAccessorySeries"
+    />
   </ScrollContainer>
 </template>
 
