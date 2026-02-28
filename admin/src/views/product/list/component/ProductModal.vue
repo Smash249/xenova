@@ -1,15 +1,5 @@
 <script setup lang="tsx">
-import {
-  NButton,
-  NForm,
-  NFormItem,
-  NInput,
-  NInputNumber,
-  NModal,
-  NSelect,
-  NSpace,
-  useMessage,
-} from 'naive-ui'
+import { NButton, NForm, NFormItem, NInput, NModal, NSelect, NSpace, useMessage } from 'naive-ui'
 import { ref, useTemplateRef, computed } from 'vue'
 
 import { CreateProductApi, GetProductSeriesListApi, UpdateProductApi } from '@/api/product'
@@ -31,7 +21,6 @@ interface ModelForm {
   description: string
   cover: string
   previews: string[]
-  price: number
 }
 
 defineOptions({
@@ -49,7 +38,6 @@ const DEFAULT_MODAL_FORM: ModelForm = {
   description: '',
   cover: '',
   previews: [],
-  price: 0,
 }
 
 const message = useMessage()
@@ -108,7 +96,6 @@ function Open(action: 'create' | 'update', row?: Product) {
       description: row.description,
       cover: row.cover,
       previews: [...row.previews],
-      price: row.price,
     }
   }
   showModal.value = true
@@ -129,7 +116,6 @@ function HandleModalSubmit() {
             description: form.description,
             cover: form.cover,
             previews: form.previews,
-            price: form.price,
           })
           break
         case 'update':
@@ -141,7 +127,6 @@ function HandleModalSubmit() {
             description: form.description,
             cover: form.cover,
             previews: form.previews,
-            price: form.price,
           })
           break
       }
@@ -223,20 +208,6 @@ defineExpose({
               clearable
               filterable
             />
-          </NFormItem>
-          <NFormItem
-            label="产品价格"
-            path="price"
-          >
-            <NInputNumber
-              v-model:value="modalForm.price"
-              :min="0"
-              :precision="2"
-              placeholder="请输入产品价格"
-              class="w-full"
-            >
-              <template #prefix>¥</template>
-            </NInputNumber>
           </NFormItem>
         </div>
       </div>

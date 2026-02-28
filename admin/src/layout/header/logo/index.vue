@@ -66,15 +66,16 @@ watch(
       ]"
     >
       <div class="size-10">
-        <Logo />
+        <img
+          src="/images/logo.png"
+          alt="logo"
+        />
       </div>
       <div
         class="flex flex-1 overflow-hidden transition-[margin-left,max-width]"
         :class="sidebarMenu.collapsed ? 'ml-0 max-w-0' : 'ml-4 max-w-44'"
       >
-        <h1 class="truncate text-xl">
-          {{ APP_NAME }}
-        </h1>
+        <h1 class="truncate text-xl">星实科技</h1>
       </div>
     </div>
   </div>

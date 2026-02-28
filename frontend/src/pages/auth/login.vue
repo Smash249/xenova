@@ -10,7 +10,7 @@
     <div
       class="fixed inset-0 z-10 bg-linear-to-br from-blue-900/90 via-blue-800/80 to-indigo-900/80 mix-blend-multiply"
     ></div>
-    <div class="fixed top-10 left-10 z-50 text-white">
+    <div class="fixed top-6 left-4 z-50 text-white sm:top-10 sm:left-10">
       <button
         @click="router.push('/')"
         class="group flex cursor-pointer items-center gap-2 rounded-full text-sm font-medium backdrop-blur-md transition-all hover:scale-105"
@@ -23,7 +23,7 @@
     </div>
 
     <div
-      class="relative z-20 grid h-screen w-full grid-cols-2 items-center justify-evenly"
+      class="relative z-20 grid h-screen w-full grid-cols-1 items-center justify-evenly lg:grid-cols-2"
     >
       <div
         class="hidden h-full flex-col justify-evenly px-12 py-6 text-white lg:flex"
@@ -81,11 +81,35 @@
       </div>
 
       <div
-        class="relative flex h-full w-full flex-col items-center justify-center px-8"
+        class="relative flex h-full w-full flex-col items-center justify-center px-4 sm:px-8"
       >
         <div
-          class="glass-form animate-fade-in-up w-full max-w-100 rounded-3xl p-8 md:p-10"
+          class="glass-form animate-fade-in-up w-full max-w-md rounded-2xl p-6 sm:rounded-3xl sm:p-8 md:p-10"
         >
+          <!-- 移动端顶部品牌信息展示 -->
+          <div class="mb-6 flex flex-col items-center justify-center lg:hidden">
+            <div
+              class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 shadow-lg shadow-black/10 backdrop-blur-md"
+            >
+              <svg
+                class="h-7 w-7 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <h1 class="text-2xl font-bold tracking-wide text-white">
+              星实科技
+            </h1>
+          </div>
+
           <div class="mb-8 text-center">
             <h2 class="text-2xl font-bold text-white">欢迎回来</h2>
             <p class="mt-2 text-sm text-blue-200">登录您的账户以继续</p>
@@ -247,12 +271,10 @@ async function HandleLogin() {
   color: white !important;
 }
 
-/* 修改 Placeholder 颜色 */
 :deep(.el-input__inner::placeholder) {
   color: rgba(255, 255, 255, 0.4);
 }
 
-/* 自定义 Checkbox 颜色 */
 :deep(.custom-checkbox .el-checkbox__label) {
   color: rgba(255, 255, 255, 0.8) !important;
 }
@@ -265,7 +287,6 @@ async function HandleLogin() {
   border-color: #409eff;
 }
 
-/* 入场动画 */
 @keyframes fadeInUp {
   from {
     opacity: 0;

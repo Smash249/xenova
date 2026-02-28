@@ -1,17 +1,17 @@
 <template>
   <div class="min-h-screen bg-gray-50 font-sans text-slate-800">
     <CustomBanner title="配件商城" />
-    <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-      <nav class="mb-10 flex items-center text-sm text-slate-500">
+    <div class="container mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <nav class="mb-6 flex items-center text-sm text-slate-500 sm:mb-10">
         <a href="/" class="transition-colors hover:text-blue-600">首页</a>
         <ChevronRight class="mx-2 h-4 w-4" />
         <span class="font-medium text-slate-800">配件商城</span>
       </nav>
 
-      <div class="grid grid-cols-1 gap-10 lg:grid-cols-4">
-        <aside class="space-y-8 lg:col-span-1">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 lg:gap-10">
+        <aside class="space-y-4 lg:col-span-1 lg:space-y-8">
           <div
-            class="flex items-center rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
+            class="flex items-center rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4"
           >
             <Search class="mr-3 h-5 w-5 text-slate-400" />
             <input
@@ -22,9 +22,7 @@
             />
           </div>
 
-          <div
-            class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm"
-          >
+          <div class="rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div
               class="flex items-center justify-between border-b border-gray-50 bg-gray-50/50 p-5"
             >
@@ -33,49 +31,56 @@
                 配件系列
               </h2>
             </div>
-            <ul class="cursor-pointer space-y-1 p-3">
-              <li v-for="cat in categories" :key="cat.id">
+            <ul
+              class="scrollbar-hide flex cursor-pointer flex-row gap-2 overflow-x-auto p-2 lg:flex-col lg:gap-1 lg:p-3"
+            >
+              <li
+                v-for="cat in categories"
+                :key="cat.id"
+                class="shrink-0 lg:w-full"
+              >
                 <button
                   @click="SelectAccessorySeries(cat.id)"
-                  class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-all duration-200"
+                  class="group flex w-full items-center justify-between rounded-xl px-4 py-2 text-left transition-all duration-200 lg:py-3"
                   :class="[
                     activeAccessorySeriesId === cat.id
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
                       : 'text-slate-600 hover:bg-gray-50 hover:text-blue-600',
                   ]"
                 >
-                  <span class="font-medium">{{ cat.name }}</span>
+                  <span
+                    class="text-sm font-medium whitespace-nowrap lg:whitespace-normal"
+                    >{{ cat.name }}</span
+                  >
                 </button>
               </li>
             </ul>
           </div>
-          <ContactUs />
+
+          <div class="hidden lg:block">
+            <ContactUs />
+          </div>
         </aside>
 
         <main class="flex flex-col lg:col-span-3">
           <div
-            class="mb-8 flex flex-col items-center justify-between border-b border-gray-200 pb-4 sm:flex-row"
+            class="mb-6 flex flex-col items-start justify-between border-b border-gray-200 pb-4 sm:mb-8 sm:flex-row sm:items-center"
           >
-            <h2 class="mb-4 text-2xl font-bold text-slate-800 sm:mb-0">
+            <h2
+              class="mb-2 text-xl font-bold text-slate-800 sm:mb-0 sm:text-2xl"
+            >
               全部配件
-              <span class="ml-2 text-base font-normal text-slate-400">
+              <span
+                class="ml-2 text-sm font-normal text-slate-400 sm:text-base"
+              >
                 共 {{ paginate?.total_count ?? 0 }} 款设备
               </span>
             </h2>
-            <div class="flex items-center space-x-2">
-              <span class="text-sm text-slate-500">排序:</span>
-              <select
-                class="cursor-pointer border-none bg-transparent text-sm font-medium text-slate-700 focus:ring-0"
-              >
-                <option>推荐排序</option>
-                <option>最新发布</option>
-              </select>
-            </div>
           </div>
 
           <div
             v-if="loading"
-            class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+            class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3"
           >
             <div
               v-for="n in 6"
@@ -84,8 +89,11 @@
             >
               <el-skeleton animated>
                 <template #template>
-                  <el-skeleton-item variant="image" class="h-56 w-full" />
-                  <div class="p-6">
+                  <el-skeleton-item
+                    variant="image"
+                    class="h-48 w-full sm:h-56"
+                  />
+                  <div class="p-4 sm:p-6">
                     <el-skeleton-item variant="h3" class="mb-3 w-3/4" />
                     <el-skeleton-item variant="text" class="mb-2 w-full" />
                     <el-skeleton-item variant="text" class="w-2/3" />
@@ -97,7 +105,7 @@
 
           <div
             v-else-if="isEmpty"
-            class="flex h-full items-center justify-center"
+            class="flex h-64 flex-col items-center justify-center sm:h-full"
           >
             <el-empty description="暂无相关配件" :image-size="160">
               <template #description>
@@ -113,7 +121,7 @@
             appear
             name="list"
             tag="div"
-            class="grid flex-1 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+            class="grid flex-1 grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3"
           >
             <div
               v-for="(accessory, index) in accessorys"
@@ -122,7 +130,7 @@
               :style="{ animationDelay: `${index * 50}ms` }"
               @click="HandleGotoDetail(accessory)"
             >
-              <div class="relative h-56 overflow-hidden bg-gray-100">
+              <div class="relative h-48 overflow-hidden bg-gray-100 sm:h-56">
                 <img
                   :src="BASE_URL + accessory.cover"
                   :alt="accessory.name"
@@ -134,13 +142,15 @@
                 ></div>
               </div>
 
-              <div class="flex flex-1 flex-col p-6">
+              <div class="flex flex-1 flex-col p-4 sm:p-6">
                 <h3
-                  class="mb-2 text-lg font-bold text-slate-800 transition-colors group-hover:text-blue-600"
+                  class="mb-2 text-base font-bold text-slate-800 transition-colors group-hover:text-blue-600 sm:text-lg"
                 >
                   {{ accessory.name }}
                 </h3>
-                <p class="mb-6 line-clamp-2 flex-1 text-sm text-slate-500">
+                <p
+                  class="mb-4 line-clamp-2 flex-1 text-xs text-slate-500 sm:mb-6 sm:text-sm"
+                >
                   {{ accessory.description }}
                 </p>
 
@@ -167,6 +177,7 @@
               :total="paginate?.total_count ?? 0"
               layout="prev, pager, next"
               background
+              small
               @current-change="HandlePageChange"
             />
           </div>

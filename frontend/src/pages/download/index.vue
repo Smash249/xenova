@@ -1,33 +1,35 @@
 <template>
   <div class="min-h-screen bg-gray-50 font-sans text-slate-800">
     <CustomBanner title="软件中心" />
-
-    <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-      <nav class="mb-8 flex items-center text-sm text-slate-500">
+    <div class="container mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <nav class="mb-6 flex items-center text-sm text-slate-500 sm:mb-8">
         <a href="/" class="transition-colors hover:text-blue-600">首页</a>
         <el-icon class="mx-2"><ArrowRight /></el-icon>
         <span class="font-medium text-slate-800">软件中心</span>
       </nav>
 
       <div
-        class="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center"
+        class="mb-6 flex flex-col items-start justify-between gap-4 sm:mb-8 md:flex-row md:items-center"
       >
-        <div
-          class="scrollbar-hide flex w-full overflow-x-auto rounded-xl border border-gray-100 bg-white p-1.5 shadow-sm md:w-auto"
-        >
-          <button
-            v-for="tab in tabs"
-            :key="tab.id"
-            @click="SelectSoftWareSeries(tab.id)"
-            class="rounded-lg px-6 py-2 text-sm font-medium whitespace-nowrap transition-all duration-300"
-            :class="[
-              activeTab === tab.id
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-slate-600 hover:bg-gray-50 hover:text-blue-600',
-            ]"
+        <div>
+          <div
+            class="scrollbar-hide flex w-full overflow-x-auto rounded-xl border border-gray-100 bg-white p-1.5 shadow-sm md:w-auto"
+            v-if="tabs.length > 0"
           >
-            {{ tab.label }}
-          </button>
+            <button
+              v-for="tab in tabs"
+              :key="tab.id"
+              @click="SelectSoftWareSeries(tab.id)"
+              class="rounded-lg px-4 py-2 text-xs font-medium whitespace-nowrap transition-all duration-300 sm:px-6 sm:text-sm"
+              :class="[
+                activeTab === tab.id
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-slate-600 hover:bg-gray-50 hover:text-blue-600',
+              ]"
+            >
+              {{ tab.label }}
+            </button>
+          </div>
         </div>
 
         <div class="w-full shrink-0 md:w-64">
@@ -44,9 +46,11 @@
 
       <div
         v-if="activeSeriesDescription"
-        class="mb-8 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-sm leading-relaxed text-slate-600"
+        class="mb-6 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-xs leading-relaxed text-slate-600 sm:mb-8 sm:text-sm"
       >
-        <el-icon class="mt-0.5 text-lg text-blue-500"><InfoFilled /></el-icon>
+        <el-icon class="mt-0.5 shrink-0 text-base text-blue-500 sm:text-lg"
+          ><InfoFilled
+        /></el-icon>
         <span>{{ activeSeriesDescription }}</span>
       </div>
 
@@ -54,19 +58,35 @@
         <div
           v-for="n in 4"
           :key="n"
-          class="rounded-2xl border border-gray-100 bg-white p-6"
+          class="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6"
         >
           <el-skeleton animated>
             <template #template>
-              <div class="flex items-center gap-5">
-                <el-skeleton-item
-                  variant="rect"
-                  class="h-14 w-14 rounded-2xl"
-                />
-                <div class="flex-1">
-                  <el-skeleton-item variant="h3" class="mb-3 w-1/3" />
-                  <el-skeleton-item variant="text" class="mb-2 w-2/3" />
-                  <el-skeleton-item variant="text" class="w-1/2" />
+              <div
+                class="flex flex-col justify-between gap-5 md:flex-row md:items-center"
+              >
+                <div class="flex w-full items-start gap-4 sm:gap-5">
+                  <el-skeleton-item
+                    variant="rect"
+                    class="h-12 w-12 shrink-0 rounded-2xl sm:h-14 sm:w-14"
+                  />
+                  <div class="flex-1">
+                    <el-skeleton-item
+                      variant="h3"
+                      class="mb-3 w-1/2 sm:w-1/3"
+                    />
+                    <el-skeleton-item
+                      variant="text"
+                      class="mb-2 w-full sm:w-2/3"
+                    />
+                    <el-skeleton-item variant="text" class="w-2/3 sm:w-1/2" />
+                  </div>
+                </div>
+                <div class="mt-2 w-full shrink-0 md:mt-0 md:w-auto">
+                  <el-skeleton-item
+                    variant="button"
+                    class="h-10 w-full rounded-lg md:w-32"
+                  />
                 </div>
               </div>
             </template>
@@ -84,25 +104,25 @@
         <div
           v-for="(item, index) in filteredDownloads"
           :key="item.id"
-          class="group transform rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-100 hover:shadow-xl"
+          class="group transform rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-100 hover:shadow-xl sm:p-6"
           :style="{ animationDelay: `${index * 50}ms` }"
         >
           <div
-            class="flex flex-col justify-between gap-6 md:flex-row md:items-center"
+            class="flex flex-col justify-between gap-5 md:flex-row md:items-center"
           >
-            <div class="flex items-start gap-5">
+            <div class="flex w-full items-start gap-4 sm:gap-5">
               <div
-                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 transition-colors duration-300 group-hover:bg-blue-600 group-hover:text-white"
+                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 transition-colors duration-300 group-hover:bg-blue-600 group-hover:text-white sm:h-14 sm:w-14"
               >
-                <span class="text-2xl font-bold uppercase">{{
+                <span class="text-xl font-bold uppercase sm:text-2xl">{{
                   item.name ? item.name.charAt(0) : ""
                 }}</span>
               </div>
 
-              <div>
-                <div class="mb-1 flex items-center gap-3">
+              <div class="flex-1">
+                <div class="mb-1 flex items-center gap-2 sm:gap-3">
                   <h3
-                    class="text-lg font-bold text-slate-800 transition-colors group-hover:text-blue-600"
+                    class="text-base font-bold text-slate-800 transition-colors group-hover:text-blue-600 sm:text-lg"
                   >
                     {{ item.name }}
                   </h3>
@@ -119,23 +139,23 @@
                 </div>
 
                 <p
-                  class="mb-3 max-w-2xl text-sm leading-relaxed text-slate-500"
+                  class="mb-3 max-w-2xl text-xs leading-relaxed text-slate-500 sm:text-sm"
                 >
                   {{ item.description }}
                 </p>
 
                 <div
-                  class="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-400"
+                  class="flex flex-wrap items-center gap-2 text-[10px] font-medium text-slate-400 sm:gap-4 sm:text-xs"
                 >
                   <span class="flex items-center rounded bg-gray-50 px-2 py-1">
-                    <el-icon class="mr-1.5"><Setting /></el-icon>
+                    <el-icon class="mr-1 sm:mr-1.5"><Setting /></el-icon>
                     {{ item.file_type }}
                   </span>
                   <span class="flex items-center rounded bg-gray-50 px-2 py-1">
-                    <el-icon class="mr-1.5"><Monitor /></el-icon>
+                    <el-icon class="mr-1 sm:mr-1.5"><Monitor /></el-icon>
                     {{ item.file_size }}
                   </span>
-                  <span class="flex items-center">
+                  <span class="flex items-center rounded bg-gray-50 px-2 py-1">
                     更新于:
                     {{ dayjs(item.created_at).format("YYYY-MM-DD") }}
                   </span>
@@ -143,7 +163,9 @@
               </div>
             </div>
 
-            <div class="flex shrink-0 items-center justify-end">
+            <div
+              class="mt-2 flex w-full shrink-0 items-center justify-end md:mt-0 md:w-auto"
+            >
               <el-button
                 type="primary"
                 class="w-full md:w-auto"
@@ -171,6 +193,17 @@
           :total="paginate?.total_count ?? 0"
           layout="prev, pager, next"
           background
+          small
+          class="sm:hidden"
+          @current-change="HandlePageChange"
+        />
+        <el-pagination
+          v-model:current-page="currentPage"
+          :page-size="paginate?.page_size ?? 0"
+          :total="paginate?.total_count ?? 0"
+          layout="prev, pager, next"
+          background
+          class="hidden sm:flex"
           @current-change="HandlePageChange"
         />
       </div>
@@ -316,6 +349,14 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 .list-enter-active {
   animation: list-fade-in-up 0.5s ease-out both;
 }

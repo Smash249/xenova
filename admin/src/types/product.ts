@@ -18,7 +18,6 @@ interface Product extends BaseResponse {
   description: string
   cover: string
   previews: string[]
-  price: number
 }
 
 type CreateProductParams = Omit<Product, 'id' | 'created_at' | 'updated_at'>

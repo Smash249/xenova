@@ -8,27 +8,10 @@
     }"
     class="fixed inset-0 z-50 h-16 w-full py-4 transition-shadow duration-100 ease-linear"
   >
-    <div class="mx-auto flex h-full w-[90%] items-center justify-between">
-      <div class="flex items-center">
-        <div class="relative h-10 w-10 shrink-0">
-          <svg class="h-full w-full" fill="none" viewBox="0 0 100 100">
-            <path
-              d="M20 10 L45 50 L20 90 L35 90 L60 50 L35 10 Z"
-              fill="#EAB308"
-            />
-            <path
-              d="M80 10 L55 50 L80 90 L65 90 L40 50 L65 10 Z"
-              fill="#52525B"
-            />
-          </svg>
-        </div>
-        <div class="flex flex-col">
-          <h1 class="text-2xl font-bold tracking-wide text-orange-400">
-            星实科技
-          </h1>
-        </div>
-      </div>
+    <div class="mx-auto flex w-[90%] items-center justify-between">
+      <img src="/images/logo.png" alt="logo" class="h-auto w-28 sm:w-48" />
 
+      <!-- 桌面端导航 -->
       <nav
         ref="navRef"
         :style="{
@@ -61,41 +44,61 @@
         </div>
       </nav>
 
-      <div class="hidden items-center gap-3 md:flex">
-        <div
-          v-if="user.isLogin"
-          class="cursor-pointer transition-transform hover:scale-105 active:scale-95"
-          @click="ToggleDesktopDrawer"
-        >
-          <el-avatar class="bg-blue-100 font-bold text-blue-600">
-            {{ avatarLetter }}
-          </el-avatar>
+      <div class="flex items-center gap-3">
+        <!-- 桌面端操作区 -->
+        <div class="hidden items-center gap-3 md:flex">
+          <div
+            v-if="user.isLogin"
+            class="cursor-pointer transition-transform hover:scale-105 active:scale-95"
+            @click="ToggleDesktopDrawer"
+          >
+            <el-avatar class="bg-blue-100 font-bold text-blue-600">
+              {{ avatarLetter }}
+            </el-avatar>
+          </div>
+          <el-button
+            v-else
+            type="primary"
+            round
+            class="border-0! bg-blue-600! px-6! py-5! text-sm font-medium hover:bg-blue-500!"
+            @click="router.push('/login')"
+            :icon="Position"
+          >
+            登录
+          </el-button>
         </div>
-        <el-button
-          v-else
-          type="primary"
-          round
-          class="border-0! bg-blue-600! px-6! py-5! text-sm font-medium hover:bg-blue-500!"
-          @click="router.push('/login')"
-          :icon="Position"
-        >
-          登录
-        </el-button>
+
+        <!-- 移动端菜单按钮 -->
+        <div class="flex cursor-pointer md:hidden" @click="ToggleMobileMenu">
+          <el-icon :size="28" :style="{ color: dynamicTextColor }">
+            <Menu />
+          </el-icon>
+        </div>
       </div>
     </div>
   </header>
+
   <DeskDrawer v-model="drawerVisible" />
+
+  <MobileDrawer
+    v-model="mobileMenuVisible"
+    :active-item="activeItem"
+    @item-click="HandleClickItem"
+    @login-click="router.push('/login')"
+    @user-click="ToggleDesktopDrawer"
+  />
 </template>
 
 <script setup>
 import userStore from "@/store/modules/user"
-import { Position } from "@element-plus/icons-vue"
+import { Menu, Position } from "@element-plus/icons-vue"
 import { useWindowScroll, useWindowSize } from "@vueuse/core"
 import { computed, nextTick, onMounted, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
 import { systemConfig } from "@/config/header"
 import DeskDrawer from "@/components/layout/DeskDrawer.vue"
+import MobileDrawer from "@/components/layout/MobileDrawer.vue"
 
 const router = useRouter()
 const route = useRoute()
@@ -109,6 +112,7 @@ const navRef = ref(null)
 const menuItemsRef = ref([])
 const activeSlider = ref({ left: 0, width: 0 })
 const drawerVisible = ref(false)
+const mobileMenuVisible = ref(false)
 
 const fadeProgress = computed(() => {
   if (windowHeight.value === 0) return 0
@@ -172,6 +176,10 @@ function HandleClickItem(item, index) {
 
 function ToggleDesktopDrawer() {
   drawerVisible.value = true
+}
+
+function ToggleMobileMenu() {
+  mobileMenuVisible.value = true
 }
 
 watch(() => route.fullPath, SyncActiveItemWithRoute, { immediate: true })

@@ -45,7 +45,9 @@
                 </li>
               </ul>
             </div>
-            <ContactUs />
+            <div class="hidden lg:block">
+              <ContactUs />
+            </div>
           </div>
         </aside>
 

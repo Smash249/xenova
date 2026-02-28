@@ -1,17 +1,17 @@
 <template>
   <div class="min-h-screen bg-gray-50 font-sans text-slate-800">
     <CustomBanner title="企业动态" />
-    <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-      <nav class="mb-10 flex items-center text-sm text-slate-500">
+    <div class="container mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <nav class="mb-6 flex items-center text-sm text-slate-500 sm:mb-10">
         <a class="transition-colors hover:text-blue-600" href="/">首页</a>
         <ChevronRight class="mx-2 h-4 w-4" />
         <span class="font-medium text-slate-800">企业动态</span>
       </nav>
 
-      <div class="grid grid-cols-1 gap-10 lg:grid-cols-4">
-        <aside class="space-y-8 lg:col-span-1">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 lg:gap-10">
+        <aside class="space-y-4 lg:col-span-1 lg:space-y-8">
           <div
-            class="flex items-center rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
+            class="flex items-center rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4"
           >
             <Search class="mr-3 h-5 w-5 text-slate-400" />
             <input
@@ -33,48 +33,54 @@
                 新闻分类
               </h2>
             </div>
-            <ul class="cursor-pointer space-y-1 p-3">
-              <li v-for="cat in categories" :key="cat.id">
+            <ul
+              class="flex cursor-pointer flex-row gap-2 overflow-x-auto p-2 lg:flex-col lg:gap-1 lg:p-3"
+            >
+              <li
+                v-for="cat in categories"
+                :key="cat.id"
+                class="shrink-0 lg:w-full"
+              >
                 <button
                   @click="SelectProductSeries(cat.id)"
-                  class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-all duration-200"
+                  class="group flex w-full items-center justify-between rounded-xl px-4 py-2 text-left transition-all duration-200 lg:py-3"
                   :class="[
                     activeProductSeriesId === cat.id
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
                       : 'text-slate-600 hover:bg-gray-50 hover:text-blue-600',
                   ]"
                 >
-                  <span class="font-medium">{{ cat.name }}</span>
+                  <span
+                    class="text-sm font-medium whitespace-nowrap lg:whitespace-normal"
+                    >{{ cat.name }}</span
+                  >
                 </button>
               </li>
             </ul>
           </div>
 
-          <ContactUs />
+          <div class="hidden lg:block">
+            <ContactUs />
+          </div>
         </aside>
 
         <main class="flex flex-col lg:col-span-3">
           <div
-            class="mb-8 flex flex-col items-center justify-between border-b border-gray-200 pb-4 sm:flex-row"
+            class="mb-6 flex flex-col items-start justify-between border-b border-gray-200 pb-4 sm:mb-8 sm:flex-row sm:items-center"
           >
-            <h2 class="mb-4 text-2xl font-bold text-slate-800 sm:mb-0">
+            <h2
+              class="mb-2 text-xl font-bold text-slate-800 sm:mb-0 sm:text-2xl"
+            >
               全部动态
-              <span class="ml-2 text-base font-normal text-slate-400">
+              <span
+                class="ml-2 text-sm font-normal text-slate-400 sm:text-base"
+              >
                 共 {{ paginate?.total_count ?? 0 }} 篇文章
               </span>
             </h2>
-            <div class="flex items-center space-x-2">
-              <span class="text-sm text-slate-500">排序:</span>
-              <select
-                class="cursor-pointer border-none bg-transparent text-sm font-medium text-slate-700 focus:ring-0"
-              >
-                <option>推荐排序</option>
-                <option>最新发布</option>
-              </select>
-            </div>
           </div>
 
-          <div v-if="loading" class="space-y-6">
+          <div v-if="loading" class="space-y-4 sm:space-y-6">
             <div
               v-for="n in 4"
               :key="n"
@@ -82,7 +88,7 @@
             >
               <el-skeleton animated>
                 <template #template>
-                  <div class="p-6">
+                  <div class="p-4 sm:p-6">
                     <el-skeleton-item variant="h3" class="mb-3 w-3/4" />
                     <el-skeleton-item variant="text" class="mb-2 w-full" />
                     <el-skeleton-item variant="text" class="w-2/3" />
@@ -94,7 +100,7 @@
 
           <div
             v-else-if="isEmpty"
-            class="flex h-full items-center justify-center"
+            class="flex h-64 flex-col items-center justify-center sm:h-full"
           >
             <el-empty description="暂无相关动态" :image-size="160">
               <template #description>
@@ -110,22 +116,22 @@
             appear
             name="list"
             tag="div"
-            class="flex-1 space-y-6"
+            class="flex-1 space-y-4 sm:space-y-6"
           >
             <article
               v-for="(news, index) in newsData"
               :key="news.id"
-              class="group cursor-pointer rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5 md:p-8"
+              class="group cursor-pointer rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5 sm:p-6 md:p-8"
               :style="{ animationDelay: `${index * 50}ms` }"
-              @click="HandelGotoNewsDetail(news)"
+              @click="HandleGotoNewsDetail(news)"
             >
               <div
-                class="mb-4 flex flex-col justify-between gap-4 md:flex-row md:items-start"
+                class="mb-3 flex flex-col justify-between gap-3 sm:mb-4 sm:gap-4 md:flex-row md:items-start"
               >
                 <div class="flex-1">
-                  <div class="mb-3 flex items-center gap-3">
+                  <div class="mb-2 flex items-center gap-2 sm:mb-3 sm:gap-3">
                     <span
-                      class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600"
+                      class="rounded-full bg-blue-50 px-2 py-1 text-[10px] font-semibold text-blue-600 sm:px-3 sm:text-xs"
                     >
                       {{ GetCategoryName(news.series_id) }}
                     </span>
@@ -135,27 +141,31 @@
                     </div>
                   </div>
                   <h3
-                    class="mb-3 line-clamp-2 text-xl font-bold text-slate-800 transition-colors group-hover:text-blue-700 md:text-2xl"
+                    class="mb-2 line-clamp-2 text-lg font-bold text-slate-800 transition-colors group-hover:text-blue-700 sm:mb-3 sm:text-xl md:text-2xl"
                   >
                     <a :href="`/news/detail/${news.id}`">{{ news.title }}</a>
                   </h3>
                 </div>
               </div>
 
-              <p class="mb-6 line-clamp-3 leading-relaxed text-slate-600">
+              <p
+                class="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-600 sm:mb-6 sm:text-base"
+              >
                 {{ news.content }}
               </p>
 
               <div
-                class="flex items-center justify-between border-t border-gray-50 pt-6"
+                class="flex items-center justify-between border-t border-gray-50 pt-4 sm:pt-6"
               >
-                <div class="flex items-center text-sm text-slate-400">
-                  <Eye class="mr-2 h-4 w-4" />
+                <div
+                  class="flex items-center text-xs text-slate-400 sm:text-sm"
+                >
+                  <Eye class="mr-1.5 h-4 w-4 sm:mr-2" />
                   <span>{{ news.view_count }} 次浏览</span>
                 </div>
 
                 <div
-                  class="group/btn inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  class="group/btn inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 sm:px-6 sm:py-2.5 sm:text-sm"
                 >
                   阅读更多
                   <ChevronRight
@@ -166,13 +176,14 @@
             </article>
           </TransitionGroup>
 
-          <div v-if="canShowPaginate" class="mt-12 flex justify-center">
+          <div v-if="canShowPaginate" class="mt-8 flex justify-center sm:mt-12">
             <el-pagination
               v-model:current-page="currentPage"
               :page-size="paginate?.page_size ?? 0"
               :total="paginate?.total_count ?? 0"
               layout="prev, pager, next"
               background
+              small
               @current-change="HandlePageChange"
             />
           </div>
@@ -234,7 +245,7 @@ function HandlePageChange(page: number) {
   GetNewsList()
 }
 
-function HandelGotoNewsDetail(news: News) {
+function HandleGotoNewsDetail(news: News) {
   router.push({
     name: "newsDetail",
     params: {

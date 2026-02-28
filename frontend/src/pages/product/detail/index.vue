@@ -184,7 +184,7 @@
                 class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100"
               >
                 <el-image
-                  :src="img"
+                  :src="Baseurl + img"
                   lazy
                   class="block w-full object-cover"
                   fit="cover"

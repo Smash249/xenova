@@ -11,8 +11,21 @@
       class="fixed inset-0 z-10 bg-linear-to-br from-blue-900/90 via-blue-800/80 to-indigo-900/80 mix-blend-multiply"
     ></div>
 
+    <!-- 新增移动端兼容的返回按钮 -->
+    <div class="fixed top-6 left-4 z-50 text-white sm:top-10 sm:left-10">
+      <button
+        @click="router.push('/')"
+        class="group flex cursor-pointer items-center gap-2 rounded-full text-sm font-medium backdrop-blur-md transition-all hover:scale-105"
+      >
+        <el-icon class="transition-transform group-hover:-translate-x-1"
+          ><Back
+        /></el-icon>
+        返回首页
+      </button>
+    </div>
+
     <div
-      class="relative z-20 grid h-screen w-full grid-cols-[3fr_2fr] items-center justify-center"
+      class="relative z-20 grid h-screen w-full grid-cols-1 items-center justify-center lg:grid-cols-[3fr_2fr]"
     >
       <div
         class="hidden h-full flex-col justify-between p-12 text-white lg:flex"
@@ -78,10 +91,34 @@
         </div>
       </div>
 
-      <div class="flex h-full w-full items-center justify-center px-4">
+      <div class="flex h-full w-full items-center justify-center px-4 sm:px-8">
         <div
-          class="glass-form animate-fade-in-up custom-scrollbar max-h-[90vh] w-full max-w-120 overflow-y-auto rounded-3xl p-8 md:p-10"
+          class="glass-form animate-fade-in-up custom-scrollbar max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl p-6 sm:max-w-120 sm:rounded-3xl sm:p-8 md:p-10"
         >
+          <!-- 移动端顶部品牌信息展示 -->
+          <div class="mb-6 flex flex-col items-center justify-center lg:hidden">
+            <div
+              class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 shadow-lg shadow-black/10 backdrop-blur-md"
+            >
+              <svg
+                class="h-7 w-7 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <h1 class="text-2xl font-bold tracking-wide text-white">
+              星实科技
+            </h1>
+          </div>
+
           <div class="mb-6 text-center">
             <h2 class="text-2xl font-bold text-white">创建新账户</h2>
             <p class="mt-2 text-sm text-blue-200">只需几步即可完成注册</p>
@@ -210,6 +247,7 @@
 <script setup lang="ts">
 import { RegisterApi, SendEmailApi } from "@/api/auth"
 import {
+  Back,
   CircleCheck,
   DataLine,
   Key,

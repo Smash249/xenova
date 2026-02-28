@@ -98,6 +98,7 @@ func (p *AccessoryService) CreateAccessory(params request.CreateAccessoryReq) er
 		Cover:       params.Cover,
 		Previews:    params.Previews,
 		SeriesID:    params.SeriesID,
+		Price:       params.Price,
 	}).Error
 }
 

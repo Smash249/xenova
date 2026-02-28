@@ -80,7 +80,6 @@ func (p *ProductService) GetProductDetail(id uint) (response.ProductDetailResp, 
         pd.description,
         pd.cover,
         pd.previews,
-        pd.price,
         pd.created_at,
         pd.updated_at
     `).

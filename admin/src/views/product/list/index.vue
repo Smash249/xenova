@@ -12,7 +12,6 @@ import {
   NPagination,
   NDropdown,
   NImage,
-  NTag,
 } from 'naive-ui'
 import { reactive, ref, useTemplateRef, computed, onMounted } from 'vue'
 
@@ -134,20 +133,7 @@ const columns = computed<DataTableColumns<Product>>(() => {
           <span class='text-gray-400'>暂无</span>
         ),
     },
-    {
-      key: 'price',
-      title: '价格',
-      width: 120,
-      align: 'right',
-      render: (row) => (
-        <NTag
-          type='warning'
-          size='small'
-        >
-          ¥{row.price.toFixed(2)}
-        </NTag>
-      ),
-    },
+
     {
       key: 'previews',
       title: '预览图',
