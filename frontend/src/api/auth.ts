@@ -12,10 +12,22 @@ export async function LoginApi(params: LoginParams) {
   }
 }
 
+export async function SendEmailApi(email: string) {
+  try {
+    const result = await request.post<LoginResp>("/public/code", {
+      email,
+    })
+    if (!result || !result.success) throw new Error("邮件发送失败")
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}
+
 export async function RegisterApi(params: RegisterParams) {
   try {
     const result = await request.post<LoginResp>("/public/register", params)
-    if (!result || !result.success) throw new Error("登录失败")
+    if (!result || !result.success) throw new Error("注册失败")
     return result.data
   } catch (error) {
     throw error

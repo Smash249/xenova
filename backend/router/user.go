@@ -9,6 +9,7 @@ func initUserRouter() {
 	GroupRouterHubApp.RegisterRouterHub(
 		func(public, private, admin *echo.Group) {
 			public.POST("/login", api.UserApi.FrontendLogin)
+			public.POST("/code", api.UserApi.SendEmailCode)
 			public.POST("/register", api.UserApi.Register)
 			public.POST("/sigin", api.UserApi.AdminLogin)
 

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -72,8 +73,14 @@ func (u *UserService) AdminLogin(params request.UserLoginReq) (*response.UserLog
 	return u.baseLogin(user, params)
 }
 
+func (u *UserService) SendEmailCode(params request.EmailCodeReq) error {
+	return utils.StoreAndSendEmailCode(context.Background(), params.Email)
+}
+
 func (u *UserService) Register(params request.UserRegisterReq) error {
-	// todo: 校验邮箱
+	if !utils.VerifyEmailCode(context.Background(), params.Email, params.Code) {
+		return errors.New("验证码错误或已过期")
+	}
 	return global.DB.Create(&models.User{
 		UserName: params.UserName,
 		Email:    params.Email,

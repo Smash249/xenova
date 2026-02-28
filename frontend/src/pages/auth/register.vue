@@ -102,8 +102,7 @@
                   v-model="registerForm.userName"
                   placeholder="用户名"
                   class="custom-input h-12"
-                  autocomplete="off"
-                  readonly
+                  autocomplete="new-username"
                 >
                   <template #prefix>
                     <el-icon class="text-white/60"><User /></el-icon>
@@ -118,8 +117,7 @@
                   v-model="registerForm.email"
                   placeholder="邮箱地址"
                   class="custom-input h-12"
-                  autocomplete="off"
-                  readonly
+                  autocomplete="new-email"
                 >
                   <template #prefix>
                     <el-icon class="text-white/60"><Message /></el-icon>
@@ -134,7 +132,7 @@
                   v-model="registerForm.code"
                   placeholder="验证码"
                   class="custom-input h-12 flex-1"
-                  autocomplete="off"
+                  autocomplete="one-time-code"
                 >
                   <template #prefix>
                     <el-icon class="text-white/60"><Key /></el-icon>
@@ -160,7 +158,6 @@
                   show-password
                   class="custom-input h-12"
                   autocomplete="new-password"
-                  readonly
                 >
                   <template #prefix>
                     <el-icon class="text-white/60"><Lock /></el-icon>
@@ -178,7 +175,6 @@
                   show-password
                   class="custom-input h-12"
                   autocomplete="new-password"
-                  readonly
                 >
                   <template #prefix>
                     <el-icon class="text-white/60"><CircleCheck /></el-icon>
@@ -212,7 +208,7 @@
 </template>
 
 <script setup lang="ts">
-import userStore from "@/store/modules/user"
+import { RegisterApi, SendEmailApi } from "@/api/auth"
 import {
   CircleCheck,
   DataLine,
@@ -228,7 +224,6 @@ import { onBeforeUnmount, reactive, ref } from "vue"
 import { useRouter } from "vue-router"
 
 const router = useRouter()
-const useUserStore = userStore()
 
 const registerFormRef = ref<FormInstance>()
 const loading = ref(false)
@@ -277,7 +272,7 @@ const registerRules: FormRules = {
 
 async function HandleSendCode() {
   if (!registerForm.email) {
-    ElMessage.warning("��先输入邮箱地址")
+    ElMessage.warning("请先输入邮箱地址")
     return
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -285,23 +280,27 @@ async function HandleSendCode() {
     ElMessage.warning("请输入有效的邮箱格式")
     return
   }
-  ElMessage.info("验证码发送功能需要后端支持，模拟发送成功")
-  codeDisabled.value = true
-  let currentCount = countdown.value
-  codeText.value = `${currentCount}秒`
-
-  countdownTimer.value = window.setInterval(() => {
-    currentCount--
-    codeText.value = `${currentCount}秒`
-    if (currentCount <= 0) {
-      if (countdownTimer.value) {
-        clearInterval(countdownTimer.value)
-        countdownTimer.value = null
+  try {
+    await SendEmailApi(registerForm.email)
+    ElMessage.success("验证码已发送，请查收邮箱")
+    codeDisabled.value = true
+    codeText.value = `重新发送 (${countdown.value}s)`
+    countdownTimer.value = window.setInterval(() => {
+      countdown.value -= 1
+      if (countdown.value <= 0) {
+        codeDisabled.value = false
+        codeText.value = "发送验证码"
+        countdown.value = 60
+        if (countdownTimer.value) {
+          clearInterval(countdownTimer.value)
+        }
+      } else {
+        codeText.value = `重新发送 (${countdown.value}s)`
       }
-      codeDisabled.value = false
-      codeText.value = "重新发送"
-    }
-  }, 1000)
+    }, 1000)
+  } catch (error: any) {
+    ElMessage.error(error.message || "验证码发送失败，请稍后重试")
+  }
 }
 
 async function HandleRegister() {
@@ -310,7 +309,7 @@ async function HandleRegister() {
     if (valid) {
       loading.value = true
       try {
-        await useUserStore.Register(registerForm)
+        await RegisterApi(registerForm)
         ElMessage.success("注册成功，即将跳转到登录页面")
         setTimeout(() => {
           router.push("/login")
@@ -345,7 +344,6 @@ onBeforeUnmount(() => {
   background: transparent;
 }
 
-/* 改造 Element Plus 输入框 */
 :deep(.custom-input .el-input__wrapper) {
   background-color: rgba(0, 0, 0, 0.2) !important;
   box-shadow: none !important;
@@ -376,7 +374,6 @@ onBeforeUnmount(() => {
   color: rgba(255, 255, 255, 0.4);
 }
 
-/* 入场动画 */
 @keyframes fadeInUp {
   from {
     opacity: 0;

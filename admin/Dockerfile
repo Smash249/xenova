@@ -1,30 +1,30 @@
-# Build stage
-FROM node:22-alpine AS builder
-
+# ============================================
+# 阶段1: 安装依赖 + 构建
+# ============================================
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package.json
-COPY package.json ./
+RUN npm install -g pnpm
 
-# Install dependencies
-RUN npm install
+# 先复制依赖文件，利用 Docker 缓存
+COPY package*.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
-# Copy source code
+# 复制源代码并构建
 COPY . .
+RUN pnpm run build
 
-# Build the application (build-only skips type-check for faster/more reliable builds)
-RUN npm run build-only
+# ============================================
+# 阶段2: 运行（Nginx）
+# ============================================
+FROM nginx:1.27-alpine
 
-# Runtime stage
-FROM nginx:alpine
-
-# Copy built files from builder
+RUN apk add --no-cache curl tzdata && \
+    rm -rf /var/cache/apk/*
+RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
+RUN rm -rf /etc/nginx/conf.d/*
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]

@@ -5,6 +5,10 @@ type UserLoginReq struct {
 	Password string `json:"password" validate:"required,min=8,max=20"`
 }
 
+type EmailCodeReq struct {
+	Email string `json:"email" validate:"required,email"`
+}
+
 type UserRegisterReq struct {
 	UserName string `json:"userName" validate:"required,min=2,max=20"`
 	Email    string `json:"email" validate:"required,email"`

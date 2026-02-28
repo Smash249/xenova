@@ -64,7 +64,6 @@
           </p>
         </div>
 
-        <!-- 底部数据展示 -->
         <div class="flex gap-6">
           <div
             class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition-colors hover:bg-white/10"
@@ -132,17 +131,12 @@
               </div>
             </el-form-item>
 
-            <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center justify-between px-2 text-sm">
               <el-checkbox
                 v-model="rememberMe"
                 label="记住我"
                 class="custom-checkbox"
               />
-              <a
-                href="#"
-                class="text-blue-300 transition-colors hover:text-white"
-                >忘记密码?</a
-              >
             </div>
 
             <el-button

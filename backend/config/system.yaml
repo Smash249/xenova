@@ -20,7 +20,7 @@ Jwt:
   issuer: "xenova"
 
 Email:
-  stmp: "your stmp server"
-  port: "your smtp port"
-  host: "your smtp host"
-  pwd: "your smtp pwd"
+  stmp: "smtp.163.com"
+  port: 465
+  host: "lf1888@163.com"
+  pwd: "NRbXt6ybZxtFYsSJ"

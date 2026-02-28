@@ -36,6 +36,17 @@ func (userApi) AdminLogin(ctx *echo.Context) error {
 	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
 }
 
+func (userApi) SendEmailCode(ctx *echo.Context) error {
+	emailCodeReq, err := utils.BindAndValidate[request.EmailCodeReq](ctx)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	if err := userServicesApp.SendEmailCode(emailCodeReq); err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	return utils.SuccessApiResponse(ctx, "验证码发送成功", http.StatusOK)
+}
+
 func (userApi) Register(ctx *echo.Context) error {
 	userRegisterReq, err := utils.BindAndValidate[request.UserRegisterReq](ctx)
 	if err != nil {
