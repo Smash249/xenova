@@ -110,6 +110,22 @@ func (u *UserService) UpdateUserInfo(userID uint, params request.UpdateUserInfoR
 	return &user, nil
 }
 
+func (u *UserService) AdminUpdateUserInfo(userID uint, params request.UpdateAdminInfoReq) (*models.User, error) {
+	var user models.User
+	err := global.DB.First(&user, userID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("用户不存在")
+		}
+		return nil, err
+	}
+	user.UserName = params.UserName
+	if err := global.DB.Save(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (u *UserService) ChangePassword(userID uint, params request.ChangePasswordReq) error {
 	var user models.User
 	err := global.DB.First(&user, userID).Error
@@ -122,7 +138,11 @@ func (u *UserService) ChangePassword(userID uint, params request.ChangePasswordR
 	if !utils.CheckPasswordHash(params.OldPassword, user.Password) {
 		return errors.New("旧密码错误")
 	}
-	user.Password = params.NewPassword
+	hashed, err := utils.GenerateHashPassword(params.NewPassword)
+	if err != nil {
+		return err
+	}
+	user.Password = hashed
 	return global.DB.Save(&user).Error
 }
 

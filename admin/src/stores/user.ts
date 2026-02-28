@@ -18,6 +18,7 @@ const DetaultUserInfo: UserInfo = {
   role: '',
   created_at: '',
   updated_at: '',
+  isBanned: false,
 }
 
 export const useUserStore = defineStore('userStore', () => {
@@ -298,6 +299,13 @@ export const useUserStore = defineStore('userStore', () => {
     return resolveRoute(menu.value)
   })
 
+  function UpdateUserInfo(newUserInfo: Partial<UserInfo>) {
+    user.value = {
+      ...user.value,
+      ...newUserInfo,
+    } as UserInfo
+  }
+
   function cleanup(redirectPath?: string) {
     router.replace({
       name: 'login',
@@ -310,10 +318,13 @@ export const useUserStore = defineStore('userStore', () => {
     }
   }
 
+  function Logout() {
+    cleanup()
+  }
+
   async function Login(data: Parameters<typeof LoginApi>[0]) {
     try {
       const result = await LoginApi(data)
-      console.log('登录成功:', result)
       token.value = result.accessToken
       refreshToken.value = result.refreshToken
       user.value = result.user
@@ -329,6 +340,8 @@ export const useUserStore = defineStore('userStore', () => {
     userMenu,
     userRoute,
     Login,
+    Logout,
+    UpdateUserInfo,
     cleanup,
   }
 })

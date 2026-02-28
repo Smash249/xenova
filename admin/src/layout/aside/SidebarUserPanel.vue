@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import { useMessage } from 'naive-ui'
+import { ref } from 'vue'
 
 import { ButtonAnimation } from '@/components'
 import UserAvatar from '@/components/UserAvatar.vue'
 import UserDropdown from '@/components/UserDropdown.vue'
 import { toRefsPreferencesStore, toRefsUserStore } from '@/stores'
 
+import UserProfileModal from './UserProfileModal.vue'
+
 const { sidebarMenu } = toRefsPreferencesStore()
 
 const { user } = toRefsUserStore()
 
-const message = useMessage()
+const showProfileModal = ref(false)
 
 function HandleUserPanelClick() {
-  message.info('你可以把它设计成有背景的User Card')
+  showProfileModal.value = true
 }
 </script>
 <template>
@@ -61,9 +63,6 @@ function HandleUserPanelClick() {
           <span class="truncate text-sm">
             {{ user?.userName || '未登录用户' }}
           </span>
-          <span class="truncate text-xs text-neutral-450 dark:text-neutral-500">
-            这里或许可以写点什么
-          </span>
         </div>
 
         <UserDropdown placement="top">
@@ -77,4 +76,6 @@ function HandleUserPanelClick() {
       </div>
     </Transition>
   </div>
+
+  <UserProfileModal v-model:show="showProfileModal" />
 </template>

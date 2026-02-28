@@ -11,7 +11,7 @@
       >
         <a class="transition-colors hover:text-blue-600" href="/">首页</a>
         <ChevronRight class="mx-2 h-4 w-4" />
-        <span class="font-bold text-blue-600">{{ tabs[activeTab] }}</span>
+        <span class="font-medium text-slate-800">{{ tabs[activeTab] }}</span>
       </div>
 
       <div

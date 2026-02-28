@@ -76,6 +76,22 @@ func (userApi) UpdateUserInfo(ctx *echo.Context) error {
 	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
 }
 
+func (userApi) AdminUpdateUserInfo(ctx *echo.Context) error {
+	userId, exists := utils.GetUserID(ctx)
+	if !exists {
+		return utils.ErrorApiResponse(ctx, "获取用户失败", http.StatusBadRequest)
+	}
+	updateAdminInfoReq, err := utils.BindAndValidate[request.UpdateAdminInfoReq](ctx)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	result, err := userServicesApp.AdminUpdateUserInfo(userId, updateAdminInfoReq)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	return utils.SuccessApiResponse(ctx, result, http.StatusOK)
+}
+
 func (userApi) ChangePassword(ctx *echo.Context) error {
 	userId, exists := utils.GetUserID(ctx)
 	if !exists {

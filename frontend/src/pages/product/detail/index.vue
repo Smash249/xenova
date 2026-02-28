@@ -75,70 +75,92 @@
               </el-image>
             </div>
 
-            <div class="flex flex-col justify-between space-y-6">
-              <div>
-                <div
-                  class="mb-6 grid grid-cols-2 gap-4 border-b border-gray-100 pb-6 text-sm"
+            <div class="flex flex-col space-y-8">
+              <div class="border-b border-gray-100 pb-6">
+                <h2
+                  class="mb-4 text-3xl font-extrabold tracking-tight text-slate-900"
                 >
-                  <div class="space-y-1">
-                    <span class="block text-slate-400">产品名称</span>
-                    <span class="block font-medium text-slate-800">{{
-                      productDetail.name
-                    }}</span>
+                  {{ productDetail.name }}
+                </h2>
+
+                <div class="flex flex-wrap items-center gap-3">
+                  <span
+                    class="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600"
+                  >
+                    {{ productDetail.series_name ?? "默认分类" }}
+                  </span>
+                  <div
+                    class="flex items-center rounded-full border border-green-100 bg-green-50 px-3 py-1 text-xs font-medium text-green-600"
+                  >
+                    <CheckCircle class="mr-1.5 h-3.5 w-3.5" />
+                    <span>现货供应</span>
                   </div>
-                  <div class="space-y-1">
-                    <span class="block text-slate-400">产品分类</span>
-                    <span class="block font-medium text-blue-600">
-                      {{ productDetail.series_name ?? "默认分类" }}
-                    </span>
+                  <div
+                    class="flex items-center rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600"
+                  >
+                    <ShieldCheck class="mr-1.5 h-3.5 w-3.5" />
+                    <span>产品质保</span>
                   </div>
                 </div>
+              </div>
 
+              <div>
+                <h3
+                  class="mb-3 flex items-center text-base font-bold text-slate-800"
+                >
+                  <div class="mr-2 h-4 w-1 rounded-sm bg-blue-600"></div>
+                  产品简介
+                </h3>
                 <div
-                  class="space-y-4 rounded-xl border border-gray-100 bg-gray-50 p-6 text-slate-600"
+                  class="rounded-xl border border-gray-100 bg-gray-50 p-5 text-slate-600"
                 >
                   <p class="text-justify text-sm leading-relaxed">
                     {{ productDetail.description ?? "暂无产品描述" }}
                   </p>
+                </div>
+              </div>
 
-                  <div class="mt-4 rounded-lg bg-blue-50/50 p-4">
-                    <h4 class="mb-3 font-bold text-slate-800">
-                      有意向购买？请联系我们
-                    </h4>
-                    <div class="space-y-2 text-sm">
-                      <div class="flex items-center text-slate-700">
-                        <Phone class="mr-2 h-4 w-4 text-blue-600" />
-                        <span class="font-medium">咨询热线：</span>
-                        <span>400-123-4567</span>
-                      </div>
-                      <div class="flex items-center text-slate-700">
-                        <Mail class="mr-2 h-4 w-4 text-blue-600" />
-                        <span class="font-medium">电子邮箱：</span>
-                        <span>sales@example.com</span>
-                      </div>
-                    </div>
-                    <p class="mt-2 text-xs text-slate-500">
-                      * 工作时间：周一至周五 9:00 - 18:00
-                    </p>
-                  </div>
-
+              <div
+                class="mt-auto rounded-2xl border border-blue-100 bg-linear-to-br from-blue-50/80 to-white p-6 shadow-sm"
+              >
+                <h4 class="mb-5 text-lg font-bold text-slate-800">
+                  有意向购买？请联系我们
+                </h4>
+                <div class="space-y-3 text-sm">
                   <div
-                    class="mt-4 flex items-center space-x-4 text-xs font-medium"
+                    class="flex items-center rounded-xl border border-gray-50 bg-white p-3 shadow-sm transition-all hover:border-blue-100"
                   >
                     <div
-                      class="flex items-center rounded bg-green-50 px-2 py-1 text-green-600"
+                      class="mr-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50"
                     >
-                      <CheckCircle class="mr-1 h-3 w-3" />
-                      <span>现货供应</span>
+                      <Phone class="h-4 w-4 text-blue-600" />
                     </div>
+                    <div>
+                      <div class="mb-0.5 text-xs text-slate-400">咨询热线</div>
+                      <div class="text-base font-bold text-slate-800">
+                        400-123-4567
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="flex items-center rounded-xl border border-gray-50 bg-white p-3 shadow-sm transition-all hover:border-blue-100"
+                  >
                     <div
-                      class="flex items-center rounded bg-blue-50 px-2 py-1 text-blue-600"
+                      class="mr-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50"
                     >
-                      <ShieldCheck class="mr-1 h-3 w-3" />
-                      <span>产品质保</span>
+                      <Mail class="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <div class="mb-0.5 text-xs text-slate-400">电子邮箱</div>
+                      <div class="text-base font-bold text-slate-800">
+                        sales@example.com
+                      </div>
                     </div>
                   </div>
                 </div>
+                <p class="mt-4 text-right text-xs text-slate-400">
+                  * 工作时间：周一至周五 9:00 - 18:00
+                </p>
               </div>
             </div>
           </div>
@@ -193,7 +215,6 @@
         </div>
       </div>
 
-      <!-- 404 状态 -->
       <div
         v-else
         class="flex h-[50vh] flex-col items-center justify-center text-slate-500"

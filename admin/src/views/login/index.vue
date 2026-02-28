@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useMutation } from '@pinia/colada'
-import { NForm, NFormItem, NInput, NButton, NCheckbox, NCarousel } from 'naive-ui'
+import { NForm, NFormItem, NInput, NButton, NCarousel, useMessage } from 'naive-ui'
 import {
   computed,
   defineAsyncComponent,
@@ -25,6 +25,7 @@ defineOptions({
   name: 'SignIn',
 })
 
+const message = useMessage()
 const { isMaxSm } = useInjection(mediaQueryInjectionKey)
 
 const { isDark } = toRefsPreferencesStore()
@@ -38,7 +39,7 @@ const illustrations = [
 ]
 
 const isNavigating = ref(false)
-const isRememberMed = ref(false)
+const errorMessage = ref('')
 
 const textureMaskParams = reactive({
   size: '666px 666px',
@@ -62,14 +63,22 @@ const signInForm = reactive({
 })
 
 const signInFormRules: Record<string, FormItemRule[]> = {
-  email: [{ required: true, message: '请输入邮箱账号', trigger: ['input'] }],
-  password: [{ required: true, message: '请输入密码', trigger: ['input'] }],
+  email: [{ required: true, message: '请输入邮箱账号', trigger: ['input', 'blur'] }],
+  password: [{ required: true, message: '请输入密码', trigger: ['input', 'blur'] }],
 }
 
 const { isLoading: isSignInLoading, mutate: signInMutation } = useMutation({
   mutation: Login,
   onSuccess: () => {
+    errorMessage.value = ''
+    message.success('登录成功')
     ToLayout()
+  },
+  onError: (error: any) => {
+    // 适配常见的 axios 或者 fetch 错误响应格式
+    const msg = error?.response?.data?.message || error?.message || '登录失败，请检查账号和密码'
+    errorMessage.value = msg
+    message.error(msg)
   },
 })
 
@@ -89,6 +98,7 @@ function ToLayout() {
 }
 
 function HandleSubmitClick() {
+  errorMessage.value = '' // 提交前清空错误信息
   signInFormRef.value?.validate((errors) => {
     if (!errors) {
       signInMutation(toRaw(signInForm))
@@ -210,7 +220,7 @@ onUnmounted(() => {
               size="large"
             >
               <NFormItem
-                path="account"
+                path="email"
                 class="mb-2"
               >
                 <NInput
@@ -234,6 +244,7 @@ onUnmounted(() => {
                   :input-props="{
                     autocomplete: 'off',
                   }"
+                  @keydown.enter.prevent="HandleSubmitClick"
                 >
                   <template #prefix>
                     <span class="mr-2 iconify size-5.5 text-neutral-400 ph--user-circle" />
@@ -264,6 +275,7 @@ onUnmounted(() => {
                   :input-props="{
                     autocomplete: 'off',
                   }"
+                  @keydown.enter.prevent="HandleSubmitClick"
                 >
                   <template #prefix>
                     <span class="mr-2 iconify size-5.5 text-neutral-400 ph--lock-key" />
@@ -271,18 +283,7 @@ onUnmounted(() => {
                 </NInput>
               </NFormItem>
 
-              <div class="mt-2 mb-8 flex items-center justify-between px-1">
-                <NCheckbox v-model:checked="isRememberMed">记住密码</NCheckbox>
-                <NButton
-                  text
-                  size="small"
-                  class="text-blue-500! hover:text-blue-600!"
-                >
-                  忘记密码？
-                </NButton>
-              </div>
-
-              <div>
+              <div class="mt-2">
                 <NButton
                   type="primary"
                   :loading="mergedLoading"

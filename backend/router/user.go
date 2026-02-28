@@ -14,6 +14,7 @@ func initUserRouter() {
 
 			private.GET("/userInfo", api.UserApi.GetUserInfo)
 			private.PUT("/userInfo", api.UserApi.UpdateUserInfo)
+			admin.POST("/userInfo", api.UserApi.AdminUpdateUserInfo)
 			private.POST("/changePassword", api.UserApi.ChangePassword)
 			private.POST("/upload", api.UserApi.Upload)
 		},

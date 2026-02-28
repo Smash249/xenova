@@ -74,87 +74,108 @@
                 </template>
               </el-image>
             </div>
-
-            <div class="flex flex-col justify-between space-y-6">
-              <div>
-                <div class="mb-6 border-b border-gray-100 pb-6">
-                  <div class="mb-5 grid grid-cols-2 gap-4 text-sm">
-                    <div class="space-y-1">
-                      <span class="block text-slate-400">配件名称</span>
-                      <span class="block font-medium text-slate-800">{{
-                        accessoryDetail.name
-                      }}</span>
-                    </div>
-                    <div class="space-y-1">
-                      <span class="block text-slate-400">配件分类</span>
-                      <span class="block font-medium text-blue-600">
-                        {{ accessoryDetail.series_name ?? "默认分类" }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div
-                    class="flex items-baseline gap-2 rounded-xl bg-red-50 p-4"
+            <div class="flex h-full flex-col">
+              <div
+                class="mb-6 flex flex-wrap items-start justify-between gap-6 border-b border-gray-100 pb-6"
+              >
+                <div class="flex-1">
+                  <h2
+                    class="mb-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"
                   >
-                    <span class="text-sm text-slate-500">参考价</span>
-                    <span class="text-xl font-bold text-red-600">¥</span>
+                    {{ accessoryDetail.name }}
+                  </h2>
+                  <div class="flex flex-wrap items-center gap-2">
                     <span
-                      class="text-3xl font-bold tracking-tight text-red-600"
-                      >{{ accessoryDetail.price ?? "面议" }}</span
+                      class="rounded bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600"
                     >
-                  </div>
-                </div>
-
-                <div
-                  class="space-y-4 rounded-xl border border-gray-100 bg-gray-50 p-6 text-slate-600"
-                >
-                  <p class="text-justify text-sm leading-relaxed">
-                    {{ accessoryDetail.description ?? "暂无配件描述" }}
-                  </p>
-
-                  <div class="mt-4 rounded-lg bg-blue-50/50 p-4">
-                    <h4 class="mb-3 font-bold text-slate-800">
-                      有意向购买？请联系我们
-                    </h4>
-                    <div class="space-y-2 text-sm">
-                      <div class="flex items-center text-slate-700">
-                        <Phone class="mr-2 h-4 w-4 text-blue-600" />
-                        <span class="font-medium">咨询热线：</span>
-                        <span>400-123-4567</span>
-                      </div>
-                      <div class="flex items-center text-slate-700">
-                        <Mail class="mr-2 h-4 w-4 text-blue-600" />
-                        <span class="font-medium">电子邮箱：</span>
-                        <span>sales@example.com</span>
-                      </div>
-                    </div>
-                    <p class="mt-2 text-xs text-slate-500">
-                      * 工作时间：周一至周五 9:00 - 18:00
-                    </p>
-                  </div>
-
-                  <div
-                    class="mt-4 flex items-center space-x-4 text-xs font-medium"
-                  >
+                      {{ accessoryDetail.series_name ?? "默认分类" }}
+                    </span>
                     <div
-                      class="flex items-center rounded bg-green-50 px-2 py-1 text-green-600"
+                      class="flex items-center rounded bg-green-50 px-2 py-1 text-xs font-medium text-green-600"
                     >
                       <CheckCircle class="mr-1 h-3 w-3" />
-                      <span>现货供应</span>
+                      现货供应
                     </div>
                     <div
-                      class="flex items-center rounded bg-blue-50 px-2 py-1 text-blue-600"
+                      class="flex items-center rounded bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600"
                     >
                       <ShieldCheck class="mr-1 h-3 w-3" />
-                      <span>配件质保</span>
+                      原厂质保
                     </div>
+                  </div>
+                </div>
+                <div class="shrink-0 text-right">
+                  <span class="mb-1 block text-xs text-slate-400">参考价</span>
+                  <div class="text-red-600">
+                    <span class="text-lg font-bold">¥</span>
+                    <span class="text-3xl font-black tracking-tight">{{
+                      accessoryDetail.price ?? "面议"
+                    }}</span>
                   </div>
                 </div>
               </div>
 
-              <div class="border-t border-gray-100 pt-6">
-                <div class="mb-6 flex items-baseline gap-2">
-                  <span class="text-sm text-slate-400">订购数量</span>
+              <!-- 独立商品描述区块 -->
+              <div class="mb-6 flex-1">
+                <h3
+                  class="mb-3 text-sm font-bold tracking-widest text-slate-400 uppercase"
+                >
+                  配件参数与描述
+                </h3>
+                <div
+                  class="relative rounded-2xl bg-slate-50/80 p-5 text-slate-600 ring-1 ring-slate-100/50 ring-inset"
+                >
+                  <p class="text-justify text-sm leading-relaxed">
+                    {{ accessoryDetail.description ?? "暂无配件描述" }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- 双栏网格联系方式卡片 (与产品页不同) -->
+              <div class="mb-8">
+                <h3
+                  class="mb-3 text-sm font-bold tracking-widest text-slate-400 uppercase"
+                >
+                  采购与技术支持
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                  <div
+                    class="flex flex-col items-start rounded-2xl border border-blue-100 bg-blue-50/30 p-4 transition-colors hover:bg-blue-50"
+                  >
+                    <div
+                      class="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100/50 text-blue-600"
+                    >
+                      <Phone class="h-4 w-4" />
+                    </div>
+                    <span class="text-xs text-slate-500">咨询热线</span>
+                    <span
+                      class="mt-0.5 font-mono text-sm font-bold text-slate-800"
+                      >400-123-4567</span
+                    >
+                  </div>
+                  <div
+                    class="flex flex-col items-start rounded-2xl border border-blue-100 bg-blue-50/30 p-4 transition-colors hover:bg-blue-50"
+                  >
+                    <div
+                      class="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100/50 text-blue-600"
+                    >
+                      <Mail class="h-4 w-4" />
+                    </div>
+                    <span class="text-xs text-slate-500">电子邮箱</span>
+                    <span
+                      class="mt-0.5 font-mono text-sm font-bold text-slate-800"
+                      >sales@example.com</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- 下单操作区 -->
+              <div class="mt-auto border-t border-gray-100 pt-6">
+                <div class="mb-4 flex items-baseline gap-2">
+                  <span class="text-sm font-medium text-slate-800"
+                    >选择订购数量</span
+                  >
                 </div>
                 <div class="flex flex-col gap-4 sm:flex-row">
                   <el-input-number
@@ -171,8 +192,20 @@
                     class="flex! h-auto! flex-1! items-center justify-center rounded-xl! px-8! py-3! text-base! font-bold! shadow-lg! shadow-blue-200! hover:shadow-blue-300! sm:w-64! sm:flex-initial!"
                   >
                     <ShoppingCart class="mr-2 h-5 w-5" />
-                    立即下单
+                    加入采购单
                   </el-button>
+                </div>
+
+                <!-- 新增购买提示 -->
+                <div class="mt-4 flex items-center text-sm text-slate-500">
+                  <Info class="mr-1.5 h-4 w-4 shrink-0 text-blue-500" />
+                  <span
+                    >如需购买，请联系我们的电话：<a
+                      href="tel:4001234567"
+                      class="font-medium text-blue-600 hover:underline"
+                      >400-123-4567</a
+                    ></span
+                  >
                 </div>
               </div>
             </div>
@@ -253,6 +286,7 @@ import {
   CheckCircle,
   ChevronRight,
   ImageOff,
+  Info,
   Mail,
   Phone,
   ShieldCheck,

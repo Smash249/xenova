@@ -16,6 +16,9 @@ type UpdateUserInfoReq struct {
 	UserName string `json:"userName" validate:"required,min=2,max=20"`
 	Phone    string `json:"phone" validate:"required,phone"`
 }
+type UpdateAdminInfoReq struct {
+	UserName string `json:"userName" validate:"required"`
+}
 
 type ChangePasswordReq struct {
 	OldPassword string `json:"oldPassword" validate:"required,min=8,max=20"`
