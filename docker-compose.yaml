@@ -1,0 +1,77 @@
+version: '1.0.0'
+
+services:
+  mysql:
+    container_name: "xenova-mysql"
+    image: "mysql:8.0"
+    ports:
+      - "3399:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 2495592289
+      MYSQL_DATABASE: xenova
+      MYSQL_USER: xenova_user
+      MYSQL_PASSWORD: xenova_pass
+    volumes:
+      - ./data/mysql-data:/var/lib/mysql
+      - ./data/mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - xenona-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p2495592289"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: "xenova-redis"
+    image: "redis:alpine"
+    ports:
+      - "6399:6379"
+    volumes:
+      - ./data/redis-data:/data
+    networks:
+      - xenona-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    container_name: "xenova-backend"
+    image: "xenova-backend:latest"
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./backend/uploads:/app/uploads 
+    networks:
+      - xenona-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  
+  frontend:
+    container_name: "xenova-frontend"
+    image: "xenova-frontend:latest"
+    ports:
+      - "8081:80"
+    networks:
+      - xenona-network
+    depends_on:
+      - backend
+  
+  admin:
+    container_name: "xenova-admin"
+    image: "xenova-admin:latest"
+    ports:
+      - "8082:80"
+    networks:
+      - xenona-network
+    depends_on:
+      - backend
+
+networks:
+  xenona-network:
+    driver: bridge

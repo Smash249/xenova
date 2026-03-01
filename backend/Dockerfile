@@ -26,6 +26,8 @@ COPY --from=builder /app/main .
 COPY --from=builder /app/config ./config
 
 
+
+
 EXPOSE 8099
 
 

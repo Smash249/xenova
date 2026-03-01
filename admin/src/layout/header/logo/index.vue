@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
 
-import Logo from '@/components/AppLogo.vue'
 import { useInjection } from '@/composables'
 import { layoutInjectionKey } from '@/injection'
 import { toRefsPreferencesStore, DEFAULT_PREFERENCES_OPTIONS } from '@/stores'
@@ -9,8 +8,6 @@ import { toRefsPreferencesStore, DEFAULT_PREFERENCES_OPTIONS } from '@/stores'
 defineOptions({
   name: 'Logo',
 })
-
-const APP_NAME = import.meta.env.VITE_APP_NAME
 
 const { minWidth: defaultMinWidth, width: defaultWidth } = DEFAULT_PREFERENCES_OPTIONS.sidebarMenu
 

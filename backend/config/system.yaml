@@ -3,16 +3,16 @@ Router:
 
 Database:
   mysqlConfig:
-    dsn: "root:2495592289@tcp(127.0.0.1:3306)/xenova?charset=utf8mb4&parseTime=True&loc=Local"
+    dsn: "root:2495592289@tcp(xenova-mysql:3306)/xenova?charset=utf8mb4&parseTime=True&loc=Local"
     defaultStringSize: 256
     disableDatetimePrecision: true
 
 Redis:
-  host: 127.0.0.1
+  host: xenova-redis  
   port: 6379
   db: 0
-  password:
-
+  password:   
+          
 Jwt:
   signingKey: "xenova@2026!!"
   refresh_exp: 72
