@@ -19,10 +19,7 @@
             <h2
               class="text-4xl font-extrabold tracking-tight text-slate-900 md:text-5xl"
             >
-              关于<span
-                class="bg-linear-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent"
-                >我们</span
-              >
+              关于我们
             </h2>
             <p
               class="border-l-4 border-blue-600 pl-4 text-xl font-semibold text-slate-700"
@@ -37,12 +34,17 @@
 
           <div class="flex flex-wrap gap-4">
             <button
-              class="group flex items-center gap-2 rounded-full bg-blue-600 px-8 py-3.5 font-medium text-white shadow-lg transition-all duration-300 hover:bg-blue-700 hover:shadow-blue-500/30"
+              class="group relative overflow-hidden rounded-full bg-[#b8dcf2] px-8 py-3 font-bold tracking-wider text-[#0062b1] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#a6d1eb] hover:shadow-md"
             >
-              了解更多
-              <ArrowRight
-                class="h-5 w-5 transition-transform group-hover:translate-x-1"
-              />
+              <div
+                class="absolute inset-0 z-0 h-full w-full -translate-x-full bg-linear-to-r from-transparent via-white/80 to-transparent transition-transform duration-700 ease-in-out group-hover:translate-x-full"
+              ></div>
+              <span class="relative z-10 flex items-center gap-2 text-lg">
+                立即联系我们
+                <ArrowRight
+                  class="h-5 w-5 transition-transform group-hover:translate-x-1"
+                />
+              </span>
             </button>
           </div>
         </div>
@@ -85,7 +87,7 @@
         </div>
       </div>
 
-      <div class="mt-20">
+      <div class="mt-20" ref="statsContainerRef">
         <div class="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5">
           <div
             v-for="(item, index) in stats"
@@ -95,7 +97,7 @@
             <div
               class="mb-2 inline-block origin-center text-3xl font-bold text-blue-600 transition-transform duration-300 group-hover:scale-110 md:text-4xl"
             >
-              {{ item.value }}
+              {{ item.current }}{{ item.suffix }}
             </div>
             <div class="text-sm font-medium text-slate-500 md:text-base">
               {{ item.label }}
@@ -108,18 +110,55 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowRight, CheckCircle } from "lucide-vue-next"
+import { useIntersectionObserver } from "@vueuse/core"
+import { CheckCircle } from "lucide-vue-next"
+import { reactive, ref } from "vue"
 
-interface StatItem {
-  value: string
-  label: string
+const statsContainerRef = ref(null)
+
+const stats = reactive([
+  { target: 15, current: 0, suffix: "年", label: "行业经验" },
+  { target: 1500, current: 0, suffix: "m²", label: "制造基地" },
+  { target: 100, current: 0, suffix: "+", label: "客户群体" },
+  { target: 500, current: 0, suffix: "+", label: "累计发货" },
+  { target: 5, current: 0, suffix: "+", label: "每月发货非标设备" },
+])
+
+function AnimateNumbers() {
+  const duration = 2000
+  const startTime = performance.now()
+
+  function Step(currentTime: number) {
+    const elapsedTime = currentTime - startTime
+    const progress = Math.min(elapsedTime / duration, 1)
+
+    const easeOutProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
+
+    stats.forEach((stat) => {
+      stat.current = Math.floor(easeOutProgress * stat.target)
+    })
+
+    if (progress < 1) {
+      requestAnimationFrame(Step)
+    } else {
+      stats.forEach((stat) => {
+        stat.current = stat.target
+      })
+    }
+  }
+
+  requestAnimationFrame(Step)
 }
 
-const stats: StatItem[] = [
-  { value: "15年", label: "行业经验" },
-  { value: "1500m²", label: "制造基地" },
-  { value: "100+", label: "客户群体" },
-  { value: "500+", label: "累计发货" },
-  { value: "5+", label: "每月发货非标设备" },
-]
+const { stop } = useIntersectionObserver(
+  statsContainerRef,
+  (entries) => {
+    const entry = entries[0]
+    if (entry?.isIntersecting) {
+      AnimateNumbers()
+      stop()
+    }
+  },
+  { threshold: 0.2 }
+)
 </script>

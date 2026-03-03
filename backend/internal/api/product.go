@@ -117,6 +117,18 @@ func (p *productApi) UpdateProduct(ctx *echo.Context) error {
 	return utils.SuccessApiResponse(ctx, "更新成功", http.StatusOK)
 }
 
+func (p *productApi) UpdateProductHotStatus(ctx *echo.Context) error {
+	updateHotStatusReq, err := utils.BindAndValidate[request.UpdateProductHotStatusReq](ctx)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	err = productServiceApp.UpdateProductHotStatus(updateHotStatusReq)
+	if err != nil {
+		return utils.ErrorApiResponse(ctx, err.Error(), http.StatusBadRequest)
+	}
+	return utils.SuccessApiResponse(ctx, "更新成功", http.StatusOK)
+}
+
 func (p *productApi) DeleteProduct(ctx *echo.Context) error {
 	deleteProductReq, err := utils.BindAndValidate[request.DeleteProductReq](ctx)
 	if err != nil {

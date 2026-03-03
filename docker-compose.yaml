@@ -39,11 +39,11 @@ services:
 
   backend:
     container_name: "xenova-backend"
-    image: "xenova-backend:latest"
+    image: "crpi-8xnx0pvmu0k6hjh4.cn-hongkong.personal.cr.aliyuncs.com/smash249/xenova-backend:latest"
     ports:
       - "8089:8089"
     volumes:
-      - ./backend/uploads:/app/uploads 
+      - ./data/uploads:/app/uploads 
     networks:
       - xenona-network
     depends_on:
@@ -54,7 +54,7 @@ services:
   
   frontend:
     container_name: "xenova-frontend"
-    image: "xenova-frontend:latest"
+    image: "crpi-8xnx0pvmu0k6hjh4.cn-hongkong.personal.cr.aliyuncs.com/smash249/xenova-frontend:latest"
     ports:
       - "8081:80"
     networks:
@@ -64,7 +64,7 @@ services:
   
   admin:
     container_name: "xenova-admin"
-    image: "xenova-admin:latest"
+    image: "crpi-8xnx0pvmu0k6hjh4.cn-hongkong.personal.cr.aliyuncs.com/smash249/xenova-admin:latest"
     ports:
       - "8082:80"
     networks:

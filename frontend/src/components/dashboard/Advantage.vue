@@ -14,75 +14,62 @@
       class="absolute top-0 left-0 -z-10 h-64 w-full bg-linear-to-b from-slate-50 to-transparent"
     ></div>
 
-    <div class="relative z-10 container mx-auto px-6 lg:px-12">
-      <!-- 移除了初始的 opacity-0 和 translate-y-8 -->
-      <div class="header-group relative mb-16">
-        <h2
-          class="flex items-center gap-3 text-4xl font-black tracking-tight text-slate-900 md:text-5xl"
-        >
-          <span
-            class="bg-linear-to-r from-blue-700 to-indigo-600 bg-clip-text text-transparent"
-          >
-            产品优势
-          </span>
-          <span class="h-3 w-3 animate-pulse rounded-full bg-blue-600"></span>
+    <div class="relative z-10 container mx-auto px-6 py-16 lg:px-12">
+      <div class="header-group relative mb-8">
+        <div class="mb-1 flex items-end gap-2">
+          <span class="text-3xl font-medium tracking-wide">Quality</span>
+          <div class="mb-2 h-0.5 w-12"></div>
+        </div>
+        <h2 class="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
+          星实设备·以质取胜
         </h2>
-        <div
-          class="mt-4 h-1 w-24 rounded-full bg-linear-to-r from-blue-600 to-transparent"
-        ></div>
+        <p
+          class="text-sm font-medium tracking-wide text-slate-800 md:text-base"
+        >
+          用数据捍卫标准，以专业定义可靠——因为信任始于真实，卓越源于对品质的执着
+        </p>
       </div>
 
-      <div class="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <!-- 移除了初始的 opacity-0 和 translate-y-4 -->
+      <div class="mb-10 grid grid-cols-2 md:grid-cols-4">
         <button
           v-for="(item, index) in systemConfig.advantages"
           :key="index"
-          @click="handleTabClick(index)"
-          class="gsap-tab-btn group relative flex h-32 cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border transition-all duration-300"
+          @click="HandleTabClick(index)"
+          class="gsap-tab-btn group relative flex h-24 cursor-pointer flex-col items-center justify-center gap-1 border-r border-white/50 transition-all duration-300 last:border-r-0 md:h-28"
           :class="
             activeTab === index
-              ? 'z-10 -translate-y-1 border-blue-600 bg-blue-600 shadow-xl shadow-blue-600/30'
-              : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/50'
+              ? 'bg-[#4773c4]'
+              : 'bg-[#999999] hover:bg-[#8c8c8c]'
           "
         >
-          <div
-            v-if="activeTab === index"
-            class="pointer-events-none absolute inset-0 bg-linear-to-br from-white/10 to-transparent"
-          ></div>
           <span
-            class="absolute top-2 right-4 text-4xl font-black italic opacity-20 transition-colors select-none"
-            :class="activeTab === index ? 'text-white' : 'text-slate-300'"
+            class="text-3xl font-bold transition-colors duration-300 md:text-4xl"
+            :class="
+              activeTab === index
+                ? 'text-white'
+                : 'text-[#7cb0e5] group-hover:text-[#6ba1d9]'
+            "
           >
-            {{ item.id }}
+            {{ String(index + 1).padStart(2, "0") }}
           </span>
-          <component
-            :is="item.icon"
-            class="relative z-10 h-8 w-8 transition-colors duration-300"
-            :class="
-              activeTab === index
-                ? 'text-white'
-                : 'text-slate-500 group-hover:text-blue-500'
-            "
-          />
           <span
-            class="relative z-10 text-lg font-bold transition-colors duration-300"
+            class="px-2 text-center text-xs font-medium transition-colors duration-300 md:text-sm"
             :class="
               activeTab === index
                 ? 'text-white'
-                : 'text-slate-600 group-hover:text-blue-600'
+                : 'text-slate-900 group-hover:text-black'
             "
           >
-            {{ item.tabTitle }}
+            {{ tabTitles[index] || item.tabTitle }}
           </span>
         </button>
       </div>
 
       <div
         ref="contentContainerRef"
-        class="relative min-h-125 overflow-hidden rounded-2xl border border-slate-100 bg-white"
+        class="relative min-h-125 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm"
       >
         <div class="grid h-full grid-cols-1 lg:grid-cols-12">
-          <!-- 移除了初始的 opacity-0 -->
           <div
             class="left-panel-block group relative h-64 overflow-hidden lg:col-span-5 lg:h-full"
           >
@@ -97,23 +84,22 @@
             <div
               class="absolute top-6 left-6 z-20 rounded bg-white/90 px-4 py-1 text-sm font-bold text-blue-800 shadow-sm backdrop-blur"
             >
-              {{ currentItem?.tabTitle }} VIEW
+              {{ tabTitles[activeTab] || currentItem?.tabTitle }} VIEW
             </div>
           </div>
 
-          <!-- 移除了初始的 opacity-0 -->
           <div
             class="right-panel-block relative flex flex-col justify-center bg-white p-8 lg:col-span-7 lg:p-14"
           >
             <span
               class="absolute top-6 right-6 z-0 text-9xl font-black text-slate-50 select-none"
             >
-              {{ currentItem?.id }}
+              {{ String(activeTab + 1).padStart(2, "0") }}
             </span>
 
             <div class="relative z-10">
               <span
-                class="mb-2 block text-sm font-bold tracking-widest text-blue-600 uppercase"
+                class="mb-2 block text-sm font-bold tracking-widest text-[#4773c4] uppercase"
               >
                 {{ currentItem?.subTitle }}
               </span>
@@ -123,7 +109,7 @@
               >
                 {{ currentItem?.headline }}
               </h3>
-              <div class="mb-8 h-1.5 w-20 rounded-full bg-blue-600"></div>
+              <div class="mb-8 h-1.5 w-20 rounded-full bg-[#4773c4]"></div>
 
               <ul class="mb-12 space-y-6">
                 <li
@@ -134,7 +120,7 @@
                   <div
                     class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-50 transition-colors group-hover/item:bg-blue-100"
                   >
-                    <div class="h-2 w-2 rounded-full bg-blue-600"></div>
+                    <div class="h-2 w-2 rounded-full bg-[#4773c4]"></div>
                   </div>
                   <p
                     class="text-justify text-lg leading-relaxed text-slate-600 transition-colors group-hover/item:text-slate-900"
@@ -154,7 +140,7 @@
                     class="flex items-center gap-3"
                   >
                     <div
-                      class="flex h-12 w-12 items-center justify-center rounded-lg border border-slate-200 bg-white text-blue-600 shadow-sm"
+                      class="flex h-12 w-12 items-center justify-center rounded-lg border border-slate-200 bg-white text-[#4773c4] shadow-sm"
                     >
                       <component :is="stat.icon" class="h-6 w-6" />
                     </div>
@@ -164,9 +150,9 @@
                       >
                         <span
                           class="gsap-counter"
-                          :data-target="parseNumber(stat.value)"
-                          >{{ parseNumber(stat.value) }}</span
-                        >{{ getSuffix(stat.value) }}
+                          :data-target="ParseNumber(stat.value)"
+                          >{{ ParseNumber(stat.value) }}</span
+                        >{{ GetSuffix(stat.value) }}
                       </div>
                       <div class="mt-1 text-xs text-slate-500 uppercase">
                         {{ stat.label }}
@@ -179,7 +165,7 @@
                 ></div>
                 <div class="hidden text-right sm:block">
                   <span
-                    class="text-xs font-bold tracking-widest text-blue-600/80"
+                    class="text-xs font-bold tracking-widest text-[#4773c4]/80"
                     >XINGSHI · TECH</span
                   >
                 </div>
@@ -206,28 +192,35 @@ const activeTab = ref(0)
 const isAnimating = ref(false)
 const currentItem = computed(() => systemConfig.advantages[activeTab.value])
 
-function startAutoTab() {
+const tabTitles = [
+  "卓越的工程设计质量",
+  "可靠的零部件与制造质量",
+  "稳定的过程控制与调试质量",
+  "卓越的长期运行与服务质量",
+]
+
+function StartAutoTab() {
   if (timer) clearInterval(timer)
   timer = setInterval(() => {
     let nextIndex = activeTab.value + 1
     if (nextIndex >= systemConfig.advantages.length) {
       nextIndex = 0
     }
-    handleTabClick(nextIndex)
+    HandleTabClick(nextIndex)
   }, 4000)
 }
 
-function parseNumber(str: string) {
+function ParseNumber(str: string) {
   const match = str.match(/\d+(\.\d+)?/)
   return match ? parseFloat(match[0]) : 0
 }
 
-function getSuffix(str: string) {
+function GetSuffix(str: string) {
   const match = str.replace(/[\d\.]/g, "")
   return match
 }
 
-function animateContentIn() {
+function AnimateContentIn() {
   if (!contentContainerRef.value) return
   gsap.killTweensOf(".gsap-counter")
 
@@ -269,7 +262,7 @@ function animateContentIn() {
   )
 }
 
-async function animateContentOut() {
+async function AnimateContentOut() {
   if (!contentContainerRef.value) return
   await gsap.to([".left-panel-block", ".right-panel-block"], {
     opacity: 0,
@@ -280,21 +273,21 @@ async function animateContentOut() {
   })
 }
 
-async function handleTabClick(index: number) {
+async function HandleTabClick(index: number) {
   if (activeTab.value === index || isAnimating.value) return
   isAnimating.value = true
-  startAutoTab()
-  await animateContentOut()
+  StartAutoTab()
+  await AnimateContentOut()
   activeTab.value = index
   await nextTick()
-  animateContentIn()
+  AnimateContentIn()
 }
 
 onMounted(() => {
   ctx = gsap.context(() => {
-    animateContentIn()
+    AnimateContentIn()
   }, contentContainerRef.value || undefined)
-  startAutoTab()
+  StartAutoTab()
 })
 
 onUnmounted(() => {

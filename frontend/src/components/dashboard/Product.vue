@@ -25,12 +25,7 @@
         <h2
           class="flex items-center gap-3 text-4xl font-black tracking-tight text-slate-900 md:text-5xl"
         >
-          <span
-            class="bg-linear-to-r from-blue-700 to-indigo-600 bg-clip-text text-transparent"
-          >
-            热门产品系列
-          </span>
-          <span class="h-3 w-3 animate-pulse rounded-full bg-blue-600"></span>
+          <span class="text-black"> 热门产品系列 </span>
         </h2>
         <div
           class="mt-4 h-1 w-24 rounded-full bg-linear-to-r from-blue-600 to-transparent"
@@ -38,10 +33,23 @@
       </div>
 
       <div
+        v-if="isLoading"
+        class="flex min-h-[50vh] flex-col items-center justify-center"
+      >
+        <div
+          class="mb-6 h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600"
+        ></div>
+        <p class="text-lg font-medium tracking-widest text-slate-500">
+          数据加载中...
+        </p>
+      </div>
+
+      <div
+        v-else-if="products.length > 0"
         class="grid grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-24"
-        @mouseenter="handleMouseEnter"
-        @mouseleave="handleMouseLeave"
-        @mousemove="handleMouseMove"
+        @mouseenter="HandleMouseEnter"
+        @mouseleave="HandleMouseLeave"
+        @mousemove="HandleMouseMove"
       >
         <!-- 左侧-->
         <div class="group perspective-1000 relative">
@@ -72,7 +80,7 @@
             >
               <img
                 ref="productImageRef"
-                :src="currentProduct?.image"
+                :src="currentProduct?.cover || currentProduct?.image"
                 :alt="currentProduct?.name"
                 class="h-full w-full object-cover will-change-transform"
               />
@@ -90,14 +98,14 @@
               <div
                 class="anim-text stroke-text absolute -top-16 -left-4 -z-10 bg-linear-to-b from-slate-200 to-white bg-clip-text font-mono text-9xl font-black tracking-tighter text-transparent opacity-60 select-none"
               >
-                {{ currentProduct?.id }}
+                {{ String(currentIndex + 1).padStart(2, "0") }}
               </div>
 
               <div
                 class="anim-text mb-2 flex items-center gap-3 font-mono text-sm font-bold tracking-wider text-blue-600"
               >
                 <Zap class="h-4 w-4 fill-current" />
-                PRODUCT_{{ currentProduct?.id }}
+                PRODUCT_{{ String(currentIndex + 1).padStart(2, "0") }}
               </div>
 
               <h3
@@ -108,12 +116,14 @@
               <p
                 class="anim-text mt-1 text-lg font-medium tracking-wide text-slate-400 uppercase"
               >
-                {{ currentProduct?.subtitle }}
+                {{ currentProduct?.seriesId }}
               </p>
             </div>
             <ul class="space-y-4 pt-4">
               <li
-                v-for="(feature, idx) in currentProduct?.features"
+                v-for="(feature, idx) in FormatFeatures(
+                  currentProduct?.description
+                )"
                 :key="`${currentProduct?.id}-feat-${idx}`"
                 class="anim-text flex items-center text-lg text-slate-700"
               >
@@ -125,6 +135,7 @@
             </ul>
             <div class="anim-text flex items-center gap-6 pt-8">
               <button
+                @click="GoToDetail(currentProduct?.id)"
                 class="group relative overflow-hidden rounded-sm bg-slate-900 px-8 py-3.5 font-bold text-white transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
               >
                 <span class="relative z-10 flex items-center gap-2">
@@ -155,13 +166,13 @@
 
             <div class="flex gap-2">
               <button
-                @click="manualChangeSlide(-1)"
+                @click="ManualChangeSlide(-1)"
                 class="flex h-10 w-10 items-center justify-center rounded-sm border border-slate-300 text-slate-600 transition-all hover:border-blue-600 hover:bg-blue-50 hover:text-blue-600"
               >
                 <ChevronLeft class="h-5 w-5" />
               </button>
               <button
-                @click="manualChangeSlide(1)"
+                @click="ManualChangeSlide(1)"
                 class="flex h-10 w-10 items-center justify-center rounded-sm border border-slate-300 text-slate-600 transition-all hover:border-blue-600 hover:bg-blue-50 hover:text-blue-600"
               >
                 <ChevronRight class="h-5 w-5" />
@@ -170,27 +181,54 @@
           </div>
         </div>
       </div>
+
+      <!-- 空数据状态 -->
+      <div
+        v-else
+        class="flex min-h-[50vh] flex-col items-center justify-center opacity-80"
+      >
+        <Inbox class="mb-6 h-24 w-24 stroke-1 text-slate-300" />
+        <p class="text-xl font-medium tracking-wider text-slate-500">
+          暂无热门产品
+        </p>
+        <p class="mt-2 text-sm text-slate-400">敬请期待更多精彩内容上新</p>
+      </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { GetHotProductListApi } from "@/api/product"
 import gsap from "gsap"
 import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
   Crosshair,
+  Inbox,
   Zap,
 } from "lucide-vue-next"
 import { computed, nextTick, onMounted, onUnmounted, ref } from "vue"
+import { useRouter } from "vue-router"
 
-import { systemConfig } from "@/config/header"
+interface Product {
+  id: number
+  name: string
+  seriesId: string
+  image: string
+  description: string
+  cover: string
+  previews: string[]
+}
+
+const router = useRouter()
 
 let ctx: gsap.Context | null = null
 let autoPlayTween: gsap.core.Tween | null = null
 const AUTO_PLAY_TIME = 5
 
+const isLoading = ref(true)
+const products = ref<Product[]>([])
 const currentIndex = ref(0)
 const isAnimating = ref(false)
 const containerRef = ref<HTMLElement | null>(null)
@@ -199,23 +237,41 @@ const progressBarRef = ref<HTMLElement | null>(null)
 const productImageRef = ref<HTMLElement | null>(null)
 const decorationRef = ref<HTMLElement | null>(null)
 
-const currentProduct = computed(() => systemConfig.products[currentIndex.value])
+const currentProduct = computed(() => products.value[currentIndex.value])
 
-function animateIn() {
+function FormatFeatures(description?: string) {
+  if (!description) return []
+  return description.split(/[\n；;]/).filter((item) => item.trim().length > 0)
+}
+
+async function FetchHotProducts() {
+  isLoading.value = true
+  try {
+    const data = await GetHotProductListApi()
+    products.value = data || []
+  } catch (error) {
+    console.error("获取热门产品失败:", error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+function GoToDetail(productId?: number) {
+  if (!productId) return
+  router.push({ name: "productDetail", params: { product_id: productId } })
+}
+
+function AnimateIn() {
   if (!containerRef.value || !rightSideRef.value || !productImageRef.value) {
     return
   }
 
   const animTexts = rightSideRef.value.querySelectorAll(".anim-text")
 
-  if (animTexts.length === 0) {
-    console.warn("No .anim-text elements found")
-  }
-
   const tl = gsap.timeline({
     onComplete: () => {
       isAnimating.value = false
-      startAutoPlay()
+      StartAutoPlay()
     },
   })
 
@@ -249,7 +305,7 @@ function animateIn() {
   return tl
 }
 
-function animateOut() {
+function AnimateOut() {
   if (!rightSideRef.value || !productImageRef.value) {
     return gsap.timeline()
   }
@@ -279,15 +335,15 @@ function animateOut() {
   return tl
 }
 
-function manualChangeSlide(dir: number) {
+function ManualChangeSlide(dir: number) {
+  if (products.value.length === 0) return
   const next =
-    (currentIndex.value + dir + systemConfig.products.length) %
-    systemConfig.products.length
-  switchSlide(next)
+    (currentIndex.value + dir + products.value.length) % products.value.length
+  SwitchSlide(next)
 }
 
-function startAutoPlay() {
-  if (!progressBarRef.value) return
+function StartAutoPlay() {
+  if (!progressBarRef.value || products.value.length === 0) return
   if (autoPlayTween) autoPlayTween.kill()
   autoPlayTween = gsap.fromTo(
     progressBarRef.value,
@@ -297,22 +353,22 @@ function startAutoPlay() {
       duration: AUTO_PLAY_TIME,
       ease: "none",
       onComplete: () => {
-        const next = (currentIndex.value + 1) % systemConfig.products.length
-        switchSlide(next)
+        const next = (currentIndex.value + 1) % products.value.length
+        SwitchSlide(next)
       },
     }
   )
 }
 
-function handleMouseEnter() {
+function HandleMouseEnter() {
   if (!isAnimating.value && autoPlayTween) autoPlayTween.pause()
 }
 
-function handleMouseLeave() {
+function HandleMouseLeave() {
   if (!isAnimating.value && autoPlayTween) autoPlayTween.play()
 }
 
-function handleMouseMove(e: MouseEvent) {
+function HandleMouseMove(e: MouseEvent) {
   if (!containerRef.value) return
   const x = (e.clientX / window.innerWidth - 0.5) * 2
   const y = (e.clientY / window.innerHeight - 0.5) * 2
@@ -333,19 +389,26 @@ function handleMouseMove(e: MouseEvent) {
   })
 }
 
-async function switchSlide(newIndex: number) {
+async function SwitchSlide(newIndex: number) {
   if (isAnimating.value) return
   isAnimating.value = true
   if (autoPlayTween) autoPlayTween.pause()
-  await animateOut().then()
+  await AnimateOut().then()
   currentIndex.value = newIndex
   await nextTick()
-  animateIn()
+  AnimateIn()
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await FetchHotProducts()
+
   nextTick(() => {
-    if (!containerRef.value || !decorationRef.value) return
+    if (
+      !containerRef.value ||
+      !decorationRef.value ||
+      products.value.length === 0
+    )
+      return
 
     ctx = gsap.context(() => {
       const decorations =
@@ -357,11 +420,11 @@ onMounted(() => {
           opacity: 0,
           duration: 1,
           stagger: 0.2,
-          ease: "elastic.out(1, 0.5)",
+          ease: "elastic.out(1,0.5)",
         })
       }
 
-      animateIn()
+      AnimateIn()
     }, containerRef.value)
   })
 })

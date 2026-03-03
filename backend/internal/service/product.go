@@ -55,6 +55,9 @@ func (p *ProductService) DeleteProductSeries(params request.DeleteProductSeriesR
 // GetProductList 获取产品列表
 func (p *ProductService) GetProductList(params request.GetProductReq) (*global.PaginatorResp[models.Product], error) {
 	query := global.DB.Model(&models.Product{})
+	if params.IsHot {
+		query = query.Where("is_hot = ?", params.IsHot)
+	}
 	if params.SeriesID != 0 {
 		query = query.Where("series_id = ?", params.SeriesID)
 	}
@@ -97,6 +100,7 @@ func (p *ProductService) CreateProduct(params request.CreateProductReq) error {
 		Cover:       params.Cover,
 		Previews:    params.Previews,
 		SeriesID:    params.SeriesID,
+		IsHot:       params.IsHot,
 	}).Error
 }
 
@@ -108,7 +112,13 @@ func (p *ProductService) UpdateProduct(params request.UpdateProductReq) error {
 		Cover:       params.Cover,
 		Previews:    params.Previews,
 		SeriesID:    params.SeriesID,
+		IsHot:       params.IsHot,
 	}).Error
+}
+
+// UpdateProductHotStatus 更新产品热门状态
+func (p *ProductService) UpdateProductHotStatus(params request.UpdateProductHotStatusReq) error {
+	return global.DB.Model(&models.Product{}).Where("id = ?", params.ID).Update("is_hot", params.IsHot).Error
 }
 
 // DeleteProduct 删除产品

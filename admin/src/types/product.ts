@@ -18,16 +18,20 @@ interface Product extends BaseResponse {
   description: string
   cover: string
   previews: string[]
+  is_hot: boolean
 }
 
 type CreateProductParams = Omit<Product, 'id' | 'created_at' | 'updated_at'>
 
 type UpdateProductParams = CreateProductParams & { id: number }
 
+type UpdateProductHotParams = { is_hot: boolean } & { id: number }
+
 export type {
   ProductSeries,
   CreateProductSeriesParams,
   UpdateProductSeriesParams,
+  UpdateProductHotParams,
   Product,
   CreateProductParams,
   UpdateProductParams,

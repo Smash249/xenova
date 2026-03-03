@@ -15,10 +15,7 @@
         <h2
           class="mb-6 text-4xl font-extrabold tracking-tight text-slate-900 md:text-5xl"
         >
-          我们的<span
-            class="bg-linear-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent"
-            >业务领域</span
-          >
+          我们的业务领域
         </h2>
         <p class="text-lg leading-relaxed text-slate-600">
           我们专注于自动化设备制造和企业咨询服务两大核心业务，致力于为客户提供全方位的智能制造解决方案，助力产业升级。

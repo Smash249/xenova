@@ -14,6 +14,7 @@ interface Product extends BaseResponse {
   cover: string
   previews: string[]
 }
+
 interface ProductDetail extends BaseResponse {
   id: number
   name: string

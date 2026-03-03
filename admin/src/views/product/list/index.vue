@@ -12,6 +12,7 @@ import {
   NPagination,
   NDropdown,
   NImage,
+  NTag,
 } from 'naive-ui'
 import { reactive, ref, useTemplateRef, computed, onMounted } from 'vue'
 
@@ -113,6 +114,28 @@ const columns = computed<DataTableColumns<Product>>(() => {
       key: 'name',
       title: '产品名称',
       width: 150,
+    },
+    {
+      key: 'is_hot',
+      title: '是否热门',
+      width: 100,
+      align: 'center',
+      render: (row: any) =>
+        row.is_hot ? (
+          <NTag
+            type='error'
+            size='small'
+          >
+            热门
+          </NTag>
+        ) : (
+          <NTag
+            type='default'
+            size='small'
+          >
+            否
+          </NTag>
+        ),
     },
     {
       key: 'cover',

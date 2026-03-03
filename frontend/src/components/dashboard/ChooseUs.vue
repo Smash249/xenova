@@ -26,15 +26,7 @@
               class="gsap-text-reveal mb-6 text-4xl leading-tight font-black text-slate-900 lg:text-5xl"
             >
               为什么选择 <br />
-              <span
-                class="relative inline-block bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-              >
-                星实科技
-                <span
-                  class="gsap-highlight absolute bottom-1 left-0 -z-10 h-3 w-full origin-left scale-x-0 bg-blue-200/30"
-                ></span>
-              </span>
-              ?
+              星实科技 ?
             </h2>
 
             <p
@@ -57,15 +49,15 @@
 
           <div class="gsap-btn-wrapper pt-4">
             <button
-              class="group relative overflow-hidden rounded-lg bg-blue-600 px-8 py-3 font-bold text-white shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-1 hover:shadow-blue-600/50"
+              class="group relative overflow-hidden rounded-full bg-[#b8dcf2] px-8 py-3 font-bold tracking-wider text-[#0062b1] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#a6d1eb] hover:shadow-md"
             >
               <div
-                class="animate-shimmer absolute inset-0 h-full w-full -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full group-hover:animate-none"
+                class="absolute inset-0 z-0 h-full w-full -translate-x-full bg-linear-to-r from-transparent via-white/80 to-transparent transition-transform duration-700 ease-in-out group-hover:translate-x-full"
               ></div>
-              <span class="relative z-10 flex items-center gap-2">
+              <span class="relative z-10 flex items-center gap-2 text-lg">
                 了解更多
                 <ArrowRight
-                  class="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  class="h-5 w-5 transition-transform group-hover:translate-x-1"
                 />
               </span>
             </button>
@@ -124,7 +116,6 @@
 <script setup lang="ts">
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ArrowRight } from "lucide-vue-next"
 import { onMounted, onUnmounted, ref } from "vue"
 
 import { systemConfig } from "@/config/header"

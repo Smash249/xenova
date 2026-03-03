@@ -1,5 +1,15 @@
 <script setup lang="tsx">
-import { NButton, NForm, NFormItem, NInput, NModal, NSelect, NSpace, useMessage } from 'naive-ui'
+import {
+  NButton,
+  NForm,
+  NFormItem,
+  NInput,
+  NModal,
+  NSelect,
+  NSpace,
+  NSwitch,
+  useMessage,
+} from 'naive-ui'
 import { ref, useTemplateRef, computed } from 'vue'
 
 import { CreateProductApi, GetProductSeriesListApi, UpdateProductApi } from '@/api/product'
@@ -20,6 +30,7 @@ interface ModelForm {
   image: string
   description: string
   cover: string
+  is_hot: boolean
   previews: string[]
 }
 
@@ -37,6 +48,7 @@ const DEFAULT_MODAL_FORM: ModelForm = {
   image: '',
   description: '',
   cover: '',
+  is_hot: false,
   previews: [],
 }
 
@@ -95,6 +107,7 @@ function Open(action: 'create' | 'update', row?: Product) {
       image: row.image,
       description: row.description,
       cover: row.cover,
+      is_hot: row.is_hot,
       previews: [...row.previews],
     }
   }
@@ -116,6 +129,7 @@ function HandleModalSubmit() {
             description: form.description,
             cover: form.cover,
             previews: form.previews,
+            is_hot: form.is_hot,
           })
           break
         case 'update':
@@ -127,6 +141,7 @@ function HandleModalSubmit() {
             description: form.description,
             cover: form.cover,
             previews: form.previews,
+            is_hot: form.is_hot,
           })
           break
       }
@@ -208,6 +223,16 @@ defineExpose({
               clearable
               filterable
             />
+          </NFormItem>
+          <NFormItem
+            label="是否热门产品"
+            path="is_hot"
+            class="col-span-2 max-md:col-span-1"
+          >
+            <NSpace align="center">
+              <NSwitch v-model:value="modalForm.is_hot" />
+              <span class="text-sm text-gray-500">如果开启，将会作为热门产品展示在前端页面中</span>
+            </NSpace>
           </NFormItem>
         </div>
       </div>

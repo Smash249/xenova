@@ -26,7 +26,8 @@ export const systemConfig: SystemConfig = {
     },
     {
       title: "关于我们",
-      isNav: false,
+      path: "/about",
+      isNav: true,
     },
     {
       title: "产品中心",

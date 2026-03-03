@@ -18,6 +18,7 @@ func initProductRouter() {
 			admin.POST("/products", api.ProductApi.CreateProduct)
 			admin.PUT("/products", api.ProductApi.UpdateProduct)
 			admin.DELETE("/products", api.ProductApi.DeleteProduct)
+			admin.POST("/products/hot", api.ProductApi.UpdateProductHotStatus)
 		},
 	)
 }

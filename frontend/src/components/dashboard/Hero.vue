@@ -62,7 +62,7 @@
 
     <div
       class="group absolute bottom-12 left-1/2 z-20 -translate-x-1/2 cursor-pointer"
-      @click="scrollToContent"
+      @click="ScrollToContent"
     >
       <div
         v-motion
@@ -103,12 +103,32 @@
 </template>
 
 <script setup lang="ts">
-function scrollToContent() {
-  window.scrollTo({
-    top: window.innerHeight,
-    behavior: "smooth",
-  })
+import { onMounted, onUnmounted } from "vue"
+import { useRouter } from "vue-router"
+
+const router = useRouter()
+let isNavigating = false
+
+function ScrollToContent() {
+  if (isNavigating) return
+  isNavigating = true
+  router.push("/about")
 }
+
+function HandleWheel(event: WheelEvent) {
+  if (event.deltaY > 10) {
+    ScrollToContent()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("wheel", HandleWheel, { passive: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener("wheel", HandleWheel)
+  isNavigating = false
+})
 </script>
 
 <style scoped lang="scss"></style>

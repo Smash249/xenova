@@ -3,6 +3,7 @@ import request from '@/utils/request'
 import type {
   CreateProductParams,
   CreateProductSeriesParams,
+  UpdateProductHotParams,
   UpdateProductParams,
   UpdateProductSeriesParams,
 } from '@/types/product'
@@ -40,6 +41,7 @@ export async function UpdateProductSeriesApi(parmas: UpdateProductSeriesParams) 
     throw error
   }
 }
+
 export async function DeleteProductSeriesApi(id_list: number[]) {
   try {
     const result = await request.delete('/admin/product_series', {
@@ -80,6 +82,16 @@ export async function CreateProductApi(params: CreateProductParams) {
 export async function UpdateProductApi(params: UpdateProductParams) {
   try {
     const result = await request.put('/admin/products', params)
+    if (!result || !result.success) throw new Error('请求出错')
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export async function UpdateProductHotStatusApi(params: UpdateProductHotParams) {
+  try {
+    const result = await request.post('/admin/products/hot', params)
     if (!result || !result.success) throw new Error('请求出错')
     return result.data
   } catch (error) {

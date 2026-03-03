@@ -29,6 +29,19 @@ export async function GetProductListApi(
   }
 }
 
+export async function GetHotProductListApi() {
+  const searchParams = new URLSearchParams()
+  searchParams.append("is_hot", "true")
+  const query = searchParams.toString()
+  try {
+    const result = await request.get(`/public/products?${query}`)
+    if (!result || !result.success) throw new Error("请求出错")
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}
+
 export async function GetProductDetailApi(product_id: number) {
   try {
     const result = await request.get(`/private/products/${product_id}`)

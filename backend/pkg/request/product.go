@@ -28,6 +28,7 @@ type GetProductReq struct {
 	global.PaginateReq
 	Name     string `query:"name" json:"name"`
 	SeriesID uint   `query:"series_id" json:"series_id"`
+	IsHot    bool   `query:"is_hot" json:"is_hot"`
 }
 
 type CreateProductReq struct {
@@ -36,6 +37,7 @@ type CreateProductReq struct {
 	Cover       string   `json:"cover" validate:"required"`
 	Previews    []string `json:"previews" validate:"required"`
 	SeriesID    uint     `json:"series_id" validate:"required"`
+	IsHot       bool     `json:"is_hot" validate:"required"`
 }
 
 type UpdateProductReq struct {
@@ -45,6 +47,12 @@ type UpdateProductReq struct {
 	Cover       string   `json:"cover" validate:"required"`
 	Previews    []string `json:"previews" validate:"required"`
 	SeriesID    uint     `json:"series_id" validate:"required"`
+	IsHot       bool     `json:"is_hot" validate:"required"`
+}
+
+type UpdateProductHotStatusReq struct {
+	ID    uint `json:"id" validate:"required"`
+	IsHot bool `json:"is_hot" validate:"required"`
 }
 
 type DeleteProductReq struct {
